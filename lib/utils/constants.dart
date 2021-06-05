@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
 String kPhone = 'Phone';
+String kOtp = 'OTP';
+String kSendOtp = 'Send OTP';
 String kLoginButtonText = 'Enter in to SportsHouse';
 String kInvalidPhone = 'Invalid Phone Number!';
 String kWelcomeToSportsHouse = 'Welcome to SportsHouse';

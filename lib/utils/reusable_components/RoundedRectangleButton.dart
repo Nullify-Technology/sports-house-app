@@ -9,6 +9,7 @@ class RoundedRectangleButton extends StatelessWidget {
     this.borderRadius = 4.0,
     required this.text,
     this.fontWeight = FontWeight.bold,
+    required this.onClick,
   }) : super(key: key);
   final Color background;
   final Color textColor;
@@ -16,6 +17,7 @@ class RoundedRectangleButton extends StatelessWidget {
   final double borderRadius;
   final String text;
   final FontWeight fontWeight;
+  final Function onClick;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class RoundedRectangleButton extends StatelessWidget {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () => onClick(),
             style: ElevatedButton.styleFrom(
               primary: background,
               padding: EdgeInsets.all(15),
