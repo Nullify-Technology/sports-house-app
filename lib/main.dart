@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sports_house/screens/login/login_screen.dart';
+
+import 'package:sports_house/utils/constants.dart';
+
+import 'utils/reusable_components/RoundedRectangleButton.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,7 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sports House',
-      theme: ThemeData.dark().copyWith(),
+      theme: ThemeData(
+        fontFamily: 'Product Sans',
+        colorScheme: ColorScheme.dark().copyWith(
+          primary: kColorGreen,
+        ),
+      ),
       home: MyHomePage(title: 'Sports House'),
     );
   }
@@ -28,15 +38,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    return LoginScreen();
   }
 }
