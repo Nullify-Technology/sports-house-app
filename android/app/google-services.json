@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "639663034253",
+    "project_id": "sports-house-1b0a9",
+    "storage_bucket": "sports-house-1b0a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639663034253:android:5c098ce3f49878ccadb7c4",
+        "android_client_info": {
+          "package_name": "com.sportshouse.sports_house"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639663034253-qaonmir5d9nkm5s22o8glmukkm0ev0fi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH4H3NPyGTqFaIXiXSKOvTKMjfbhTUa2w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639663034253-qaonmir5d9nkm5s22o8glmukkm0ev0fi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
