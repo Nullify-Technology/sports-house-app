@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/services/auth_service.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 

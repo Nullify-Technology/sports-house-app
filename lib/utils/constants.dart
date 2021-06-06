@@ -25,3 +25,7 @@ String kName = 'Full Name';
 String kEnterYourName = 'Enter your Name';
 String kNameCannotBeEmpty = 'Name Cannot Be Empty!';
 String kProfileScreenButtonText = 'Confirm & Update';
+
+final String INVALID_PHONE_NUMBER = "Invalid Phone Number";
+final String OTP_FAILED = "Failed to send OTP! Try again later";
+final INVALID_OTP = "Invalid OTP";

@@ -1,8 +1,8 @@
+import 'dart:collection';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/screens/home/home_screen.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
-import 'package:sports_house/services/auth_service.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
@@ -17,30 +17,76 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   late TabController _controller;
-  int _selectedIndex = 0;
+  late String _verificationId;
   final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
   final GlobalKey<FormState> _otpFormKey = GlobalKey();
-  final GlobalKey<FormState> _progressFormKey = GlobalKey();
-  final AuthService service = new AuthService();
 
   void signInWithPhoneNumber(String phoneNumber) async {
+    _controller.animateTo(1);
+
+    PhoneVerificationFailed phoneVerificationFailed =
+        (FirebaseAuthException authException) {
+          _controller.animateTo(0);
+          final snackBar = SnackBar(content: Text(INVALID_PHONE_NUMBER));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          print('Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
+    };
+
+    PhoneVerificationCompleted phoneVerificationCompleted =
+        (PhoneAuthCredential credentials) async {
+      final User user = (await _auth.signInWithCredential(credentials)).user as User;
+      print("Successfully signed in UID: ${user.uid}");
+      if (user.uid.isNotEmpty) {
+        Navigator.popAndPushNamed(context, ProfileScreen.pageId);
+      }
+    };
+
+    PhoneCodeSent codeSent =
+        (String verificationId, [int? forceResendingToken]) async {
+      this._verificationId = verificationId;
+      _controller.animateTo(2);
+    };
+
+    PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
+        (String verificationId) {
+      this._verificationId = verificationId;
+      _controller.animateTo(0);
+      print( "timeout");
+    };
+
     try {
-      await service.signInWithPhoneNumber(phoneNumber);
-      _controller.animateTo(_selectedIndex = 2);
+      await _auth.verifyPhoneNumber(
+          phoneNumber: "+91" + phoneNumber,
+          verificationCompleted: phoneVerificationCompleted,
+          verificationFailed: phoneVerificationFailed,
+          codeSent: codeSent,
+          codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
     } catch (e) {
+      final snackBar = SnackBar(content: Text(OTP_FAILED));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print(e);
     }
   }
 
   void verifyOtp(String otp) async {
-    try {
-      User user = await service.verifyOtp(otp);
+    _controller.animateTo(1);
+    try{
+      final AuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: this._verificationId,
+          smsCode: otp
+      );
+      final User user = (await _auth.signInWithCredential(credential)).user as User;
       print("Successfully signed in UID: ${user.uid}");
       if (user.uid.isNotEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       }
-    } catch (e) {
+    } catch(e){
+      final snackBar = SnackBar(content: Text(INVALID_OTP));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      _controller.animateTo(2);
       print(e);
     }
   }
@@ -161,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen>
               },
               keyboardType: TextInputType.phone,
               onSaved: (phone) {
-                _controller.animateTo(_selectedIndex = 1);
                 signInWithPhoneNumber(phone as String);
               },
               onFieldSubmitted: (v) {},
@@ -205,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen>
                 children: [
                   IconButton(
                     onPressed: () {
-                      _controller.animateTo(_selectedIndex = 0);
+                      _controller.animateTo(0);
                     },
                     icon: Icon(Icons.arrow_back),
                   ),
@@ -248,7 +293,6 @@ class _LoginScreenState extends State<LoginScreen>
               },
               keyboardType: TextInputType.phone,
               onSaved: (otp) {
-                _controller.animateTo(_selectedIndex = 1);
                 verifyOtp(otp as String);
               },
               onFieldSubmitted: (v) {},
@@ -275,9 +319,6 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget buildProgressBarTab() {
-    return Form(
-      key: _progressFormKey,
-      child: CenterProgressBar(),
-    );
+    return CenterProgressBar();
   }
 }
