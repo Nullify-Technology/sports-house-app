@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "639663034253-elvs1m2ro83hfjmvn3qvh18dr9l3e3ms.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sportshouse.sports_house",
+            "certificate_hash": "7fe83ecc857eb902a88b90debf679c330e0b7b78"
+          }
+        },
+        {
           "client_id": "639663034253-qaonmir5d9nkm5s22o8glmukkm0ev0fi.apps.googleusercontent.com",
           "client_type": 3
         }

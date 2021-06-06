@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/services/auth_service.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 
@@ -13,6 +15,30 @@ class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   late TabController _controller;
   int _selectedIndex = 0;
+  final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
+  final GlobalKey<FormState> _otpFormKey = GlobalKey();
+  final AuthService service = new AuthService();
+
+
+  void signInWithPhoneNumber(String phoneNumber) async{
+
+      try{
+        await service.signInWithPhoneNumber(phoneNumber);
+        _controller.animateTo(_selectedIndex = 1);
+      }catch(e){
+        print(e);
+      }
+  }
+
+  void verifyOtp(String otp) async{
+    try{
+      User user = await service.verifyOtp(otp);
+      print("Successfully signed in UID: ${user.uid}");
+    }catch(e){
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,142 +101,166 @@ class _LoginScreenState extends State<LoginScreen>
   Widget buildPhoneNumberTab() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(15, 0, 15, 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 25,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.sports),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  kWelcomeToSportsHouse,
-                  style: TextStyle(
-                    fontSize: 25,
+      child: Form(
+        key: _phoneNumberFormKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 25,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.sports),
+                  SizedBox(
+                    width: 5,
                   ),
+                  Text(
+                    kWelcomeToSportsHouse,
+                    style: TextStyle(
+                      fontSize: 25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TextFormField(
+              textInputAction: TextInputAction.next,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kColorGreen,
+                letterSpacing: 2,
+              ),
+              decoration: InputDecoration(
+                prefix: Padding(
+                  padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                  child: Text("+91"),
                 ),
-              ],
+                filled: true,
+                border: OutlineInputBorder(),
+                labelText: kPhone,
+                hintText: kEnterPhoneNumber,
+                fillColor: kTextFieldBgColor,
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return kInvalidPhone;
+                }
+                return null;
+              },
+              keyboardType: TextInputType.phone,
+              onSaved: (phone) {
+                signInWithPhoneNumber(phone as String);
+              },
+              onFieldSubmitted: (v) {},
             ),
-          ),
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: kColorGreen,
-              letterSpacing: 2,
+            SizedBox(
+              height: 20,
             ),
-            decoration: InputDecoration(
-              filled: true,
-              border: OutlineInputBorder(),
-              labelText: kPhone,
-              hintText: kEnterPhoneNumber,
-              fillColor: kTextFieldBgColor,
+            RoundedRectangleButton(
+              background: kColorGreen,
+              text: kSendOtp,
+              textColor: kColorBlack,
+              onClick: () {
+                FocusScope.of(context).unfocus();
+                if(!_phoneNumberFormKey.currentState!.validate()){
+                  return;
+                }
+                _phoneNumberFormKey.currentState!.save();
+              },
             ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return kInvalidPhone;
-              }
-              return null;
-            },
-            keyboardType: TextInputType.phone,
-            onSaved: (phone) {},
-            onFieldSubmitted: (v) {},
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          RoundedRectangleButton(
-            background: kColorGreen,
-            text: kSendOtp,
-            textColor: kColorBlack,
-            onClick: () {
-              _controller.animateTo(_selectedIndex = 1);
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget buildOtpTab() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 0, 15, 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 15,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _controller.animateTo(_selectedIndex = 0);
-                  },
-                  icon: Icon(Icons.arrow_back),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      kWelcomeToSportsHouse,
-                      style: TextStyle(
-                        fontSize: 25,
+    return Form(
+      key: _otpFormKey,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 0, 15, 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      _controller.animateTo(_selectedIndex = 0);
+                    },
+                    icon: Icon(Icons.arrow_back),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        kWelcomeToSportsHouse,
+                        style: TextStyle(
+                          fontSize: 25,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 24,
-                ),
-              ],
+                  SizedBox(
+                    width: 24,
+                  ),
+                ],
+              ),
             ),
-          ),
-          TextFormField(
-            textInputAction: TextInputAction.next,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: kColorGreen,
-              letterSpacing: 8,
+            TextFormField(
+              textInputAction: TextInputAction.next,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kColorGreen,
+                letterSpacing: 8,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                border: OutlineInputBorder(),
+                labelText: kOtp,
+                fillColor: kTextFieldBgColor,
+              ),
+              textAlign: TextAlign.center,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return kInvalidPhone;
+                }
+                return null;
+              },
+              keyboardType: TextInputType.phone,
+              onSaved: (otp) {
+                verifyOtp(otp as String);
+              },
+              onFieldSubmitted: (v) {},
             ),
-            decoration: InputDecoration(
-              filled: true,
-              border: OutlineInputBorder(),
-              labelText: kOtp,
-              fillColor: kTextFieldBgColor,
+            SizedBox(
+              height: 20,
             ),
-            textAlign: TextAlign.center,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return kInvalidPhone;
-              }
-              return null;
-            },
-            keyboardType: TextInputType.phone,
-            onSaved: (phone) {},
-            onFieldSubmitted: (v) {},
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          RoundedRectangleButton(
-            background: kColorGreen,
-            text: kLoginButtonText,
-            textColor: kColorBlack,
-            onClick: () {},
-          ),
-        ],
+            RoundedRectangleButton(
+              background: kColorGreen,
+              text: kLoginButtonText,
+              textColor: kColorBlack,
+              onClick: () {
+                FocusScope.of(context).unfocus();
+                if(!_otpFormKey.currentState!.validate()){
+                  return;
+                }
+                _otpFormKey.currentState!.save();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
