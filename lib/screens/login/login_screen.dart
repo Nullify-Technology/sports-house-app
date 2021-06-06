@@ -1,11 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/screens/home/home_screen.dart';
+import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/services/auth_service.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen();
+  static String pageId = 'LoginScreen';
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -17,24 +21,26 @@ class _LoginScreenState extends State<LoginScreen>
   int _selectedIndex = 0;
   final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
   final GlobalKey<FormState> _otpFormKey = GlobalKey();
+  final GlobalKey<FormState> _progressFormKey = GlobalKey();
   final AuthService service = new AuthService();
 
-
-  void signInWithPhoneNumber(String phoneNumber) async{
-
-      try{
-        await service.signInWithPhoneNumber(phoneNumber);
-        _controller.animateTo(_selectedIndex = 1);
-      }catch(e){
-        print(e);
-      }
+  void signInWithPhoneNumber(String phoneNumber) async {
+    try {
+      await service.signInWithPhoneNumber(phoneNumber);
+      _controller.animateTo(_selectedIndex = 2);
+    } catch (e) {
+      print(e);
+    }
   }
 
-  void verifyOtp(String otp) async{
-    try{
+  void verifyOtp(String otp) async {
+    try {
       User user = await service.verifyOtp(otp);
       print("Successfully signed in UID: ${user.uid}");
-    }catch(e){
+      if (user.uid.isNotEmpty) {
+        Navigator.popAndPushNamed(context, ProfileScreen.pageId);
+      }
+    } catch (e) {
       print(e);
     }
   }
@@ -43,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
     _controller = TabController(
-      length: 2,
+      length: 3,
       vsync: this,
     );
   }
@@ -88,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen>
                 physics: NeverScrollableScrollPhysics(),
                 children: [
                   buildPhoneNumberTab(),
+                  buildProgressBarTab(),
                   buildOtpTab(),
                 ],
               ),
@@ -137,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               decoration: InputDecoration(
                 prefix: Padding(
-                  padding: const EdgeInsets.fromLTRB(0,0,10,0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                   child: Text("+91"),
                 ),
                 filled: true,
@@ -154,6 +161,7 @@ class _LoginScreenState extends State<LoginScreen>
               },
               keyboardType: TextInputType.phone,
               onSaved: (phone) {
+                _controller.animateTo(_selectedIndex = 1);
                 signInWithPhoneNumber(phone as String);
               },
               onFieldSubmitted: (v) {},
@@ -167,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if(!_phoneNumberFormKey.currentState!.validate()){
+                if (!_phoneNumberFormKey.currentState!.validate()) {
                   return;
                 }
                 _phoneNumberFormKey.currentState!.save();
@@ -240,6 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
               },
               keyboardType: TextInputType.phone,
               onSaved: (otp) {
+                _controller.animateTo(_selectedIndex = 1);
                 verifyOtp(otp as String);
               },
               onFieldSubmitted: (v) {},
@@ -253,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if(!_otpFormKey.currentState!.validate()){
+                if (!_otpFormKey.currentState!.validate()) {
                   return;
                 }
                 _otpFormKey.currentState!.save();
@@ -262,6 +271,13 @@ class _LoginScreenState extends State<LoginScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildProgressBarTab() {
+    return Form(
+      key: _progressFormKey,
+      child: CenterProgressBar(),
     );
   }
 }
