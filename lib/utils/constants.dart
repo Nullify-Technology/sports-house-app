@@ -32,3 +32,7 @@ final INVALID_OTP = "Invalid OTP";
 
 final String kTrending = 'Trending';
 final String kPeopleTalkingText = 'people are talking about this';
+
+String kCreate = 'Create';
+final String kTodaysEvents = "Today's Events";
+final double kHeadingFontSize = 23;

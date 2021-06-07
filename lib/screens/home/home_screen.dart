@@ -4,6 +4,7 @@ import 'package:sports_house/utils/SportsEvent.dart';
 
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -26,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
         'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
   );
 
+  String imageUrl =
+      'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
+
   @override
   Widget build(BuildContext context) {
     eventList.add(event);
@@ -38,57 +42,161 @@ class _HomeScreenState extends State<HomeScreen> {
       // extendBodyBehindAppBar: true,
       backgroundColor: kColorBlack,
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        // title: Text(appName),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              35,
-              0,
-              0,
-              15,
-            ),
-            child: Row(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            pinned: true,
+            snap: false,
+            floating: false,
+            expandedHeight: 350.0,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.whatshot,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  kTrending,
-                  style: TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold,
+                TextButton(
+                  child: Icon(
+                    Icons.search,
+                    color: Colors.white,
                   ),
+                  onPressed: () {},
+                ),
+                Row(
+                  children: [
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            kCreate,
+                            style: TextStyle(
+                              fontSize: 17,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    TextButton(
+                      child: CircleAvatar(
+                        foregroundImage: NetworkImage(imageUrl),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 200.0,
-              enableInfiniteScroll: false,
-              enlargeCenterPage: true,
-            ),
-            items: eventList.map((e) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    // margin: EdgeInsets.symmetric(horizontal: 1.0),
-                    child: RoomsCard(
-                      event: e,
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              background: Padding(
+                padding: const EdgeInsets.only(
+                  top: 100,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Icon(
+                          Icons.whatshot,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          kTrending,
+                          style: TextStyle(
+                            fontSize: kHeadingFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              );
-            }).toList(),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                      child: CarouselSlider(
+                        options: CarouselOptions(
+                          height: 200.0,
+                          enableInfiniteScroll: false,
+                          enlargeCenterPage: true,
+                        ),
+                        items: eventList.map((e) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return Container(
+                                width: MediaQuery.of(context).size.width,
+                                // margin: EdgeInsets.symmetric(horizontal: 1.0),
+                                child: RoomsCard(
+                                  event: e,
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 30, 0, 10),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.radar,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    kTodaysEvents,
+                    style: TextStyle(
+                      fontSize: kHeadingFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 10,
+                      ),
+                      height: 250,
+                      child: RoomsCard(
+                        event: eventList[index],
+                      ),
+                    );
+                  },
+                );
+              },
+              childCount: 5,
+            ),
           ),
         ],
       ),
