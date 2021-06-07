@@ -29,3 +29,6 @@ String kProfileScreenButtonText = 'Confirm & Update';
 final String INVALID_PHONE_NUMBER = "Invalid Phone Number";
 final String OTP_FAILED = "Failed to send OTP! Try again later";
 final INVALID_OTP = "Invalid OTP";
+
+final String kTrending = 'Trending';
+final String kPeopleTalkingText = 'people are talking about this';
