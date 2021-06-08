@@ -16,9 +16,8 @@ const String kInvalidPhone = 'Invalid Phone Number!';
 const String kWelcomeToSportsHouse = 'Welcome to $appName';
 const String kEnterPhoneNumber = 'Enter your phone number';
 
-Radius kLoginCardRadius = Radius.circular(10);
-Radius kCreateRoomCardRadius = Radius.circular(15);
 const Radius kLoginCardRadius = Radius.circular(10);
+const Radius kCreateRoomCardRadius = Radius.circular(15);
 
 //Profile Screen
 const String kProfileText =
@@ -28,29 +27,25 @@ const String kEnterYourName = 'Enter your Name';
 const String kNameCannotBeEmpty = 'Name Cannot Be Empty!';
 const String kProfileScreenButtonText = 'Confirm & Update';
 
-final String INVALID_PHONE_NUMBER = "Invalid Phone Number";
-final String OTP_FAILED = "Failed to send OTP! Try again later";
-final INVALID_OTP = "Invalid OTP";
+const String INVALID_PHONE_NUMBER = "Invalid Phone Number";
+const String OTP_FAILED = "Failed to send OTP! Try again later";
+const String INVALID_OTP = "Invalid OTP";
 
-final String kTrending = 'Trending';
-final String kPeopleTalkingText = 'people are talking about this';
+const String kTrending = 'Trending';
+const String kPeopleTalkingText = 'people are talking about this';
 
-String kCreate = 'Create';
-final String kTodaysEvents = "Today's Events";
-final double kHeadingFontSize = 23;
+const String kCreate = 'Create';
+const String kTodaysEvents = "Today's Events";
+const double kHeadingFontSize = 23;
 
-final String kRoomName = "Room Name";
-final String kEnterRoomName = "Enter Room Name";
-final String kCreateRoom = "Create Room";
-List<String> kRoomTypes = [
+const String kRoomName = "Room Name";
+const String kEnterRoomName = "Enter Room Name";
+const String kCreateRoom = "Create Room";
+const List<String> kRoomTypes = [
   'Private Room',
   'Public Room',
   'Channel',
 ];
-
-const String INVALID_PHONE_NUMBER = "Invalid Phone Number";
-const String OTP_FAILED = "Failed to send OTP! Try again later";
-const String INVALID_OTP = "Invalid OTP";
 const String DEVELOPMENT = "dev";
 const String PRODUCTION = "prod";
 const String ACCESS_TOKEN = "AccessToken";
