@@ -30,8 +30,10 @@ class _CreateRoomState extends State<CreateRoom> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      backgroundColor: kColorBlack,
       body: Card(
         margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+        color: kCardBgColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: kCreateRoomCardRadius,
@@ -59,7 +61,7 @@ class _CreateRoomState extends State<CreateRoom> {
                       border: OutlineInputBorder(),
                       labelText: kRoomName,
                       hintText: kEnterRoomName,
-                      fillColor: kTextFieldBgColor,
+                      fillColor: kDropdownBgColor,
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -117,11 +119,7 @@ class _CreateRoomState extends State<CreateRoom> {
             ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              color: kTextFieldBgColor,
-              border: Border.all(
-                width: 1.5,
-                color: Colors.white38,
-              ),
+              color: kDropdownBgColor,
             ),
             child: DropdownButton<String>(
               value: initialValue,

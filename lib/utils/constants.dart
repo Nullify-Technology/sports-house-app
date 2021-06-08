@@ -5,6 +5,7 @@ const Color kColorGreen = Color(0xffD2FF79);
 const Color kColorBlack = Color(0xff181818);
 const Color kCardBgColor = Color(0xff2A2A2A);
 const Color kTextFieldBgColor = Color(0xff414141);
+const Color kDropdownBgColor = Color(0xff414141);
 
 // Login Screen
 const String appName = 'Sports House';
@@ -41,6 +42,7 @@ const double kHeadingFontSize = 23;
 const String kRoomName = "Room Name";
 const String kEnterRoomName = "Enter Room Name";
 const String kCreateRoom = "Create Room";
+
 const List<String> kRoomTypes = [
   'Private Room',
   'Public Room',
