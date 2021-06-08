@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/user_bloc.dart';
 import 'package:sports_house/models/response.dart';
@@ -21,8 +20,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
   late UserBloc userBloc;
   String profileUrl = "";
-
-
   @override
   Widget build(BuildContext context) {
 

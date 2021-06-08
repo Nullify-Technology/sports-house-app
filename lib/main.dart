@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/login/login_screen.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         ProfileScreen.pageId: (context) => ProfileScreen(),
         CreateRoom.pageId: (context) => CreateRoom(),
       },
-      initialRoute: _auth.currentUser == null ? LoginScreen.pageId : HomeScreen.pageId,
+      initialRoute: _auth.currentUser == null ? LoginScreen.pageId : ProfileScreen.pageId,
     );
   }
 }

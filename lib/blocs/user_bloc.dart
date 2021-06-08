@@ -15,7 +15,7 @@ class UserBloc{
   final FirebaseAuth auth = FirebaseAuth.instance;
   final RestClient client;
   late StreamController<Response<AuthUser>> _userController;
-  final storage = FlutterSecureStorage();
+  final flutterStorage = FlutterSecureStorage();
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -36,7 +36,7 @@ class UserBloc{
     userSink.add(Response.loading('Getting User Details'));
     try{
       Auth response = await client.getUser(phoneNumber, idToken);
-      await storage.write(key: kAccessToken, value: response.accessToken);
+      await flutterStorage.write(key: kAccessToken, value: response.accessToken);
       userSink.add(Response.completed(response.user!));
     }catch(e){
       userSink.add(Response.error(e.toString()));
