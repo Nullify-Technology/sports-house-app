@@ -8,12 +8,14 @@ part of 'auth.dart';
 
 Auth _$AuthFromJson(Map<String, dynamic> json) {
   return Auth(
-    User.fromJson(json['user'] as Map<String, dynamic>),
-    json['access_token'] as String,
+    user: json['user'] == null
+        ? null
+        : AuthUser.fromJson(json['user'] as Map<String, dynamic>),
+    accessToken: json['token'] as String?,
   );
 }
 
 Map<String, dynamic> _$AuthToJson(Auth instance) => <String, dynamic>{
       'user': instance.user,
-      'access_token': instance.accessToken,
+      'token': instance.accessToken,
     };

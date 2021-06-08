@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sports_house/blocs/user_bloc.dart';
+import 'package:sports_house/models/response.dart';
+import 'package:sports_house/models/user.dart';
+import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/screens/home/home_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
@@ -13,9 +17,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isLoading = false;
+  final GlobalKey<FormState> _profileNameForm = GlobalKey();
+  late UserBloc userBloc;
+  String profileUrl = "";
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: kColorBlack,
@@ -25,11 +32,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: _isLoading ? CenterProgressBar() : buildProfileScreen(context),
+      body: StreamBuilder<Response<AuthUser>>(
+        stream: userBloc.userStream,
+        builder: (context, snapShot)
+        {
+          if(snapShot.hasData){
+            switch (snapShot.data!.status){
+              case Status.LOADING :
+                return CenterProgressBar();
+              case Status.COMPLETED:
+                return buildProfileScreen(snapShot.data!.data);
+              case Status.ERROR:
+                return Container();
+            }
+          }
+          return Container();
+        }
+      ),
     );
   }
 
-  Widget buildProfileScreen(BuildContext context) {
+  Widget buildProfileScreen(AuthUser user) {
     return Column(
       children: [
         Expanded(
@@ -79,13 +102,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Container(
             padding: const EdgeInsets.fromLTRB(15, 20, 15, 25),
             child: Form(
-              // key: _phoneNumberFormKey,
+              key: _profileNameForm,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TextFormField(
                     textInputAction: TextInputAction.next,
+                    initialValue: user.name,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -105,7 +129,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       return null;
                     },
                     keyboardType: TextInputType.text,
-                    onSaved: (name) {},
+                    onSaved: (name) async {
+                      await userBloc.updateUser(name: name);
+                      Navigator.popAndPushNamed(context, HomeScreen.pageId);
+                    },
                     onFieldSubmitted: (v) {},
                   ),
                   SizedBox(
@@ -116,10 +143,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: kProfileScreenButtonText,
                     textColor: kColorBlack,
                     onClick: () {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      Navigator.popAndPushNamed(context, HomeScreen.pageId);
+                      if (!_profileNameForm.currentState!.validate()) {
+                        return;
+                      }
+                      _profileNameForm.currentState!.save();
                     },
                   ),
                 ],
@@ -129,5 +156,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    userBloc = UserBloc(client: RestClient.create());
+    userBloc.getUser();
   }
 }

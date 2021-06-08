@@ -1,31 +1,32 @@
 import 'package:flutter/cupertino.dart';
 
 //Colors
-Color kColorGreen = Color(0xffD2FF79);
-Color kColorBlack = Color(0xff181818);
-Color kCardBgColor = Color(0xff2A2A2A);
-Color kTextFieldBgColor = Color(0xff414141);
+const Color kColorGreen = Color(0xffD2FF79);
+const Color kColorBlack = Color(0xff181818);
+const Color kCardBgColor = Color(0xff2A2A2A);
+const Color kTextFieldBgColor = Color(0xff414141);
 
 // Login Screen
-String appName = 'Sports House';
-String kPhone = 'Phone';
-String kOtp = 'OTP';
-String kSendOtp = 'Send OTP';
-String kLoginButtonText = 'Enter in to $appName';
-String kInvalidPhone = 'Invalid Phone Number!';
-String kWelcomeToSportsHouse = 'Welcome to $appName';
-String kEnterPhoneNumber = 'Enter your phone number';
+const String appName = 'Sports House';
+const String kPhone = 'Phone';
+const String kOtp = 'OTP';
+const String kSendOtp = 'Send OTP';
+const String kLoginButtonText = 'Enter in to $appName';
+const String kInvalidPhone = 'Invalid Phone Number!';
+const String kWelcomeToSportsHouse = 'Welcome to $appName';
+const String kEnterPhoneNumber = 'Enter your phone number';
 
 Radius kLoginCardRadius = Radius.circular(10);
 Radius kCreateRoomCardRadius = Radius.circular(15);
+const Radius kLoginCardRadius = Radius.circular(10);
 
 //Profile Screen
-String kProfileText =
+const String kProfileText =
     'Upload your profile picture, and \nlet your friends identify you easily';
-String kName = 'Full Name';
-String kEnterYourName = 'Enter your Name';
-String kNameCannotBeEmpty = 'Name Cannot Be Empty!';
-String kProfileScreenButtonText = 'Confirm & Update';
+const String kName = 'Full Name';
+const String kEnterYourName = 'Enter your Name';
+const String kNameCannotBeEmpty = 'Name Cannot Be Empty!';
+const String kProfileScreenButtonText = 'Confirm & Update';
 
 final String INVALID_PHONE_NUMBER = "Invalid Phone Number";
 final String OTP_FAILED = "Failed to send OTP! Try again later";
@@ -46,3 +47,10 @@ List<String> kRoomTypes = [
   'Public Room',
   'Channel',
 ];
+
+const String INVALID_PHONE_NUMBER = "Invalid Phone Number";
+const String OTP_FAILED = "Failed to send OTP! Try again later";
+const String INVALID_OTP = "Invalid OTP";
+const String DEVELOPMENT = "dev";
+const String PRODUCTION = "prod";
+const String ACCESS_TOKEN = "AccessToken";
