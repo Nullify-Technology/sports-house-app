@@ -1,7 +1,9 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
@@ -14,6 +16,9 @@ class UserBloc{
   final RestClient client;
   late StreamController<Response<AuthUser>> _userController;
   final storage = FlutterSecureStorage();
+  final ImagePicker picker = ImagePicker();
+  FirebaseStorage _storage = FirebaseStorage.instance;
+
   StreamSink<Response<AuthUser>> get userSink =>
       _userController.sink;
 
@@ -39,18 +44,30 @@ class UserBloc{
     }
   }
 
-  Future<Auth> updateUser({String? name, String? profilePictureUrl}) async {
-    userSink.add(Response.loading('Updating User Details'));
-    Auth response = new Auth();
+  Future<void> updateUserName({String? name}) async {
+    userSink.add(Response.loading('Updating User name'));
     try{
-      Auth response = await client.updateUser(name: name, profileUrl: profilePictureUrl);
+      Auth response = await client.updateUser(name: name);
       userSink.add(Response.completed(response.user!));
     }catch(e){
       userSink.add(Response.error(e.toString()));
       print(e);
     }
+  }
 
-    return response;
+  Future<void> updateProfilePicture(String userId) async {
+    userSink.add(Response.loading('Updating User profile picture'));
+    try{
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      File image = File(pickedFile!.path);
+      TaskSnapshot snapshot = await _storage.ref("user_profiles/$userId.png").putFile(image);
+      String url = (await snapshot.ref.getDownloadURL()).toString();
+      Auth response = await client.updateUser(profileUrl: url);
+      userSink.add(Response.completed(response.user!));
+    }catch(e){
+      userSink.add(Response.error(e.toString()));
+      print(e);
+    }
   }
 
   dispose() {

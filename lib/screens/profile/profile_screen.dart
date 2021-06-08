@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/user_bloc.dart';
 import 'package:sports_house/models/response.dart';
@@ -20,6 +21,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
   late UserBloc userBloc;
   String profileUrl = "";
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -66,12 +69,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: kCardBgColor,
                     maxRadius: MediaQuery.of(context).size.width * .25,
                     minRadius: MediaQuery.of(context).size.width * .25,
-                    foregroundImage: AssetImage(
+                    backgroundImage: AssetImage(
                       'assets/images/profile_soccer.png',
                     ),
+                    foregroundImage: NetworkImage(
+                      user.profilePictureUrl!
+                    ),
                   ),
-                  onTap: () {
-                    //Code to handle image selection
+                  onTap: () async {
+                    await userBloc.updateProfilePicture(user.id);
                   },
                 ),
               ),
@@ -130,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     keyboardType: TextInputType.text,
                     onSaved: (name) async {
-                      await userBloc.updateUser(name: name);
+                      await userBloc.updateUserName(name: name);
                       Navigator.popAndPushNamed(context, HomeScreen.pageId);
                     },
                     onFieldSubmitted: (v) {},
