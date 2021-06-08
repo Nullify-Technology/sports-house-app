@@ -22,7 +22,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String profileUrl = "";
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: kColorBlack,
@@ -33,22 +32,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: StreamBuilder<Response<AuthUser>>(
-        stream: userBloc.userStream,
-        builder: (context, snapShot)
-        {
-          if(snapShot.hasData){
-            switch (snapShot.data!.status){
-              case Status.LOADING :
-                return CenterProgressBar();
-              case Status.COMPLETED:
-                return buildProfileScreen(snapShot.data!.data);
-              case Status.ERROR:
-                return Container();
+          stream: userBloc.userStream,
+          builder: (context, snapShot) {
+            if (snapShot.hasData) {
+              switch (snapShot.data!.status) {
+                case Status.LOADING:
+                  return CenterProgressBar();
+                case Status.COMPLETED:
+                  return buildProfileScreen(snapShot.data!.data);
+                case Status.ERROR:
+                  return Container();
+              }
             }
-          }
-          return Container();
-        }
-      ),
+            return Container();
+          }),
     );
   }
 
@@ -70,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       'assets/images/profile_soccer.png',
                     ),
                     foregroundImage: NetworkImage(
-                      user.profilePictureUrl!
+                      user.profilePictureUrl ?? '',
                     ),
                   ),
                   onTap: () async {
