@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 
 import 'package:sports_house/utils/constants.dart';
@@ -62,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, CreateRoom.pageId);
+                      },
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(50)),

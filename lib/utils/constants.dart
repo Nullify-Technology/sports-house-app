@@ -17,6 +17,7 @@ String kWelcomeToSportsHouse = 'Welcome to $appName';
 String kEnterPhoneNumber = 'Enter your phone number';
 
 Radius kLoginCardRadius = Radius.circular(10);
+Radius kCreateRoomCardRadius = Radius.circular(15);
 
 //Profile Screen
 String kProfileText =
@@ -36,3 +37,12 @@ final String kPeopleTalkingText = 'people are talking about this';
 String kCreate = 'Create';
 final String kTodaysEvents = "Today's Events";
 final double kHeadingFontSize = 23;
+
+final String kRoomName = "Room Name";
+final String kEnterRoomName = "Enter Room Name";
+final String kCreateRoom = "Create Room";
+List<String> kRoomTypes = [
+  'Private Room',
+  'Public Room',
+  'Channel',
+];
