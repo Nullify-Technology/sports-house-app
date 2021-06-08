@@ -31,7 +31,7 @@ class _CreateRoomState extends State<CreateRoom> {
         elevation: 0,
       ),
       body: Card(
-        margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: kCreateRoomCardRadius,
