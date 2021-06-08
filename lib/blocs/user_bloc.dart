@@ -31,7 +31,7 @@ class UserBloc{
     userSink.add(Response.loading('Getting User Details'));
     try{
       Auth response = await client.getUser(phoneNumber, idToken);
-      await storage.write(key: ACCESS_TOKEN, value: response.accessToken);
+      await storage.write(key: kAccessToken, value: response.accessToken);
       userSink.add(Response.completed(response.user!));
     }catch(e){
       userSink.add(Response.error(e.toString()));

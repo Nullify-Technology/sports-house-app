@@ -8,7 +8,7 @@ class HttpLoggingInterceptor extends InterceptorsWrapper{
   final storage = FlutterSecureStorage();
   @override
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-      String token = await storage.read(key: ACCESS_TOKEN) as String;
+      String token = await storage.read(key: kAccessToken) as String;
       options.headers["Authorization"] = "Bearer " + token;
 
       log.warning("---------------------------------Request-----------------------");

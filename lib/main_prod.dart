@@ -10,7 +10,7 @@ Future<void> main() async {
 
   var configuration = AppConfig(
     appTitle: appName,
-    buildFlavour: PRODUCTION,
+    buildFlavour: kProduction,
     child: MyApp(),
   );
   return runApp(configuration);

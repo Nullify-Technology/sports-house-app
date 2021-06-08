@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
     PhoneVerificationFailed phoneVerificationFailed =
         (FirebaseAuthException authException) {
           _controller.animateTo(0);
-          final snackBar = SnackBar(content: Text(INVALID_PHONE_NUMBER));
+          final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
           print('Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
     };
@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen>
           codeSent: codeSent,
           codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
     } catch (e) {
-      final snackBar = SnackBar(content: Text(OTP_FAILED));
+      final snackBar = SnackBar(content: Text(kOtpFailed));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print(e);
     }
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen>
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       }
     } catch(e){
-      final snackBar = SnackBar(content: Text(INVALID_OTP));
+      final snackBar = SnackBar(content: Text(kInvalidOtp));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       _controller.animateTo(2);
       print(e);

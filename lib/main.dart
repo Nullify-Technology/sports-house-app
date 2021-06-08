@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner:
-          AppConfig.of(context)!.buildFlavour == DEVELOPMENT,
+          AppConfig.of(context)!.buildFlavour == kDevelopment,
       routes: {
         LoginScreen.pageId: (context) => LoginScreen(),
         HomeScreen.pageId: (context) => HomeScreen(),

@@ -27,9 +27,9 @@ const String kEnterYourName = 'Enter your Name';
 const String kNameCannotBeEmpty = 'Name Cannot Be Empty!';
 const String kProfileScreenButtonText = 'Confirm & Update';
 
-const String INVALID_PHONE_NUMBER = "Invalid Phone Number";
-const String OTP_FAILED = "Failed to send OTP! Try again later";
-const String INVALID_OTP = "Invalid OTP";
+const String kInvalidPhoneNumber = "Invalid Phone Number";
+const String kOtpFailed = "Failed to send OTP! Try again later";
+const String kInvalidOtp = "Invalid OTP";
 
 const String kTrending = 'Trending';
 const String kPeopleTalkingText = 'people are talking about this';
@@ -46,6 +46,6 @@ const List<String> kRoomTypes = [
   'Public Room',
   'Channel',
 ];
-const String DEVELOPMENT = "dev";
-const String PRODUCTION = "prod";
-const String ACCESS_TOKEN = "AccessToken";
+const String kDevelopment = "dev";
+const String kProduction = "prod";
+const String kAccessToken = "AccessToken";

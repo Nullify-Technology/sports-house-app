@@ -12,7 +12,7 @@ Future<void> main() async {
 
   var configuration = AppConfig(
     appTitle: appName + "-dev",
-    buildFlavour: DEVELOPMENT,
+    buildFlavour: kDevelopment,
     child: MyApp(),
   );
   return runApp(configuration);
