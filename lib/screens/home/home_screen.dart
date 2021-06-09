@@ -1,13 +1,14 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/blocs/user_bloc.dart';
+import 'package:sports_house/models/response.dart';
+import 'package:sports_house/models/user.dart';
+import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
-
 import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -18,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late UserBloc userBloc;
+  final RestClient client = RestClient.create();
   List<SportsEvent> eventList = [];
   SportsEvent event = new SportsEvent(
     title: 'MUN Vs BAR',
@@ -33,6 +36,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String imageUrl =
       'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
 
+
+  @override
+  void initState() {
+    super.initState();
+    userBloc = UserBloc(client: client);
+    userBloc.getUserProfileImage();
+  }
+
+
+  @override
+  void dispose() {
+    super.dispose();
+    userBloc.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     eventList.add(event);
@@ -42,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
     eventList.add(event);
 
     return Scaffold(
-      // extendBodyBehindAppBar: true,
       backgroundColor: kColorBlack,
       resizeToAvoidBottomInset: true,
       body: CustomScrollView(
@@ -100,8 +117,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 10,
                     ),
                     TextButton(
-                      child: CircleAvatar(
-                        foregroundImage: NetworkImage(imageUrl),
+                      child: StreamBuilder<Response<AuthUser>>(
+                        stream: userBloc.userStream,
+                        builder: (context, snapShot) {
+                          if(snapShot.hasData && snapShot.data?.status == Status.COMPLETED){
+                            return CircleAvatar(
+                              foregroundImage: NetworkImage(snapShot.data?.data.profilePictureUrl ?? ''),
+                            );
+                          }
+                          return CircleAvatar(
+                            foregroundImage: NetworkImage(imageUrl),
+                          );
+                        }
                       ),
                       onPressed: () {
                         Navigator.pushNamed(context, ProfileScreen.pageId);

@@ -51,6 +51,7 @@ const List<String> kRoomTypes = [
 const String kDevelopment = "dev";
 const String kProduction = "prod";
 const String kAccessToken = "AccessToken";
+const String kUser = "UserProfile";
 
 const String kListners = 'Listners';
 const String kHostedBy = 'Hosted By:';

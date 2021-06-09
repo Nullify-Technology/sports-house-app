@@ -164,4 +164,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     userBloc = UserBloc(client: RestClient.create());
     userBloc.getUser();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    userBloc.dispose();
+  }
 }
