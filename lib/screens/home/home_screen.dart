@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
+import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 
 import 'package:sports_house/utils/constants.dart';
@@ -54,12 +55,17 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
-                  child: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {},
+                // TextButton(
+                //   child: Icon(
+                //     Icons.search,
+                //     color: Colors.white,
+                //   ),
+                //   onPressed: () {},
+                // ),
+                Icon(
+                  Icons.sports,
+                  size: 30,
+                  color: Colors.white,
                 ),
                 Row(
                   children: [
@@ -97,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: CircleAvatar(
                         foregroundImage: NetworkImage(imageUrl),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, ProfileScreen.pageId);
+                      },
                     ),
                   ],
                 ),
