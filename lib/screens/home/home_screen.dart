@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
+import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 
 import 'package:sports_house/utils/constants.dart';
@@ -144,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               return Container(
                                 width: MediaQuery.of(context).size.width,
                                 // margin: EdgeInsets.symmetric(horizontal: 1.0),
-                                child: RoomsCard(
+                                child: EventsCard(
                                   event: e,
                                 ),
                               );
@@ -164,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   Icon(
-                    Icons.radar,
+                    Icons.podcasts,
                   ),
                   SizedBox(
                     width: 10,
@@ -191,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 10,
                       ),
                       height: 250,
-                      child: RoomsCard(
+                      child: EventsCard(
                         event: eventList[index],
                       ),
                     );
@@ -207,107 +208,120 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class RoomsCard extends StatelessWidget {
-  const RoomsCard({
+class EventsCard extends StatelessWidget {
+  const EventsCard({
     Key? key,
     required this.event,
   }) : super(key: key);
   final SportsEvent event;
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(8),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    event.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: new BoxDecoration(
-                    color: Colors.redAccent,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.timer,
-                        size: 16,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        event.minutes,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventRooms(
+              eventName: event.title,
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+          ),
+        );
+      },
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  buildTeamIcon(event.team1Url),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: new BoxDecoration(
-                      color: kCardBgColor,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                    ),
+                  Expanded(
                     child: Text(
-                      event.score,
+                      event.title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
                     ),
                   ),
-                  buildTeamIcon(event.team2Url),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: new BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.timer,
+                          size: 16,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          event.minutes,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            if (event.talkingCount != '')
-              Column(
-                children: [
-                  Divider(
-                    thickness: 1,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${event.talkingCount} $kPeopleTalkingText',
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    buildTeamIcon(event.team1Url),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: new BoxDecoration(
+                        color: kCardBgColor,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
-                    ],
-                  ),
-                ],
+                      child: Text(
+                        event.score,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    buildTeamIcon(event.team2Url),
+                  ],
+                ),
               ),
-          ],
+              if (event.talkingCount != '')
+                Column(
+                  children: [
+                    Divider(
+                      thickness: 1,
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${event.talkingCount} $kPeopleTalkingText',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );
