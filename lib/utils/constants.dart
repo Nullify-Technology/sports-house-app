@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sports_house/utils/SportsEvent.dart';
+import 'package:sports_house/utils/TrendingEvents.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);
@@ -56,3 +58,73 @@ const String kUser = "UserProfile";
 const String kListners = 'Listners';
 const String kHostedBy = 'Hosted By:';
 const String kRooms = 'Rooms';
+
+const String kVersus = 'Vs';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Dummy Constants - To be deleted in the end
+const String kDummyProfileImageUrl =
+    'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
+
+SportsEvent kDummyEvent = new SportsEvent(
+  title: 'MUN Vs BAR',
+  minutes: '120',
+  score: '2 - 1',
+  talkingCount: '2k',
+  team1Url:
+      'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
+  team2Url:
+      'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
+);
+TrendingRoom kDummyRoom = new TrendingRoom(
+  eventName: 'MUN Vs BAR',
+  score: '2 - 1',
+  talkingCount: '2k',
+  team1Url:
+      'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
+  team2Url:
+      'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
+  roomName: 'MUN Fans Club - Kozhikode',
+  hostedBy: 'Aswin Divakar',
+  listners: '2k',
+  participants: [
+    kDummyProfileImageUrl,
+    kDummyProfileImageUrl,
+    kDummyProfileImageUrl,
+  ],
+);
+
+String kDummyImageUrl =
+    'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
+
+List<SportsEvent> eventList = [
+  kDummyEvent,
+  kDummyEvent,
+  kDummyEvent,
+  kDummyEvent,
+  kDummyEvent
+];
+List<TrendingRoom> roomList = [
+  kDummyRoom,
+  kDummyRoom,
+  kDummyRoom,
+  kDummyRoom,
+  kDummyRoom
+];

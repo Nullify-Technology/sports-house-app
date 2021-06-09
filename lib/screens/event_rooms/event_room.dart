@@ -13,13 +13,13 @@ class EventRooms extends StatefulWidget {
 }
 
 class _EventRoomsState extends State<EventRooms> {
-  String imageUrl =
-      'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.eventName),
+        title: Text(
+          widget.eventName,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -67,12 +67,16 @@ class _EventRoomsState extends State<EventRooms> {
                     listners: 500,
                     isVerified: true,
                     hostedBy: 'Aswin Divakar',
-                    participants: [imageUrl, imageUrl, imageUrl],
+                    participants: [
+                      kDummyProfileImageUrl,
+                      kDummyProfileImageUrl,
+                      kDummyProfileImageUrl
+                    ],
                   ),
                   RoomsTile(
                     title: 'The Sharky sport talk',
                     listners: 500,
-                    participants: [imageUrl],
+                    participants: [kDummyProfileImageUrl],
                   ),
                   RoomsTile(
                     title: 'One Football',

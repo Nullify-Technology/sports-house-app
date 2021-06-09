@@ -8,7 +8,9 @@ import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
+import 'package:sports_house/utils/TrendingEvents.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -21,21 +23,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late UserBloc userBloc;
   final RestClient client = RestClient.create();
-  List<SportsEvent> eventList = [];
-  SportsEvent event = new SportsEvent(
-    title: 'MUN Vs BAR',
-    minutes: '120',
-    score: '2 - 1',
-    talkingCount: '2k',
-    team1Url:
-        'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
-    team2Url:
-        'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
-  );
-
-  String imageUrl =
-      'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
-
 
   @override
   void initState() {
@@ -43,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     userBloc = UserBloc(client: client);
     userBloc.getUserProfileImage();
   }
-
 
   @override
   void dispose() {
@@ -53,12 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    eventList.add(event);
-    eventList.add(event);
-    eventList.add(event);
-    eventList.add(event);
-    eventList.add(event);
-
     return Scaffold(
       backgroundColor: kColorBlack,
       resizeToAvoidBottomInset: true,
@@ -68,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 350.0,
+            expandedHeight: 360.0,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -118,18 +98,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     TextButton(
                       child: StreamBuilder<Response<AuthUser>>(
-                        stream: userBloc.userStream,
-                        builder: (context, snapShot) {
-                          if(snapShot.hasData && snapShot.data?.status == Status.COMPLETED){
+                          stream: userBloc.userStream,
+                          builder: (context, snapShot) {
+                            if (snapShot.hasData &&
+                                snapShot.data?.status == Status.COMPLETED) {
+                              return CircleAvatar(
+                                foregroundImage: NetworkImage(
+                                    snapShot.data?.data.profilePictureUrl ??
+                                        ''),
+                              );
+                            }
                             return CircleAvatar(
-                              foregroundImage: NetworkImage(snapShot.data?.data.profilePictureUrl ?? ''),
+                              foregroundImage: NetworkImage(kDummyImageUrl),
                             );
-                          }
-                          return CircleAvatar(
-                            foregroundImage: NetworkImage(imageUrl),
-                          );
-                        }
-                      ),
+                          }),
                       onPressed: () {
                         Navigator.pushNamed(context, ProfileScreen.pageId);
                       },
@@ -142,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
               collapseMode: CollapseMode.pin,
               background: Padding(
                 padding: const EdgeInsets.only(
-                  top: 100,
+                  top: 90,
                 ),
                 child: Column(
                   children: [
@@ -170,18 +152,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
                       child: CarouselSlider(
                         options: CarouselOptions(
-                          height: 200.0,
+                          viewportFraction: 0.83,
+                          height: 240.0,
+                          enlargeStrategy: CenterPageEnlargeStrategy.scale,
                           enableInfiniteScroll: false,
                           enlargeCenterPage: true,
                         ),
-                        items: eventList.map((e) {
+                        items: roomList.map((room) {
                           return Builder(
                             builder: (BuildContext context) {
                               return Container(
                                 width: MediaQuery.of(context).size.width,
                                 // margin: EdgeInsets.symmetric(horizontal: 1.0),
-                                child: EventsCard(
-                                  event: e,
+                                child: TrendingRoomCard(
+                                  room: room,
                                 ),
                               );
                             },
