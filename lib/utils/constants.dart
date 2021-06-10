@@ -12,6 +12,9 @@ const Color kBottomBarBgColor = Color(0xff3C3C3C);
 const Color kInRoomBottomBarBgColor = Color(0xffE3FFB9);
 const Color kProfileBgColor = Color(0xff474747);
 const Color kCloseButtonBgColor = Color(0x4BFF8383);
+const Color kEventsCardBgColor = Color(0xff3F3F3F);
+const Color kTrendingCardBgColor = Color(0xff3B3B3B);
+const Color kHomeAppBarBgColor = Color(0xff181818);
 
 // Login Screen
 const String kAppName = 'Sports House';

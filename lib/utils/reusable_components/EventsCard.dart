@@ -26,6 +26,7 @@ class EventsCard extends StatelessWidget {
       },
       child: Card(
         elevation: 5,
+        color: kEventsCardBgColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(8),
