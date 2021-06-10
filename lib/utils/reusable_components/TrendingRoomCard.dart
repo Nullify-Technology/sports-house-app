@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/utils/TrendingEvents.dart';
+import 'package:sports_house/utils/Room.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {
@@ -9,7 +9,7 @@ class TrendingRoomCard extends StatelessWidget {
     Key? key,
     required this.room,
   }) : super(key: key);
-  final TrendingRoom room;
+  final Room room;
 
   @override
   Widget build(BuildContext context) {

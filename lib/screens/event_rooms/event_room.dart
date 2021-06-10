@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/RoomsTile.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 
@@ -85,9 +86,18 @@ class _EventRoomsState extends State<EventRooms> {
                   ),
                 ],
               ),
+              // Needed for keeping list above bottomNavBar
+              SizedBox(
+                height: 80,
+              ),
             ],
           ),
         ),
+      ),
+      extendBody: true,
+      //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
+      bottomNavigationBar: InRoomBottomBar(
+        room: kDummyRoom,
       ),
     );
   }

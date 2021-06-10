@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/TrendingEvents.dart';
+import 'package:sports_house/utils/Room.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 
 class RoomScreen extends StatefulWidget {
   RoomScreen({Key? key, required this.room}) : super(key: key);
   static String pageId = 'CreateRoom';
-  final TrendingRoom room;
+  final Room room;
 
   @override
   _RoomScreenState createState() => _RoomScreenState();
@@ -182,7 +182,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      //TODO : @Abhishek Change this row with StreamBuilder
+                      //TODO : @Abhishek Change this row with StreamBuilder Listview
                       Row(
                         children: [
                           Expanded(
@@ -211,6 +211,11 @@ class _RoomScreenState extends State<RoomScreen> {
                           ),
                         ],
                       ),
+
+                      //Needed for padding bottomNavBar
+                      SizedBox(
+                        height: 60,
+                      ),
                     ],
                   ),
                 ),
@@ -219,9 +224,9 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
         ],
       ),
+      extendBody: true,
       bottomNavigationBar: Container(
         height: 60,
-        color: kCardBgColor,
         child: Card(
           clipBehavior: Clip.hardEdge,
           margin: EdgeInsets.all(0),

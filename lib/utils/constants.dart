@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
-import 'package:sports_house/utils/TrendingEvents.dart';
+import 'package:sports_house/utils/Room.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);
@@ -9,6 +9,9 @@ const Color kCardBgColor = Color(0xff2A2A2A);
 const Color kTextFieldBgColor = Color(0xff414141);
 const Color kDropdownBgColor = Color(0xff414141);
 const Color kBottomBarBgColor = Color(0xff3C3C3C);
+const Color kInRoomBottomBarBgColor = Color(0xffE3FFB9);
+const Color kProfileBgColor = Color(0xff474747);
+const Color kCloseButtonBgColor = Color(0x4BFF8383);
 
 // Login Screen
 const String kAppName = 'Sports House';
@@ -79,7 +82,7 @@ SportsEvent kDummyEvent = new SportsEvent(
   team2Url:
       'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
 );
-TrendingRoom kDummyRoom = new TrendingRoom(
+Room kDummyRoom = new Room(
   eventName: 'MUN Vs BAR',
   score: '2 - 1',
   talkingCount: '2k',
@@ -97,6 +100,12 @@ TrendingRoom kDummyRoom = new TrendingRoom(
   ],
 );
 
+const List<String> kDummyParticipants = [
+  kDummyProfileImageUrl,
+  kDummyProfileImageUrl,
+  kDummyProfileImageUrl,
+];
+
 String kDummyImageUrl =
     'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
 
@@ -107,7 +116,7 @@ List<SportsEvent> eventList = [
   kDummyEvent,
   kDummyEvent
 ];
-List<TrendingRoom> roomList = [
+List<Room> roomList = [
   kDummyRoom,
   kDummyRoom,
   kDummyRoom,

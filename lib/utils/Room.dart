@@ -1,4 +1,4 @@
-class TrendingRoom {
+class Room {
   String roomName;
   // String minutes;
   String score;
@@ -10,7 +10,7 @@ class TrendingRoom {
   final String hostedBy;
   final String listners;
   final List<String> participants;
-  TrendingRoom({
+  Room({
     required this.eventName,
     // required this.minutes,
     required this.score,
