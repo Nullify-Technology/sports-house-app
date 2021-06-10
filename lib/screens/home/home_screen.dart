@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/blocs/fixtures_bloc.dart';
 import 'package:sports_house/blocs/user_bloc.dart';
+import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
@@ -14,6 +16,7 @@ import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
+
   static String pageId = 'HomeScreen';
 
   @override
@@ -22,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late UserBloc userBloc;
+  late FixtureBloc fixtureBloc;
   final RestClient client = RestClient.create();
 
   final _controller = PageController();
@@ -30,7 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     userBloc = UserBloc(client: client);
+    fixtureBloc = FixtureBloc(client: client);
     userBloc.getUserProfileImage();
+    fixtureBloc.getFixtures();
   }
 
   @override
@@ -55,13 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // TextButton(
-                //   child: Icon(
-                //     Icons.search,
-                //     color: Colors.white,
-                //   ),
-                //   onPressed: () {},
-                // ),
                 Icon(
                   Icons.sports,
                   size: 30,
@@ -204,27 +203,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 25,
-                        vertical: 10,
-                      ),
-                      height: 250,
-                      child: EventsCard(
-                        event: eventList[index],
-                      ),
-                    );
-                  },
-                );
-              },
-              childCount: 5,
-            ),
-          ),
+          StreamBuilder<Response<List<Fixture>>>(
+              stream: fixtureBloc.fixturesStream,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  switch (snapShot.data!.status) {
+                    case Status.LOADING:
+                    case Status.ERROR:
+                      return SliverToBoxAdapter(child: Container());
+                    case Status.COMPLETED:
+                      return buildFixtureList(snapShot.data!.data);
+                  }
+                }
+                return SliverToBoxAdapter(child: Container());
+              }),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 80,
@@ -236,6 +228,30 @@ class _HomeScreenState extends State<HomeScreen> {
       //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
       bottomNavigationBar: InRoomBottomBar(
         room: kDummyRoom,
+      ),
+    );
+  }
+
+  Widget buildFixtureList(List<Fixture> fixtures) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 25,
+                  vertical: 10,
+                ),
+                height: 250,
+                child: EventsCard(
+                  fixture: fixtures[index],
+                ),
+              );
+            },
+          );
+        },
+        childCount: 5,
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sports_house/blocs/user_bloc.dart';
+import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/login/login_screen.dart';
@@ -10,10 +12,10 @@ import 'config/app_config.dart';
 import 'screens/home/home_screen.dart';
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     FirebaseAuth _auth = FirebaseAuth.instance;
-
     return MaterialApp(
       title: AppConfig.of(context)!.appTitle,
       theme: ThemeData(

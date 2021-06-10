@@ -28,7 +28,12 @@ class UserBloc{
 
 
   UserBloc({required this.client}){
-    this._userController = StreamController<Response<AuthUser>>();
+    this._userController = StreamController<Response<AuthUser>>.broadcast();
+    if(auth.currentUser != null) {
+      auth.idTokenChanges().listen((user) {
+        getUser();
+      });
+    }
   }
 
   void getUser() async {

@@ -1,7 +1,11 @@
 
+import 'dart:collection';
+
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:sports_house/models/auth.dart';
+import 'package:sports_house/models/fixture.dart';
+import 'package:sports_house/models/fixtures.dart';
 import 'package:sports_house/models/user.dart';
 
 import 'interceptors/logging_interceptor.dart';
@@ -18,6 +22,9 @@ abstract class RestClient {
   @PATCH("/user")
   @FormUrlEncoded()
   Future<Auth> updateUser({@Field("name") String? name, @Field("profile_picture_url") String? profileUrl});
+
+  @GET("/fixture")
+  Future<Fixtures> getFixtures();
 
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 

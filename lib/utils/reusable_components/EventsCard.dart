@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class EventsCard extends StatelessWidget {
-  const EventsCard({
-    Key? key,
-    required this.event,
-  }) : super(key: key);
-  final SportsEvent event;
+
+  final Fixture fixture;
+
+  const EventsCard({Key? key,required this.fixture,}) : super(key: key);
+
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -17,7 +19,7 @@ class EventsCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => EventRooms(
-              eventName: event.title,
+              eventName: fixture.teams.home.name + " Vs " + fixture.teams.away.name,
             ),
           ),
         );
@@ -37,7 +39,7 @@ class EventsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      event.title,
+                      fixture.teams.home.name + " Vs " + fixture.teams.away.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -61,7 +63,7 @@ class EventsCard extends StatelessWidget {
                           width: 4,
                         ),
                         Text(
-                          event.minutes,
+                          "20",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -75,7 +77,7 @@ class EventsCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    buildTeamIcon(event.team1Url),
+                    buildTeamIcon(fixture.teams.home.logoUrl),
                     Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -85,18 +87,18 @@ class EventsCard extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
                       child: Text(
-                        event.score,
+                        "2 - 1",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                     ),
-                    buildTeamIcon(event.team2Url),
+                    buildTeamIcon(fixture.teams.away.logoUrl),
                   ],
                 ),
               ),
-              if (event.talkingCount != '')
+              if (false)
                 Column(
                   children: [
                     Divider(
@@ -109,7 +111,7 @@ class EventsCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${event.talkingCount} $kPeopleTalkingText',
+                          '2k $kPeopleTalkingText',
                         ),
                       ],
                     ),
