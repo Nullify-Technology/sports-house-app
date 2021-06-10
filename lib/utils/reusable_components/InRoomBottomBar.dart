@@ -61,7 +61,7 @@ class InRoomBottomBar extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        room.hostedBy,
+                        '$kHostedBy ${room.hostedBy}',
                         maxLines: 1,
                         style: TextStyle(
                           color: kColorBlack,
