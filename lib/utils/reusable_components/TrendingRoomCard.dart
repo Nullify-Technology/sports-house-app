@@ -25,6 +25,7 @@ class TrendingRoomCard extends StatelessWidget {
         );
       },
       child: Card(
+        color: kTrendingCardBgColor,
         elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(

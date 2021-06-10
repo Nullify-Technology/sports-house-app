@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kColorBlack,
+      backgroundColor: kCardBgColor,
       resizeToAvoidBottomInset: true,
       body: CustomScrollView(
         slivers: <Widget>[
@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
             snap: false,
             floating: false,
             expandedHeight: 360.0,
+            backgroundColor: kHomeAppBarBgColor,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
