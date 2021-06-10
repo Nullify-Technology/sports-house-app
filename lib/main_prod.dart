@@ -9,7 +9,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   var configuration = AppConfig(
-    appTitle: appName,
+    appTitle: kAppName,
     buildFlavour: kProduction,
     child: MyApp(),
   );

@@ -13,22 +13,17 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  List<String> eventList = [
-    'General Chat',
-    'MUN Vs BAR',
-    'PSG Vs MUN',
-    'ATL Vs CAR'
-  ];
-
-  String eventName = '';
-  String roomType = '';
   @override
   Widget build(BuildContext context) {
-    eventName = eventList[0];
-    roomType = kRoomTypes[0];
     return Scaffold(
       appBar: AppBar(
-        // title: Text(kCreateRoom),
+        title: Text(
+          kAppName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -116,13 +111,24 @@ class _RoomScreenState extends State<RoomScreen> {
                           children: [
                             buildTeamIcon(widget.room.team1Url),
                             Container(
-                              padding: EdgeInsets.all(5),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 14,
+                              ),
+                              decoration: new BoxDecoration(
+                                color: kCardBgColor,
+                                shape: BoxShape.rectangle,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(40.0)),
+                              ),
                               child: Text(
                                 widget.room.score,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.white54,
+                                  fontSize: 15,
                                 ),
                               ),
                             ),
@@ -266,8 +272,8 @@ class _RoomScreenState extends State<RoomScreen> {
       ),
       child: Image.network(
         url,
-        width: 23,
-        height: 23,
+        width: 40,
+        height: 40,
       ),
     );
   }

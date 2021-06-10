@@ -11,7 +11,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   var configuration = AppConfig(
-    appTitle: appName + "-dev",
+    appTitle: kAppName + "-dev",
     buildFlavour: kDevelopment,
     child: MyApp(),
   );

@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: kColorBlack,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(appName),
+        title: Text(kAppName),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

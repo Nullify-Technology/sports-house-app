@@ -11,13 +11,13 @@ const Color kDropdownBgColor = Color(0xff414141);
 const Color kBottomBarBgColor = Color(0xff3C3C3C);
 
 // Login Screen
-const String appName = 'Sports House';
+const String kAppName = 'Sports House';
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
 const String kSendOtp = 'Send OTP';
-const String kLoginButtonText = 'Enter in to $appName';
+const String kLoginButtonText = 'Enter in to $kAppName';
 const String kInvalidPhone = 'Invalid Phone Number!';
-const String kWelcomeToSportsHouse = 'Welcome to $appName';
+const String kWelcomeToSportsHouse = 'Welcome to $kAppName';
 const String kEnterPhoneNumber = 'Enter your phone number';
 
 const Radius kLoginCardRadius = Radius.circular(10);
