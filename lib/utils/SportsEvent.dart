@@ -9,7 +9,7 @@ class SportsEvent {
     required this.title,
     required this.minutes,
     required this.score,
-    required this.talkingCount,
+    this.talkingCount = '',
     required this.team1Url,
     required this.team2Url,
   });

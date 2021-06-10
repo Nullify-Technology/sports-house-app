@@ -61,24 +61,6 @@ const String kRooms = 'Rooms';
 
 const String kVersus = 'Vs';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Dummy Constants - To be deleted in the end
 const String kDummyProfileImageUrl =
     'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
