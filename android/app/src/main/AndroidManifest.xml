@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sportshouse.sports_house">
    <application
-        android:label="sports_house"
+        android:label="Sports House"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

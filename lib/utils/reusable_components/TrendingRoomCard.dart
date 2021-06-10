@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
+import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/TrendingEvents.dart';
 import 'package:sports_house/utils/constants.dart';
 
@@ -14,14 +15,14 @@ class TrendingRoomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => EventRooms(
-        //       eventName: room.eventName,
-        //     ),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoomScreen(
+              room: room,
+            ),
+          ),
+        );
       },
       child: Card(
         elevation: 5,
