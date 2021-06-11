@@ -46,30 +46,41 @@ class EventsCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: new BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.timer,
-                          size: 16,
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          "20",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                  if (false)
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: new BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.timer,
+                            size: 16,
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            "20",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    fixture.venue.name,
+                    style: TextStyle(fontSize: 11),
                   ),
                 ],
               ),
@@ -87,7 +98,7 @@ class EventsCard extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
                       child: Text(
-                        "2 - 1",
+                        "Vs",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
