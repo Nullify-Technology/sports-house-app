@@ -19,6 +19,7 @@ const Color kHomeAppBarBgColor = Color(0xff181818);
 const Color kMutedButtonColor = Colors.redAccent;
 const Color kUnmutedButtonColor = Color(0xffffffff);
 const Color kMuteButtonBgColor = Color(0x33000000);
+const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
 const String kAppName = 'Sports House';

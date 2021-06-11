@@ -173,6 +173,7 @@ class _RoomScreenState extends State<RoomScreen> {
   Container buildParticipant({
     required String imageUrl,
     required String name,
+    bool isMuted = true,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -182,10 +183,31 @@ class _RoomScreenState extends State<RoomScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(
-            radius: 30,
-            foregroundImage: NetworkImage(
-              imageUrl,
+          Container(
+            // color: Colors.red,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  foregroundImage: NetworkImage(
+                    imageUrl,
+                  ),
+                ),
+                if (isMuted)
+                  Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: kProfileMutedBgColor,
+                    ),
+                    child: Icon(
+                      Icons.mic_off_rounded,
+                      color: kMutedButtonColor,
+                      size: 17,
+                    ),
+                  )
+              ],
             ),
           ),
           SizedBox(
