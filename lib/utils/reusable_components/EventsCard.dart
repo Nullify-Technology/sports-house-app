@@ -3,6 +3,7 @@ import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:intl/intl.dart';
 
 class EventsCard extends StatelessWidget {
   final Fixture fixture;
@@ -29,7 +30,7 @@ class EventsCard extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(18),
           child: Column(
             children: [
               Row(
@@ -41,34 +42,48 @@ class EventsCard extends StatelessWidget {
                           fixture.teams.away.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 17,
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: new BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.timer,
-                          size: 16,
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          "20",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                  if (false)
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: new BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.timer,
+                            size: 16,
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            "20",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                ],
+              ),
+              SizedBox(
+                height: 2,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    '${fixture.venue.name}, ${fixture.venue.city}',
+                    style: TextStyle(fontSize: 11),
                   ),
                 ],
               ),
@@ -86,7 +101,7 @@ class EventsCard extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
                       child: Text(
-                        "2 - 1",
+                        "Vs",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -97,25 +112,26 @@ class EventsCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (false)
-                Column(
-                  children: [
-                    Divider(
-                      thickness: 1,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '2k $kPeopleTalkingText',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              Column(
+                children: [
+                  Divider(
+                    thickness: 1,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        DateFormat.yMMMMd('en_US').add_jm().format(
+                              DateTime.parse(fixture.date),
+                            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
         ),

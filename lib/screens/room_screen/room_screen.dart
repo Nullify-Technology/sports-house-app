@@ -1,12 +1,14 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
+import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class RoomScreenArguments {
   final AgoraRoom agoraRoom;
@@ -18,13 +20,14 @@ class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
   RoomScreen({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'RoomScreen';
-
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
 
 class _RoomScreenState extends State<RoomScreen> {
 
+  late RoomScreenArguments arguments;
+  late RoomsBloc roomsBloc;
   late RtcEngine _engine;
   late AuthUser currentUser;
   bool _joined = false;
@@ -55,6 +58,9 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    arguments = ModalRoute.of(context)!.settings.arguments as RoomScreenArguments;
+    currentUser = context.watch<UserProvider>().currentUser!;
+    initializeAgoraEngine(arguments.room.token, arguments.room.room.id, currentUser.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -70,21 +76,25 @@ class _RoomScreenState extends State<RoomScreen> {
       backgroundColor: kColorBlack,
       body: _joined ? buildUi(widget.arguments.agoraRoom.room) : Container(),
       extendBody: true,
-      bottomNavigationBar: Container(
-        height: 60,
-        child: Card(
-          clipBehavior: Clip.hardEdge,
-          margin: EdgeInsets.all(0),
-          elevation: 10,
-          color: kBottomBarBgColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: kCreateRoomCardRadius,
-              topRight: kCreateRoomCardRadius,
-            ),
+      bottomNavigationBar: Card(
+        clipBehavior: Clip.hardEdge,
+        margin: EdgeInsets.all(0),
+        elevation: 10,
+        color: kBottomBarBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: kCreateRoomCardRadius,
+            topRight: kCreateRoomCardRadius,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 10,
           ),
           child: TextButton(
             onPressed: () {
+
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(primary: Colors.redAccent),
@@ -110,12 +120,10 @@ class _RoomScreenState extends State<RoomScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: _muted
-            ? Icon(Icons.mic_off_rounded, color: kUnMutedButtonColor,)
-            : Icon(Icons.mic_rounded, color: kMutedButtonColor,),
-        backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
-        onPressed: _onToggleMute,
-      ),
+          child: _muted ? Icon(Icons.mic_off_rounded,color: kUnMutedButtonColor,) :Icon(Icons.mic_rounded, color: kMutedButtonColor,),
+          backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
+          onPressed: _onToggleMute,
+        ),
     );
   }
 
@@ -191,15 +199,30 @@ class _RoomScreenState extends State<RoomScreen> {
                               fontSize: 19,
                             ),
                           ),
-                          SizedBox(
-                            width: 6,
-                          ),
+                          // SizedBox(
+                          //   width: 6,
+                          // ),
                           // if (widget.room.isVerified)
                           //   Icon(
                           //     Icons.verified,
                           //     color: kColorGreen,
                           //     size: 18,
                           //   ),
+                          TextButton(
+                            onPressed: () {
+                              //TODO : Add option for sharing room link
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: kMuteButtonBgColor,
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(12),
+                            ),
+                            child: Icon(
+                              Icons.share,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          )
                         ],
                       ),
                       SizedBox(
@@ -259,7 +282,7 @@ class _RoomScreenState extends State<RoomScreen> {
                               color: kCardBgColor,
                               shape: BoxShape.rectangle,
                               borderRadius:
-                              BorderRadius.all(Radius.circular(40.0)),
+                                  BorderRadius.all(Radius.circular(40.0)),
                             ),
                             child: Text(
                               "2",
@@ -333,6 +356,8 @@ class _RoomScreenState extends State<RoomScreen> {
                       itemCount: _roomUsers.length,
 
                     ),
+
+                    //Needed for padding bottomNavBar
                     SizedBox(
                       height: 60,
                     ),
@@ -349,6 +374,7 @@ class _RoomScreenState extends State<RoomScreen> {
   Future<void> initializeAgoraEngine(String token, String channelName,
       String userId) async {
     _engine = await RtcEngine.create(kAgoraAppId);
+    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
     await _engine.disableVideo();
     await _engine.enableAudio();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/Room.dart';
 
@@ -15,8 +16,9 @@ const Color kCloseButtonBgColor = Color(0x4BFF8383);
 const Color kEventsCardBgColor = Color(0xff3F3F3F);
 const Color kTrendingCardBgColor = Color(0xff3B3B3B);
 const Color kHomeAppBarBgColor = Color(0xff181818);
-const Color kMutedButtonColor = Color(0xffff2020);
-const Color kUnMutedButtonColor = Color(0xffffffff);
+const Color kMutedButtonColor = Colors.redAccent;
+const Color kUnmutedButtonColor = Color(0xffffffff);
+const Color kMuteButtonBgColor = Color(0x33000000);
 
 // Login Screen
 const String kAppName = 'Sports House';
