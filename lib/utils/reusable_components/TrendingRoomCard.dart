@@ -15,14 +15,14 @@ class TrendingRoomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RoomScreen(
-              room: room,
-            ),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => RoomScreen(
+        //       room: room,
+        //     ),
+        //   ),
+        // );
       },
       child: Card(
         color: kTrendingCardBgColor,

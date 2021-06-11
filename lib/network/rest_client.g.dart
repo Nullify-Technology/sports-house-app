@@ -54,17 +54,56 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<Fixtures> getFixtures() async {
+  Future<ApiResponse<Fixture>> getFixtures() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _data = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Fixtures>(
+        _setStreamType<ApiResponse<Fixture>>(
             Options(method: 'GET', headers: <String, dynamic>{}, extra: _extra)
                 .compose(_dio.options, '/fixture',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Fixtures.fromJson(_result.data!);
+    final value = ApiResponse<Fixture>.fromJson(
+      _result.data!,
+      (json) => Fixture.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<ApiResponse<Room>> getRooms(fixtureId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ApiResponse<Room>>(
+            Options(method: 'GET', headers: <String, dynamic>{}, extra: _extra)
+                .compose(_dio.options, '/fixture/$fixtureId/rooms',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = ApiResponse<Room>.fromJson(
+      _result.data!,
+      (json) => Room.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<AgoraRoom> createRoom(fixtureId, userId, name) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = {'fixture_id': fixtureId, 'user_id': userId, 'name': name};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<AgoraRoom>(Options(
+                method: 'POST',
+                headers: <String, dynamic>{},
+                extra: _extra,
+                contentType: 'application/x-www-form-urlencoded')
+            .compose(_dio.options, '/room',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = AgoraRoom.fromJson(_result.data!);
     return value;
   }
 

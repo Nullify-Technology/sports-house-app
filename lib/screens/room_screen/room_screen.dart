@@ -1,20 +1,55 @@
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/Room.dart';
+import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:sports_house/models/agora_room.dart';
+import 'package:sports_house/models/response.dart';
+import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/user.dart';
+import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:provider/provider.dart';
+
+class RoomScreenArguments {
+  final AgoraRoom room;
+
+  RoomScreenArguments(this.room);
+}
 
 class RoomScreen extends StatefulWidget {
-  RoomScreen({Key? key, required this.room}) : super(key: key);
-  static String pageId = 'CreateRoom';
-  final Room room;
-
+  RoomScreen({Key? key}) : super(key: key);
+  static String pageId = 'RoomScreen';
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
 
 class _RoomScreenState extends State<RoomScreen> {
+
+  late RoomScreenArguments arguments;
+  late RoomsBloc roomsBloc;
+  late RtcEngine _engine;
+  late AuthUser currentUser;
+  bool _joined = false;
+
+  @override
+  void initState() {
+    roomsBloc = RoomsBloc(client: RestClient.create());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    roomsBloc.dispose();
+    _engine.destroy();
+    super.dispose();
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    arguments = ModalRoute.of(context)!.settings.arguments as RoomScreenArguments;
+    currentUser = context.watch<UserProvider>().currentUser!;
+    initializeAgoraEngine(arguments.room.token, arguments.room.channel, currentUser.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -28,202 +63,7 @@ class _RoomScreenState extends State<RoomScreen> {
         elevation: 0,
       ),
       backgroundColor: kColorBlack,
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Column(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 10,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              widget.room.roomName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 19,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 6,
-                            ),
-                            if (widget.room.isVerified)
-                              Icon(
-                                Icons.verified,
-                                color: kColorGreen,
-                                size: 18,
-                              ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 2,
-                        ),
-                        if (widget.room.hostedBy != '')
-                          Text(
-                            '$kHostedBy ${widget.room.hostedBy}',
-                            style: TextStyle(
-                              // color: Colors.white54,
-                              fontSize: 14,
-                            ),
-                          ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.hearing,
-                              size: 18,
-                              color: Colors.white54,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                              '${widget.room.listners} $kListners',
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 17,
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: 6,
-                        ),
-                        Divider(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            buildTeamIcon(widget.room.team1Url),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 6,
-                              ),
-                              margin: EdgeInsets.symmetric(
-                                horizontal: 14,
-                              ),
-                              decoration: new BoxDecoration(
-                                color: kCardBgColor,
-                                shape: BoxShape.rectangle,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(40.0)),
-                              ),
-                              child: Text(
-                                widget.room.score,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                            buildTeamIcon(widget.room.team2Url),
-                          ],
-                        ),
-                        // Text(
-                        //   widget.room.eventName,
-                        //   style: TextStyle(
-                        //     fontWeight: FontWeight.bold,
-                        //     fontSize: 12,
-                        //     color: Colors.white54,
-                        //   ),
-                        // ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Card(
-              margin: EdgeInsets.all(0),
-              color: kCardBgColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: kCreateRoomCardRadius,
-                  topRight: kCreateRoomCardRadius,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            kParticipants,
-                            style: TextStyle(
-                              fontSize: kHeadingFontSize,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      //TODO : @Abhishek Change this row with StreamBuilder Listview
-                      Row(
-                        children: [
-                          Expanded(
-                            child: buildParticipant(
-                              imageUrl: kDummyImageUrl,
-                              name: kDummyUserName,
-                            ),
-                          ),
-                          Expanded(
-                            child: buildParticipant(
-                              imageUrl: kDummyImageUrl,
-                              name: kDummyUserName,
-                            ),
-                          ),
-                          Expanded(
-                            child: buildParticipant(
-                              imageUrl: kDummyImageUrl,
-                              name: kDummyUserName,
-                            ),
-                          ),
-                          Expanded(
-                            child: buildParticipant(
-                              imageUrl: kDummyImageUrl,
-                              name: kDummyUserName,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      //Needed for padding bottomNavBar
-                      SizedBox(
-                        height: 60,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      body: buildUi(arguments.room.room),
       extendBody: true,
       bottomNavigationBar: Container(
         height: 60,
@@ -265,6 +105,11 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.mic),
+          backgroundColor: new Color(0xFFE57373),
+          onPressed: () {  },
+        ),
     );
   }
 
@@ -311,5 +156,247 @@ class _RoomScreenState extends State<RoomScreen> {
         ],
       ),
     );
+  }
+
+  Widget buildUi(Room room) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 30,
+                vertical: 10,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            room.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          // if (widget.room.isVerified)
+                          //   Icon(
+                          //     Icons.verified,
+                          //     color: kColorGreen,
+                          //     size: 18,
+                          //   ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 2,
+                      ),
+                      // if (widget.room.hostedBy != '')
+                      //   Text(
+                      //     '$kHostedBy ${widget.room.hostedBy}',
+                      //     style: TextStyle(
+                      //       // color: Colors.white54,
+                      //       fontSize: 14,
+                      //     ),
+                      //   ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.hearing,
+                            size: 18,
+                            color: Colors.white54,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '${room.count} $kListners',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 17,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 6,
+                      ),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          buildTeamIcon(room.fixture.teams.home.logoUrl),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 6,
+                            ),
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 14,
+                            ),
+                            decoration: new BoxDecoration(
+                              color: kCardBgColor,
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(40.0)),
+                            ),
+                            child: Text(
+                              "2",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          buildTeamIcon(room.fixture.teams.away.logoUrl),
+                        ],
+                      ),
+                      // Text(
+                      //   widget.room.eventName,
+                      //   style: TextStyle(
+                      //     fontWeight: FontWeight.bold,
+                      //     fontSize: 12,
+                      //     color: Colors.white54,
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: Card(
+            margin: EdgeInsets.all(0),
+            color: kCardBgColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: kCreateRoomCardRadius,
+                topRight: kCreateRoomCardRadius,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          kParticipants,
+                          style: TextStyle(
+                            fontSize: kHeadingFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    //TODO : @Abhishek Change this row with StreamBuilder Listview
+                    Row(
+                      children: [
+                        Expanded(
+                          child: buildParticipant(
+                            imageUrl: kDummyImageUrl,
+                            name: kDummyUserName,
+                          ),
+                        ),
+                        Expanded(
+                          child: buildParticipant(
+                            imageUrl: kDummyImageUrl,
+                            name: kDummyUserName,
+                          ),
+                        ),
+                        Expanded(
+                          child: buildParticipant(
+                            imageUrl: kDummyImageUrl,
+                            name: kDummyUserName,
+                          ),
+                        ),
+                        Expanded(
+                          child: buildParticipant(
+                            imageUrl: kDummyImageUrl,
+                            name: kDummyUserName,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    //Needed for padding bottomNavBar
+                    SizedBox(
+                      height: 60,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> initializeAgoraEngine(String token, String channelName, String userId) async{
+    _engine = await RtcEngine.create(kAgoraAppId);
+    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
+    await _engine.disableVideo();
+    await _engine.enableAudio();
+    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine.setClientRole(ClientRole.Broadcaster);
+    addEventHandlers();
+    await _engine.joinChannel(token, channelName, null, 0);
+  }
+
+  void addEventHandlers() {
+    _engine.setEventHandler(RtcEngineEventHandler(
+      error: (code) {
+        setState(() {
+          final info = 'onError: $code';
+          print(info);
+        });
+      },
+      joinChannelSuccess: (channel, uid, elapsed) async {
+        final info = 'onJoinChannel: $channel, uid: $uid';
+        print(info);
+        setState(() {
+          _joined = true;
+        });
+      },
+      leaveChannel: (stats) async {
+
+      },
+      userJoined: (uid, elapsed) {
+        final info = 'userJoined: $uid';
+        print(info);
+      },
+      userOffline: (uid, reason) {
+        final info = 'userOffline: $uid , reason: $reason';
+        print(info);
+      },
+      firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      },
+
+    ));
   }
 }

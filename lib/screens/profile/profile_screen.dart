@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sports_house/blocs/user_bloc.dart';
-import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/home/home_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen();
@@ -18,10 +18,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
-  late UserBloc userBloc;
   String profileUrl = "";
+  late AuthUser? currentUser;
+
   @override
   Widget build(BuildContext context) {
+    currentUser = context.watch<UserProvider>().currentUser;
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: kColorBlack,
@@ -31,21 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: StreamBuilder<Response<AuthUser>>(
-          stream: userBloc.userStream,
-          builder: (context, snapShot) {
-            if (snapShot.hasData) {
-              switch (snapShot.data!.status) {
-                case Status.LOADING:
-                  return CenterProgressBar();
-                case Status.COMPLETED:
-                  return buildProfileScreen(snapShot.data!.data);
-                case Status.ERROR:
-                  return Container();
-              }
-            }
-            return Container();
-          }),
+      body: currentUser == null ? CenterProgressBar() : buildProfileScreen(currentUser!),
     );
   }
 
@@ -71,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   onTap: () async {
-                    await userBloc.updateProfilePicture(user.id);
+                    await context.read<UserProvider>().updateProfilePicture(user.id);
                   },
                 ),
               ),
@@ -130,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     keyboardType: TextInputType.text,
                     onSaved: (name) async {
-                      await userBloc.updateUserName(name: name);
+                      await context.read<UserProvider>().updateUserName(name: name);
                       Navigator.popAndPushNamed(context, HomeScreen.pageId);
                     },
                     onFieldSubmitted: (v) {},
@@ -161,13 +149,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    userBloc = UserBloc(client: RestClient.create());
-    userBloc.getUser();
   }
 
   @override
   void dispose() {
     super.dispose();
-    userBloc.dispose();
   }
 }

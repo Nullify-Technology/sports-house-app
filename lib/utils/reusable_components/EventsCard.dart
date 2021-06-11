@@ -5,24 +5,20 @@ import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class EventsCard extends StatelessWidget {
-
   final Fixture fixture;
 
-  const EventsCard({Key? key,required this.fixture,}) : super(key: key);
-
+  const EventsCard({
+    Key? key,
+    required this.fixture,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EventRooms(
-              eventName: fixture.teams.home.name + " Vs " + fixture.teams.away.name,
-            ),
-          ),
-        );
+        Navigator.pushNamed(context, EventRooms.pageId,
+            arguments: EventRoomsArguments(fixture.id,
+                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
       },
       child: Card(
         elevation: 5,
@@ -40,7 +36,9 @@ class EventsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      fixture.teams.home.name + " Vs " + fixture.teams.away.name,
+                      fixture.teams.home.name +
+                          " Vs " +
+                          fixture.teams.away.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

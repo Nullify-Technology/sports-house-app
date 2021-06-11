@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/fixtures.dart';
+import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
@@ -30,12 +30,13 @@ class FixtureBloc{
 
   FixtureBloc({required this.client}){
     this._fixturesController = StreamController<Response<List<Fixture>>>.broadcast();
+    fixturesSink.add(Response.loading('Initialising fixtures Details'));
   }
 
   Future getFixtures() async {
     fixturesSink.add(Response.loading('Getting fixtures Details'));
     try{
-      Fixtures response = await client.getFixtures();
+      ApiResponse<Fixture> response = await client.getFixtures();
       fixturesSink.add(Response.completed(response.results));
     }catch(e){
       fixturesSink.add(Response.error(e.toString()));

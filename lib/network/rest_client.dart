@@ -2,10 +2,13 @@
 import 'dart:collection';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:retrofit/retrofit.dart';
+import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/fixtures.dart';
+import 'package:sports_house/models/api_response.dart';
+import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 
 import 'interceptors/logging_interceptor.dart';
@@ -24,7 +27,14 @@ abstract class RestClient {
   Future<Auth> updateUser({@Field("name") String? name, @Field("profile_picture_url") String? profileUrl});
 
   @GET("/fixture")
-  Future<Fixtures> getFixtures();
+  Future<ApiResponse<Fixture>> getFixtures();
+
+  @GET("/fixture/{fixtureId}/rooms")
+  Future<ApiResponse<Room>> getRooms(@Path() String fixtureId);
+
+  @POST("/room")
+  @FormUrlEncoded()
+  Future<AgoraRoom> createRoom(@Field("fixture_id") String fixtureId, @Field("user_id") String userId, @Field("name") String name);
 
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 

@@ -27,6 +27,7 @@ dependencies:
   image_picker: ^0.8.0+3
   agora_rtc_engine: ^4.0.2
   permission_handler: ^8.0.1
+  provider: ^5.0.0
 
 dev_dependencies:
   build_runner: ^2.0.4

@@ -1,14 +1,14 @@
+import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
-import 'package:sports_house/blocs/user_bloc.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
-import 'package:sports_house/utils/Room.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/EventsCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
@@ -24,30 +24,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late UserBloc userBloc;
   late FixtureBloc fixtureBloc;
+  late AuthUser? currentUser;
   final RestClient client = RestClient.create();
-
   final _controller = PageController();
-
   @override
   void initState() {
     super.initState();
-    userBloc = UserBloc(client: client);
     fixtureBloc = FixtureBloc(client: client);
-    userBloc.getUserProfileImage();
-    fixtureBloc.getFixtures();
   }
 
   @override
   void dispose() {
     super.dispose();
     _controller.dispose();
-    userBloc.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    currentUser = context.watch<UserProvider>().currentUser;
+
+    if(currentUser != null){
+      if(currentUser!.name == null || currentUser!.name!.isEmpty){
+        Navigator.popAndPushNamed(context, ProfileScreen.pageId);
+      }else{
+        fixtureBloc.getFixtures();
+      }
+    }
+
     return Scaffold(
       backgroundColor: kCardBgColor,
       resizeToAvoidBottomInset: true,
@@ -100,22 +104,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 10,
                     ),
                     TextButton(
-                      child: StreamBuilder<Response<AuthUser>>(
-                          stream: userBloc.userStream,
-                          builder: (context, snapShot) {
-                            if (snapShot.hasData &&
-                                snapShot.data?.status == Status.COMPLETED) {
-                              return CircleAvatar(
-                                radius: 20,
-                                foregroundImage: NetworkImage(
-                                    snapShot.data?.data.profilePictureUrl ??
-                                        ''),
-                              );
-                            }
-                            return CircleAvatar(
-                              foregroundImage: NetworkImage(kDummyImageUrl),
-                            );
-                          }),
+                      child: (currentUser == null ||
+                              currentUser?.profilePictureUrl == null)
+                          ? CircleAvatar(
+                              foregroundImage: NetworkImage(kDummyImageUrl))
+                          : CircleAvatar(
+                              radius: 20,
+                              foregroundImage: NetworkImage(
+                                  currentUser?.profilePictureUrl ?? ''),
+                            ),
                       onPressed: () {
                         Navigator.pushNamed(context, ProfileScreen.pageId);
                       },
@@ -252,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
-        childCount: 5,
+        childCount: fixtures.length,
       ),
     );
   }
