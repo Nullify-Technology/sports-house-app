@@ -1,47 +1,47 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:provider/provider.dart';
 
 class RoomScreenArguments {
-  final AgoraRoom room;
+  final AgoraRoom agoraRoom;
 
-  RoomScreenArguments(this.room);
+  RoomScreenArguments(this.agoraRoom);
 }
 
 class RoomScreen extends StatefulWidget {
-  RoomScreen({Key? key}) : super(key: key);
+  final RoomScreenArguments arguments;
+  RoomScreen({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'RoomScreen';
+
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
 
 class _RoomScreenState extends State<RoomScreen> {
 
-  late RoomScreenArguments arguments;
-  late RoomsBloc roomsBloc;
   late RtcEngine _engine;
   late AuthUser currentUser;
   bool _joined = false;
   bool _muted = true;
+  final List<String> _roomUsers = [];
+
   @override
   void initState() {
-    roomsBloc = RoomsBloc(client: RestClient.create());
-    _handleMicPermission();
     super.initState();
+    _handleMicPermission();
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
   }
 
   @override
   void dispose() {
     _engine.leaveChannel();
-    roomsBloc.dispose();
     _engine.destroy();
     super.dispose();
   }
@@ -55,9 +55,6 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    arguments = ModalRoute.of(context)!.settings.arguments as RoomScreenArguments;
-    currentUser = context.watch<UserProvider>().currentUser!;
-    initializeAgoraEngine(arguments.room.token, arguments.room.room.id, currentUser.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -71,7 +68,7 @@ class _RoomScreenState extends State<RoomScreen> {
         elevation: 0,
       ),
       backgroundColor: kColorBlack,
-      body: buildUi(arguments.room.room),
+      body: _joined ? buildUi(widget.arguments.agoraRoom.room) : Container(),
       extendBody: true,
       bottomNavigationBar: Container(
         height: 60,
@@ -88,7 +85,6 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
           child: TextButton(
             onPressed: () {
-
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(primary: Colors.redAccent),
@@ -114,10 +110,12 @@ class _RoomScreenState extends State<RoomScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          child: _muted ? Icon(Icons.mic_off_rounded,color: kUnMutedButtonColor,) :Icon(Icons.mic_rounded, color: kMutedButtonColor,),
-          backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
-          onPressed: _onToggleMute,
-        ),
+        child: _muted
+            ? Icon(Icons.mic_off_rounded, color: kUnMutedButtonColor,)
+            : Icon(Icons.mic_rounded, color: kMutedButtonColor,),
+        backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
+        onPressed: _onToggleMute,
+      ),
     );
   }
 
@@ -321,37 +319,20 @@ class _RoomScreenState extends State<RoomScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    //TODO : @Abhishek Change this row with StreamBuilder Listview
-                    Row(
-                      children: [
-                        Expanded(
+                    ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Expanded(
                           child: buildParticipant(
                             imageUrl: kDummyImageUrl,
                             name: kDummyUserName,
                           ),
-                        ),
-                        Expanded(
-                          child: buildParticipant(
-                            imageUrl: kDummyImageUrl,
-                            name: kDummyUserName,
-                          ),
-                        ),
-                        Expanded(
-                          child: buildParticipant(
-                            imageUrl: kDummyImageUrl,
-                            name: kDummyUserName,
-                          ),
-                        ),
-                        Expanded(
-                          child: buildParticipant(
-                            imageUrl: kDummyImageUrl,
-                            name: kDummyUserName,
-                          ),
-                        ),
-                      ],
-                    ),
+                        );
+                      },
+                      itemCount: _roomUsers.length,
 
-                    //Needed for padding bottomNavBar
+                    ),
                     SizedBox(
                       height: 60,
                     ),
@@ -365,48 +346,50 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Future<void> initializeAgoraEngine(String token, String channelName, String userId) async{
+  Future<void> initializeAgoraEngine(String token, String channelName,
+      String userId) async {
     _engine = await RtcEngine.create(kAgoraAppId);
-    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
     await _engine.disableVideo();
     await _engine.enableAudio();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(ClientRole.Broadcaster);
-    await _engine.muteLocalAudioStream(_muted);
-    addEventHandlers();
-    await _engine.joinChannel(token, channelName, null, 0);
+    await _engine.setDefaultAudioRoutetoSpeakerphone(true);
+    addEventHandlers(token, channelName);
+    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
   }
 
-  void addEventHandlers() {
+  void addEventHandlers(token, channelName) {
     _engine.setEventHandler(RtcEngineEventHandler(
-      error: (code) {
-        setState(() {
-          final info = 'onError: $code';
+        error: (code) {},
+        joinChannelSuccess: (channel, uid, elapsed) async {
+          final info = 'onJoinChannel: $channel, uid: $uid';
+          UserInfo uInfo = await _engine.getUserInfoByUid(uid);
+          await _engine.muteLocalAudioStream(_muted);
+          print("onJoinChannel${uInfo.userAccount}");
+          setState(() {
+            _joined = true;
+            _roomUsers.add("$uid");
+          });
+        },
+        leaveChannel: (stats) async {
+          print("left");
+        },
+        userJoined: (uid, elapsed) async {
+          final info = 'userJoined: $uid';
+          UserInfo uInfo = await _engine.getUserInfoByUid(uid);
+          print("User Account" + uInfo.userAccount!);
+          _roomUsers.add("$uid");
+        },
+        userOffline: (uid, reason) {
+          final info = 'userOffline: $uid , reason: $reason';
           print(info);
-        });
-      },
-      joinChannelSuccess: (channel, uid, elapsed) async {
-        final info = 'onJoinChannel: $channel, uid: $uid';
-        print(info);
-        setState(() {
-          _joined = true;
-        });
-      },
-      leaveChannel: (stats) async {
-          print("leaved");
-      },
-      userJoined: (uid, elapsed) async {
-        final info = 'userJoined: $uid';
-        UserInfo uInfo = await _engine.getUserInfoByUid(uid);
-        print("User Account" + uInfo.userAccount!);
-      },
-      userOffline: (uid, reason) {
-        final info = 'userOffline: $uid , reason: $reason';
-        print(info);
-      },
-      firstRemoteVideoFrame: (uid, width, height, elapsed) {
-      },
-
+        },
+        firstRemoteVideoFrame: (uid, width, height, elapsed) {},
+        localUserRegistered: (uid, userAccount) async {
+          print("user registered $userAccount");
+          await _engine.joinChannelWithUserAccount(
+              token, channelName, userAccount);
+        }
     ));
   }
 

@@ -18,7 +18,8 @@ class EventRoomsArguments {
 }
 class EventRooms extends StatefulWidget {
 
-  EventRooms({Key? key}) : super(key: key);
+  final EventRoomsArguments arguments;
+  EventRooms({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'EventRooms';
 
   @override
@@ -27,8 +28,6 @@ class EventRooms extends StatefulWidget {
 
 class _EventRoomsState extends State<EventRooms> {
   late RoomsBloc roomsBloc;
-  late EventRoomsArguments arguments;
-
 
   Future joinRoom(Room room) async {
     try {
@@ -44,18 +43,17 @@ class _EventRoomsState extends State<EventRooms> {
   @override
   void initState() {
     roomsBloc = RoomsBloc(client: RestClient.create());
+    roomsBloc.getRooms(widget.arguments.fixtureId);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    arguments = ModalRoute.of(context)!.settings.arguments as EventRoomsArguments;
-    roomsBloc.getRooms(arguments.fixtureId);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          arguments.eventName,
+          widget.arguments.eventName,
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,

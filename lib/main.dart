@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
@@ -36,8 +37,8 @@ class MyApp extends StatelessWidget {
           HomeScreen.pageId: (context) => HomeScreen(),
           ProfileScreen.pageId: (context) => ProfileScreen(),
           CreateRoom.pageId: (context) => CreateRoom(),
-          RoomScreen.pageId: (context) => RoomScreen(),
-          EventRooms.pageId: (context) => EventRooms(),
+          RoomScreen.pageId: (context) => RoomScreen(arguments: ModalRoute.of(context)!.settings.arguments as RoomScreenArguments,),
+          EventRooms.pageId: (context) => EventRooms(arguments: ModalRoute.of(context)!.settings.arguments as EventRoomsArguments,),
         },
         initialRoute:
             _auth.currentUser == null ? LoginScreen.pageId : HomeScreen.pageId,
