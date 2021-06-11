@@ -30,7 +30,7 @@ class EventsCard extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(18),
           child: Column(
             children: [
               Row(
@@ -42,7 +42,7 @@ class EventsCard extends StatelessWidget {
                           fixture.teams.away.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 17,
                       ),
                     ),
                   ),
@@ -75,11 +75,14 @@ class EventsCard extends StatelessWidget {
                     ),
                 ],
               ),
+              SizedBox(
+                height: 2,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    fixture.venue.name,
+                    '${fixture.venue.name}, ${fixture.venue.city}',
                     style: TextStyle(fontSize: 11),
                   ),
                 ],
