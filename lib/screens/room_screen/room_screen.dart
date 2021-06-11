@@ -16,8 +16,10 @@ class RoomScreenArguments {
 
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
+
   RoomScreen({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'RoomScreen';
+
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
@@ -25,7 +27,6 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> {
   late RtcEngine _engine;
   late AuthUser currentUser;
-  bool _joined = false;
   bool _muted = true;
   final List<String> _roomUsers = [];
 
@@ -33,8 +34,7 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _handleMicPermission();
-    currentUser =
-        Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
     initializeAgoraEngine(widget.arguments.agoraRoom.token,
         widget.arguments.agoraRoom.room.id, currentUser.id);
   }
@@ -68,7 +68,7 @@ class _RoomScreenState extends State<RoomScreen> {
         elevation: 0,
       ),
       backgroundColor: kColorBlack,
-      body: _joined ? buildUi(widget.arguments.agoraRoom.room) : Container(),
+      body: buildUi(widget.arguments.agoraRoom.room),
       extendBody: true,
       bottomNavigationBar: Card(
         clipBehavior: Clip.hardEdge,
@@ -139,19 +139,6 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   child: _muted
-      //       ? Icon(
-      //           Icons.mic_off_rounded,
-      //           color: kUnMutedButtonColor,
-      //         )
-      //       : Icon(
-      //           Icons.mic_rounded,
-      //           color: kMutedButtonColor,
-      //         ),
-      //   backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
-      //   onPressed: _onToggleMute,
-      // ),
     );
   }
 
@@ -393,18 +380,19 @@ class _RoomScreenState extends State<RoomScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    ListView.builder(
-                      scrollDirection: Axis.vertical,
+                    GridView.builder(
                       shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
-                        return Expanded(
-                          child: buildParticipant(
-                            imageUrl: kDummyImageUrl,
-                            name: kDummyUserName,
-                          ),
-                        );
+                        return buildParticipant(
+                            imageUrl: kDummyImageUrl, name: kDummyUserName);
                       },
                       itemCount: _roomUsers.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing: 10,
+                          crossAxisCount: 4,
+                          childAspectRatio: 0.7),
                     ),
 
                     //Needed for padding bottomNavBar
@@ -427,8 +415,8 @@ class _RoomScreenState extends State<RoomScreen> {
     await _engine.registerLocalUserAccount(kAgoraAppId, userId);
     await _engine.disableVideo();
     await _engine.enableAudio();
-    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await _engine.setClientRole(ClientRole.Broadcaster);
+    await _engine.setChannelProfile(ChannelProfile.Game);
+    // await _engine.setClientRole(ClientRole.Broadcaster);
     await _engine.setDefaultAudioRoutetoSpeakerphone(true);
     addEventHandlers(token, channelName);
     await _engine.registerLocalUserAccount(kAgoraAppId, userId);
@@ -438,23 +426,23 @@ class _RoomScreenState extends State<RoomScreen> {
     _engine.setEventHandler(RtcEngineEventHandler(
         error: (code) {},
         joinChannelSuccess: (channel, uid, elapsed) async {
-          final info = 'onJoinChannel: $channel, uid: $uid';
           UserInfo uInfo = await _engine.getUserInfoByUid(uid);
           await _engine.muteLocalAudioStream(_muted);
           print("onJoinChannel ${uInfo.userAccount}");
           setState(() {
-            _joined = true;
-            _roomUsers.add("$uid");
+            _roomUsers.add(uInfo.userAccount!);
           });
         },
         leaveChannel: (stats) async {
           print("left");
         },
         userJoined: (uid, elapsed) async {
-          final info = 'userJoined: $uid';
           UserInfo uInfo = await _engine.getUserInfoByUid(uid);
-          print("User Account" + uInfo.userAccount!);
-          _roomUsers.add("$uid");
+          final info = 'userJoined: $uid';
+          print(info, );
+          setState(() {
+            _roomUsers.add(uInfo.userAccount!);
+          });
         },
         userOffline: (uid, reason) {
           final info = 'userOffline: $uid , reason: $reason';
@@ -468,8 +456,8 @@ class _RoomScreenState extends State<RoomScreen> {
         }));
   }
 
-  void _handleMicPermission() {
-    final status = Permission.microphone.request();
-    print(status);
+  Future<void> _handleMicPermission() async {
+    final status = await Permission.microphone.request();
+    print(status.isDenied);
   }
 }
