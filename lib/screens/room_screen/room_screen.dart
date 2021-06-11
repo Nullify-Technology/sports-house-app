@@ -35,7 +35,7 @@ class _RoomScreenState extends State<RoomScreen> {
     super.initState();
     _handleMicPermission();
     currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
-    // initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
+    initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
   }
 
   @override
@@ -49,7 +49,7 @@ class _RoomScreenState extends State<RoomScreen> {
     setState(() {
       _muted = !_muted;
     });
-    // _engine.muteLocalAudioStream(_muted);
+    _engine.muteLocalAudioStream(_muted);
   }
 
   @override
