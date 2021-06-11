@@ -1,15 +1,12 @@
 
-import 'dart:collection';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:sports_house/models/agora_room.dart';
+import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
 
 import 'interceptors/logging_interceptor.dart';
 
@@ -39,13 +36,15 @@ abstract class RestClient {
   @POST("/room/{roomId}/join")
   Future<AgoraRoom> joinRoom(@Path() String roomId);
 
-
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
-  static RestClient create() {
+  static RestClient create({String? baseUrl}) {
     final dio = Dio();
     dio.interceptors.add(HttpLoggingInterceptor());
     dio.options.headers["Content-Type"] = "application/json";
+    if(baseUrl != null){
+      return RestClient(dio, baseUrl: baseUrl);
+    }
     return RestClient(dio);
   }
 }
