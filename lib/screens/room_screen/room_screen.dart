@@ -1,8 +1,8 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
@@ -30,26 +30,34 @@ class _RoomScreenState extends State<RoomScreen> {
   late RtcEngine _engine;
   late AuthUser currentUser;
   bool _joined = false;
-
+  bool _muted = true;
   @override
   void initState() {
     roomsBloc = RoomsBloc(client: RestClient.create());
+    _handleMicPermission();
     super.initState();
   }
 
   @override
   void dispose() {
+    _engine.leaveChannel();
     roomsBloc.dispose();
     _engine.destroy();
     super.dispose();
   }
 
+  void _onToggleMute() {
+    setState(() {
+      _muted = !_muted;
+    });
+    _engine.muteLocalAudioStream(_muted);
+  }
 
   @override
   Widget build(BuildContext context) {
     arguments = ModalRoute.of(context)!.settings.arguments as RoomScreenArguments;
     currentUser = context.watch<UserProvider>().currentUser!;
-    initializeAgoraEngine(arguments.room.token, arguments.room.channel, currentUser.id);
+    initializeAgoraEngine(arguments.room.token, arguments.room.room.id, currentUser.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -80,7 +88,7 @@ class _RoomScreenState extends State<RoomScreen> {
           ),
           child: TextButton(
             onPressed: () {
-              //TODO : Leave Button Action - Should close the Agora Chat
+
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(primary: Colors.redAccent),
@@ -106,9 +114,9 @@ class _RoomScreenState extends State<RoomScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.mic),
-          backgroundColor: new Color(0xFFE57373),
-          onPressed: () {  },
+          child: _muted ? Icon(Icons.mic_off_rounded,color: kUnMutedButtonColor,) :Icon(Icons.mic_rounded, color: kMutedButtonColor,),
+          backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
+          onPressed: _onToggleMute,
         ),
     );
   }
@@ -364,6 +372,7 @@ class _RoomScreenState extends State<RoomScreen> {
     await _engine.enableAudio();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(ClientRole.Broadcaster);
+    await _engine.muteLocalAudioStream(_muted);
     addEventHandlers();
     await _engine.joinChannel(token, channelName, null, 0);
   }
@@ -384,11 +393,12 @@ class _RoomScreenState extends State<RoomScreen> {
         });
       },
       leaveChannel: (stats) async {
-
+          print("leaved");
       },
-      userJoined: (uid, elapsed) {
+      userJoined: (uid, elapsed) async {
         final info = 'userJoined: $uid';
-        print(info);
+        UserInfo uInfo = await _engine.getUserInfoByUid(uid);
+        print("User Account" + uInfo.userAccount!);
       },
       userOffline: (uid, reason) {
         final info = 'userOffline: $uid , reason: $reason';
@@ -398,5 +408,10 @@ class _RoomScreenState extends State<RoomScreen> {
       },
 
     ));
+  }
+
+  void _handleMicPermission() {
+    final status = Permission.microphone.request();
+    print(status);
   }
 }

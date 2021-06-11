@@ -62,9 +62,9 @@ class RoomsBloc{
   Future<AgoraRoom?> joinRoom(String roomId) async {
     roomsSink.add(Response.loading('Getting fixtures Details'));
     try{
-      // AgoraRoom response = await client.(fixtureId, userId, name);
+      AgoraRoom response = await client.joinRoom(roomId);
       roomsSink.add(Response.completed(rooms));
-      // return response;
+      return response;
     }catch(e){
       roomsSink.add(Response.error(e.toString()));
       print(e);
