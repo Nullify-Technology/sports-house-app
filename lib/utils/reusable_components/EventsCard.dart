@@ -3,6 +3,7 @@ import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:intl/intl.dart';
 
 class EventsCard extends StatelessWidget {
   final Fixture fixture;
@@ -97,25 +98,26 @@ class EventsCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (false)
-                Column(
-                  children: [
-                    Divider(
-                      thickness: 1,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '2k $kPeopleTalkingText',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              Column(
+                children: [
+                  Divider(
+                    thickness: 1,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        DateFormat.yMMMMd('en_US').add_jm().format(
+                              DateTime.parse(fixture.date),
+                            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
         ),
