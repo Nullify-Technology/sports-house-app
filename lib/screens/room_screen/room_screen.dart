@@ -23,7 +23,6 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-
   late RtcEngine _engine;
   late AuthUser currentUser;
   bool _joined = false;
@@ -34,8 +33,10 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _handleMicPermission();
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
-    initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
+    currentUser =
+        Provider.of<UserProvider>(context, listen: false).currentUser!;
+    initializeAgoraEngine(widget.arguments.agoraRoom.token,
+        widget.arguments.agoraRoom.room.id, currentUser.id);
   }
 
   @override
@@ -85,38 +86,72 @@ class _RoomScreenState extends State<RoomScreen> {
             horizontal: 15,
             vertical: 10,
           ),
-          child: TextButton(
-            onPressed: () {
-
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(primary: Colors.redAccent),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.exit_to_app,
-                  color: Colors.redAccent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: TextButton.styleFrom(
+                  primary: Colors.redAccent,
+                  backgroundColor: kMuteButtonBgColor,
+                  shape: StadiumBorder(),
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 ),
-                SizedBox(
-                  width: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.exit_to_app,
+                      color: Colors.redAccent,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      kLeaveRoom,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  kLeaveRoom,
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                  ),
+              ),
+              TextButton(
+                onPressed: _onToggleMute,
+                style: TextButton.styleFrom(
+                  backgroundColor: kMuteButtonBgColor,
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(10),
                 ),
-              ],
-            ),
+                child: _muted
+                    ? Icon(
+                        Icons.mic_off_rounded,
+                        color: kMutedButtonColor,
+                      )
+                    : Icon(
+                        Icons.mic_rounded,
+                        color: kUnmutedButtonColor,
+                      ),
+              )
+            ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-          child: _muted ? Icon(Icons.mic_off_rounded,color: kUnMutedButtonColor,) :Icon(Icons.mic_rounded, color: kMutedButtonColor,),
-          backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
-          onPressed: _onToggleMute,
-        ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: _muted
+      //       ? Icon(
+      //           Icons.mic_off_rounded,
+      //           color: kUnMutedButtonColor,
+      //         )
+      //       : Icon(
+      //           Icons.mic_rounded,
+      //           color: kMutedButtonColor,
+      //         ),
+      //   backgroundColor: _muted ? kMutedButtonColor : kUnMutedButtonColor,
+      //   onPressed: _onToggleMute,
+      // ),
     );
   }
 
@@ -184,6 +219,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             room.name,
@@ -347,7 +383,6 @@ class _RoomScreenState extends State<RoomScreen> {
                         );
                       },
                       itemCount: _roomUsers.length,
-
                     ),
 
                     //Needed for padding bottomNavBar
@@ -364,8 +399,8 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Future<void> initializeAgoraEngine(String token, String channelName,
-      String userId) async {
+  Future<void> initializeAgoraEngine(
+      String token, String channelName, String userId) async {
     _engine = await RtcEngine.create(kAgoraAppId);
     await _engine.registerLocalUserAccount(kAgoraAppId, userId);
     await _engine.disableVideo();
@@ -408,8 +443,7 @@ class _RoomScreenState extends State<RoomScreen> {
           print("user registered $userAccount");
           await _engine.joinChannelWithUserAccount(
               token, channelName, userAccount);
-        }
-    ));
+        }));
   }
 
   void _handleMicPermission() {
