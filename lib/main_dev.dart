@@ -6,7 +6,7 @@ import 'config/app_config.dart';
 import 'main.dart';
 
 Future<void> main() async {
-  // _setupLogging();
+  _setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
