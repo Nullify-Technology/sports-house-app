@@ -34,7 +34,8 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _handleMicPermission();
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser =
+        Provider.of<UserProvider>(context, listen: false).currentUser!;
     initializeAgoraEngine(widget.arguments.agoraRoom.token,
         widget.arguments.agoraRoom.room.id, currentUser.id);
   }
@@ -144,7 +145,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
   Container buildTeamIcon(String url) {
     return Container(
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.all(12),
       decoration: new BoxDecoration(
         color: kCardBgColor,
         shape: BoxShape.circle,
@@ -181,7 +182,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     imageUrl,
                   ),
                 ),
-                if (isMuted)
+                if (false)
                   Container(
                     padding: EdgeInsets.all(2),
                     decoration: BoxDecoration(
@@ -390,9 +391,10 @@ class _RoomScreenState extends State<RoomScreen> {
                       },
                       itemCount: _roomUsers.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisSpacing: 10,
-                          crossAxisCount: 4,
-                          childAspectRatio: 0.7),
+                        crossAxisSpacing: 10,
+                        crossAxisCount: 4,
+                        childAspectRatio: 0.5,
+                      ),
                     ),
 
                     //Needed for padding bottomNavBar
@@ -439,7 +441,9 @@ class _RoomScreenState extends State<RoomScreen> {
         userJoined: (uid, elapsed) async {
           UserInfo uInfo = await _engine.getUserInfoByUid(uid);
           final info = 'userJoined: $uid';
-          print(info, );
+          print(
+            info,
+          );
           setState(() {
             _roomUsers.add(uInfo.userAccount!);
           });
