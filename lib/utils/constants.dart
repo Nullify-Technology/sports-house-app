@@ -17,7 +17,7 @@ const Color kEventsCardBgColor = Color(0xff3F3F3F);
 const Color kTrendingCardBgColor = Color(0xff3B3B3B);
 const Color kHomeAppBarBgColor = Color(0xff181818);
 const Color kMutedButtonColor = Colors.redAccent;
-const Color kUnmutedButtonColor = Color(0xffffffff);
+const Color kUnMutedButtonColor = Color(0xffffffff);
 const Color kMuteButtonBgColor = Color(0x33000000);
 
 // Login Screen

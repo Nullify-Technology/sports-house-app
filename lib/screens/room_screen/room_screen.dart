@@ -1,14 +1,12 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:provider/provider.dart';
 
 class RoomScreenArguments {
   final AgoraRoom agoraRoom;
@@ -26,8 +24,6 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
 
-  late RoomScreenArguments arguments;
-  late RoomsBloc roomsBloc;
   late RtcEngine _engine;
   late AuthUser currentUser;
   bool _joined = false;
@@ -39,7 +35,7 @@ class _RoomScreenState extends State<RoomScreen> {
     super.initState();
     _handleMicPermission();
     currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
-    initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
+    // initializeAgoraEngine(widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room.id, currentUser.id);
   }
 
   @override
@@ -53,14 +49,11 @@ class _RoomScreenState extends State<RoomScreen> {
     setState(() {
       _muted = !_muted;
     });
-    _engine.muteLocalAudioStream(_muted);
+    // _engine.muteLocalAudioStream(_muted);
   }
 
   @override
   Widget build(BuildContext context) {
-    arguments = ModalRoute.of(context)!.settings.arguments as RoomScreenArguments;
-    currentUser = context.watch<UserProvider>().currentUser!;
-    initializeAgoraEngine(arguments.room.token, arguments.room.room.id, currentUser.id);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -391,7 +384,7 @@ class _RoomScreenState extends State<RoomScreen> {
           final info = 'onJoinChannel: $channel, uid: $uid';
           UserInfo uInfo = await _engine.getUserInfoByUid(uid);
           await _engine.muteLocalAudioStream(_muted);
-          print("onJoinChannel${uInfo.userAccount}");
+          print("onJoinChannel ${uInfo.userAccount}");
           setState(() {
             _joined = true;
             _roomUsers.add("$uid");
