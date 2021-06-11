@@ -223,6 +223,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             room.name,
@@ -231,15 +232,30 @@ class _RoomScreenState extends State<RoomScreen> {
                               fontSize: 19,
                             ),
                           ),
-                          SizedBox(
-                            width: 6,
-                          ),
+                          // SizedBox(
+                          //   width: 6,
+                          // ),
                           // if (widget.room.isVerified)
                           //   Icon(
                           //     Icons.verified,
                           //     color: kColorGreen,
                           //     size: 18,
                           //   ),
+                          TextButton(
+                            onPressed: () {
+                              //TODO : Add option for sharing room link
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: kMuteButtonBgColor,
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(12),
+                            ),
+                            child: Icon(
+                              Icons.share,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          )
                         ],
                       ),
                       SizedBox(
