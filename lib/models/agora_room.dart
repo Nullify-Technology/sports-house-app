@@ -10,13 +10,11 @@ part 'agora_room.g.dart';
 class AgoraRoom{
   @JsonKey(name: "room")
   final Room room;
-  @JsonKey(name: "channel")
-  final String channel;
   @JsonKey(name: "token")
   final String token;
 
 
-  AgoraRoom(this.room, this.channel, this.token);
+  AgoraRoom(this.room, this.token);
 
   factory AgoraRoom.fromJson(Map<String, dynamic> json) => _$AgoraRoomFromJson(json);
   Map<String, dynamic> toJson() => _$AgoraRoomToJson(this);
