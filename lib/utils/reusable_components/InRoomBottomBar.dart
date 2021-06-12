@@ -17,79 +17,74 @@ class InRoomBottomBar extends StatelessWidget {
         Navigator.pushNamed(context, RoomScreen.pageId,
             arguments: RoomScreenArguments(agoraRoom));
       },
-      child: Container(
+      child: Card(
+        margin: EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 5,
+        ),
+        clipBehavior: Clip.hardEdge,
+        color: kInRoomBottomBarBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
         child: Container(
-          // height: 75,
-          child: Card(
-            margin: EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 5,
-            ),
-            clipBehavior: Clip.hardEdge,
-            color: kInRoomBottomBarBgColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 5,
+          padding: EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 5,
+          ),
+          child: Row(
+            children: [
+              Container(
+                // color: Colors.white,
+                // alignment: Alignment.center,
+                width: 100,
+                height: 50,
+                child: Stack(
+                  alignment: Alignment.centerRight,
+                  children: buildProfileStack(members: agoraRoom.room.members),
+                ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    // color: Colors.white,
-                    // alignment: Alignment.center,
-                    width: 100,
-                    height: 50,
-                    child: Stack(
-                      alignment: Alignment.centerRight,
-                      children: buildProfileStack(members: agoraRoom.room.members),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          agoraRoom.room.name,
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: kColorBlack,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          '$kHostedBy ${agoraRoom.room.createdBy.name}',
-                          maxLines: 1,
-                          style: TextStyle(
-                            color: kColorBlack,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      context.read<AgoraProvider>().leaveRoom(agoraRoom.room.id);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: new BoxDecoration(
-                        color: kCloseButtonBgColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.red.shade300,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      agoraRoom.room.name,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: kColorBlack,
+                        fontSize: 16,
                       ),
                     ),
-                  )
-                ],
+                    Text(
+                      '$kHostedBy ${agoraRoom.room.createdBy.name}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: kColorBlack,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              TextButton(
+                onPressed: () {
+                  context.read<AgoraProvider>().leaveRoom(agoraRoom.room.id);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: new BoxDecoration(
+                    color: kCloseButtonBgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.red.shade300,
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ),
