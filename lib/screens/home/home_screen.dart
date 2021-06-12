@@ -176,33 +176,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                      child: CarouselSlider(
-                        options: CarouselOptions(
-                          viewportFraction: 0.83,
-                          height: 240.0,
-                          enlargeStrategy: CenterPageEnlargeStrategy.scale,
-                          enableInfiniteScroll: false,
-                          enlargeCenterPage: true,
-                        ),
-                        items: roomList.map((room) {
-                          return StreamBuilder<Response<List<Room>>>(
-                            stream: roomsBloc.roomsStream,
-                            builder: (context, snapShot) {
-                              if (snapShot.hasData) {
-                                switch (snapShot.data!.status) {
-                                  case Status.LOADING:
-                                  case Status.ERROR:
-                                    return Container();
-                                  case Status.COMPLETED:
-                                    return TrendingRoomCard(
-                                      room: snapShot.data!.data[0],
-                                    );
-                                }
-                              }
-                              return Container();
-                            },
-                          );
-                        }).toList(),
+                      child: StreamBuilder<Response<List<Room>>>(
+                        stream: roomsBloc.roomsStream,
+                        builder: (context, snapShot) {
+                          if (snapShot.hasData) {
+                            switch (snapShot.data!.status) {
+                              case Status.LOADING:
+                              case Status.ERROR:
+                                return Container();
+                              case Status.COMPLETED:
+                                return buildTrendingCarousel(
+                                  snapShot.data!.data,
+                                );
+                            }
+                          }
+                          return Container();
+                        },
                       ),
                     ),
                   ],
@@ -284,6 +273,31 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         childCount: fixtures.length,
       ),
+    );
+  }
+
+  Widget buildTrendingCarousel(List<Room> rooms) {
+    return CarouselSlider(
+      options: CarouselOptions(
+        viewportFraction: 0.83,
+        height: 240.0,
+        enlargeStrategy: CenterPageEnlargeStrategy.scale,
+        enableInfiniteScroll: false,
+        enlargeCenterPage: true,
+      ),
+      items: rooms.map((room) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              // margin: EdgeInsets.symmetric(horizontal: 1.0),
+              child: TrendingRoomCard(
+                room: room,
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }
