@@ -2,7 +2,7 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -15,7 +15,7 @@ class AgoraProvider with ChangeNotifier {
   bool muted = false;
   bool isJoined = false;
   late AuthUser? currentUser;
-  Room? room;
+  AgoraRoom? room;
 
   AgoraProvider({this.currentUser}) {
     _roomsBloc = RoomsBloc(client: RestClient.create());
@@ -23,7 +23,7 @@ class AgoraProvider with ChangeNotifier {
         FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("rooms");
   }
 
-  Future joinAgoraRoom(String token, Room room) async {
+  Future joinAgoraRoom(String token, AgoraRoom room) async {
     _engine = await RtcEngine.create(kAgoraAppId);
     await _engine?.disableVideo();
     await _engine?.enableAudio();
@@ -34,8 +34,8 @@ class AgoraProvider with ChangeNotifier {
     await _engine?.adjustPlaybackSignalVolume(130);
     muted = true;
     this.room = room;
-    addEventHandlers(token, room.id);
-    addFireBaseStorageHandler(room.id);
+    addEventHandlers(token, room.room.id);
+    addFireBaseStorageHandler(room.room.id);
     notifyListeners();
   }
 
@@ -51,7 +51,7 @@ class AgoraProvider with ChangeNotifier {
     muted = !muted;
     currentUser!.muted = muted;
     await _rtDbReference
-        .child("rooms_${room!.id}").child(currentUser!.id).set(currentUser!.toJson());
+        .child("rooms_${room!.room.id}").child(currentUser!.id).set(currentUser!.toJson());
     await _engine?.muteLocalAudioStream(muted);
     notifyListeners();
   }
@@ -91,7 +91,7 @@ class AgoraProvider with ChangeNotifier {
   void dispose() {
     super.dispose();
     if (room != null && isJoined) {
-      _roomsBloc.leaveRoom(room!.id);
+      _roomsBloc.leaveRoom(room!.room.id);
       _rtDbReference.child(currentUser!.id).remove();
     }
     _engine?.destroy();

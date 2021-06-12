@@ -1,8 +1,7 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
@@ -246,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
       bottomNavigationBar: context.watch<AgoraProvider>().isJoined
           ? InRoomBottomBar(
-              room: context.watch<AgoraProvider>().room!,
+              room: context.watch<AgoraProvider>().room!.room,
             )
           : null,
     );

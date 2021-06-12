@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -24,12 +25,13 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-
+  late DatabaseReference databaseReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference()
+      .child("fixture").child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
   Future handleMicroPhonePermission() async {
     final status = await Permission.microphone.request();
     if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
       Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
-          widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room);
+          widget.arguments.agoraRoom.token, widget.arguments.agoraRoom);
     }else{
       _showPermissionDialog();
     }
@@ -64,7 +66,9 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    handleMicroPhonePermission();
+    if(!Provider.of<AgoraProvider>(context, listen: false).isJoined){
+      handleMicroPhonePermission();
+    }
   }
 
   @override
@@ -346,14 +350,29 @@ class _RoomScreenState extends State<RoomScreen> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(40.0)),
                             ),
-                            child: Text(
-                              (room.fixture.score != null)
-                                  ? '${room.fixture.score!.current.home} - ${room.fixture.score!.current.away}'
-                                  : 'Vs',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                            child: StreamBuilder<Event>(
+                              stream: databaseReference.child("score").child("current").onValue,
+                              builder: (context, snapShot){
+                                if(snapShot.hasData){
+                                  if(snapShot.data!.snapshot.value != null){
+                                    Map<String, dynamic> score = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                                    return Text(
+                                      '${score["home"]} - ${score["away"]}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    );
+                                  }
+                                }
+                                return Text(
+                                  'Vs',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           buildTeamIcon(room.fixture.teams.away.logoUrl),

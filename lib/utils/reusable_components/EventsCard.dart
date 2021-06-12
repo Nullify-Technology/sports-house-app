@@ -1,9 +1,9 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
-import 'package:sports_house/utils/SportsEvent.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:intl/intl.dart';
 
 class EventsCard extends StatelessWidget {
   final Fixture fixture;
@@ -15,6 +15,10 @@ class EventsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    late DatabaseReference databaseReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference()
+        .child("fixture").child("fixture_${fixture.id}");
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, EventRooms.pageId,
@@ -46,33 +50,18 @@ class EventsCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (false)
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: new BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.timer,
-                            size: 16,
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            "20",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  StreamBuilder<Event>(
+                    stream: databaseReference.child("status").onValue,
+                    builder: (context, snapShot){
+                      if(snapShot.hasData){
+                        if(snapShot.data!.snapshot.value != null){
+                          Map<String, dynamic> status = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                          return buildTimerWidget(status["short"], status["elapsed"]);
+                        }
+                      }
+                      return Container();
+                    },
+                  ),
                 ],
               ),
               SizedBox(
@@ -100,12 +89,29 @@ class EventsCard extends StatelessWidget {
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
-                      child: Text(
-                        '${fixture.score?.current.home} - ${fixture.score?.current.away}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                      child: StreamBuilder<Event>(
+                        stream: databaseReference.child("score").child("current").onValue,
+                        builder: (context, snapShot){
+                          if(snapShot.hasData){
+                            if(snapShot.data!.snapshot.value != null){
+                              Map<String, dynamic> score = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                              return Text(
+                                '${score["home"]} - ${score["away"]}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              );
+                            }
+                          }
+                          return Text(
+                            'Vs',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     buildTeamIcon(fixture.teams.away.logoUrl),
@@ -152,5 +158,34 @@ class EventsCard extends StatelessWidget {
         height: 50,
       ),
     );
+  }
+
+  Widget buildTimerWidget(String? short, int elapsed){
+      return Container(
+        padding:
+        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: new BoxDecoration(
+          color: (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.all(Radius.circular(40.0)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.timer,
+              size: 16,
+            ),
+            SizedBox(
+              width: 4,
+            ),
+            Text(
+              (short != null && short == "FT") ? "Full Time" : (short == "HT" ? "Half Time" : elapsed.toString()),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      );
   }
 }
