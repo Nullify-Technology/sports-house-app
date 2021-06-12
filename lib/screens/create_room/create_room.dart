@@ -9,6 +9,7 @@ import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 import 'package:sports_house/utils/reusable_components/drop_down_list.dart';
+import 'package:intl/intl.dart';
 
 class CreateRoom extends StatefulWidget {
   CreateRoom({Key? key}) : super(key: key);
@@ -31,18 +32,46 @@ class _CreateRoomState extends State<CreateRoom> {
 
   createFixtureRoom() async {
     if (_formKey.currentState!.validate()) {
-      AgoraRoom? room = await roomsBloc.createRoom(
-          selectedFixture.key, "0", roomNameController.text);
-      Navigator.popAndPushNamed(context, RoomScreen.pageId,
-          arguments: RoomScreenArguments(room!));
+      if (selectedFixture.key != 'no_matches' &&
+          selectedType.key != 'private') {
+        AgoraRoom? room = await roomsBloc.createRoom(
+            selectedFixture.key, "0", roomNameController.text);
+        print(room);
+        Navigator.popAndPushNamed(context, RoomScreen.pageId,
+            arguments: RoomScreenArguments(room!));
+      } else {
+        print('No matches are available!');
+        final snackBar = SnackBar(
+          content: Text(
+            selectedFixture.key == 'no_matches'
+                ? 'No matches are available for creating room!'
+                : 'Private rooms are unavailable right now!',
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
   }
 
   populateFixturesDropDown(List<Fixture> fixtures) {
-    fixtureDropDown = fixtures
-        .map((Fixture fixture) => DropDown(fixture.id,
-            "${fixture.teams.home.name} Vs ${fixture.teams.away.name}"))
-        .toList();
+    var now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String today = formatter.format(now);
+    print('today : $today');
+
+    for (var fixture in fixtures) {
+      try {
+        if (formatter.format(DateTime.parse(fixture.date)) == today)
+          fixtureDropDown.add(DropDown(
+            fixture.id,
+            "${fixture.teams.home.name} Vs ${fixture.teams.away.name}",
+          ));
+      } catch (e) {
+        print(e);
+      }
+    }
+    if (fixtureDropDown.length == 0)
+      fixtureDropDown.add(DropDown('no_matches', 'No matches available'));
     roomTypes = [DropDown("public", "Public"), DropDown("private", "Private")];
     selectedFixture = fixtureDropDown.first;
     selectedType = roomTypes.first;
