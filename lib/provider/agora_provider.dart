@@ -42,9 +42,9 @@ class AgoraProvider with ChangeNotifier {
   Future leaveRoom(String roomId) async {
     isJoined = false;
     notifyListeners();
-    await _roomsBloc.leaveRoom(roomId);
-    await _rtDbReference.child("rooms_$roomId").child(currentUser!.id).remove();
     await _engine?.leaveChannel();
+    await _rtDbReference.child("rooms_$roomId").child(currentUser!.id).remove();
+    await _roomsBloc.leaveRoom(roomId);
   }
 
   Future toggleMute() async {

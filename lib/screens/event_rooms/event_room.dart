@@ -87,7 +87,7 @@ class _EventRoomsState extends State<EventRooms> {
       extendBody: true,
       bottomNavigationBar: context.watch<AgoraProvider>().isJoined
           ? InRoomBottomBar(
-              room: context.watch<AgoraProvider>().room!.room,
+              agoraRoom: context.watch<AgoraProvider>().room!,
             )
           : null,
     );
