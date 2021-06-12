@@ -13,6 +13,7 @@ Fixture _$FixtureFromJson(Map<String, dynamic> json) {
     json['date'] as String,
     Teams.fromJson(json['teams'] as Map<String, dynamic>),
     json['externalId'] as int,
+    MatchDetails.fromJson(json['score'] as Map<String, dynamic>),
   );
 }
 
@@ -22,4 +23,5 @@ Map<String, dynamic> _$FixtureToJson(Fixture instance) => <String, dynamic>{
       'date': instance.date,
       'teams': instance.teams,
       'externalId': instance.externalId,
+      'score': instance.score,
     };
