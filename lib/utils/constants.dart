@@ -135,8 +135,9 @@ List<DesignRoom> roomList = [
   kDummyRoom,
   kDummyRoom
 ];
-const String kPermissionText = "Can not join room with out microphone permission!";
-const String kCompletedEventText = "Can not join room of a completed event!";
+const String kPermissionText =
+    "Inorder to join a room, you must allow $kAppName to access your microphone!";
+const String kCompletedEventText = "Cannot join room of a completed event!";
 const String kBaseUrl =
     "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kRTDBUrl =
