@@ -76,6 +76,8 @@ const String kVersus = 'Vs';
 const String kParticipants = 'Participants';
 const String kLeaveRoom = 'Leave Room';
 const String kAgoraAppId = "c5bc6c712c7f4ff5825e2d9a11ece1f1";
+
+const String kNoRoomsFound = 'No rooms found!';
 //TODO : Dummy Constants - To be deleted in the end
 const String kDummyProfileImageUrl =
     'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
@@ -132,6 +134,8 @@ List<Room> roomList = [
   kDummyRoom
 ];
 
-const String kBaseUrl = "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
+const String kBaseUrl =
+    "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kFcmBaseUrl = "https://fcm.googleapis.com";
-const String kFcmAuthorisation = "key=AAAAlO7jT40:APA91bHu7Ga95Vr2LUJjXodvp4dHRa7_GD-v4IR_Ip_SdSHvzHdBFMQ3BIE8M1q-ZdXx0NNbJpfPvVfg1HoT6wrYWnP27XjG3FV7Gwk6Xh4dbJRwtecKbj0BcYOYRw-fkCUJhcQsshYQ";
+const String kFcmAuthorisation =
+    "key=AAAAlO7jT40:APA91bHu7Ga95Vr2LUJjXodvp4dHRa7_GD-v4IR_Ip_SdSHvzHdBFMQ3BIE8M1q-ZdXx0NNbJpfPvVfg1HoT6wrYWnP27XjG3FV7Gwk6Xh4dbJRwtecKbj0BcYOYRw-fkCUJhcQsshYQ";

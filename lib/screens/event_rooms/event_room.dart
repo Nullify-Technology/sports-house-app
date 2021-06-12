@@ -4,6 +4,7 @@ import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
@@ -117,21 +118,69 @@ class _EventRoomsState extends State<EventRooms> {
           SizedBox(
             height: 15,
           ),
-          ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: rooms.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                child: RoomsTile(
-                  title: rooms[index].name,
-                  listners: rooms[index].count,
-                  participants: rooms[index].members,
-                ),
-                onTap: () => joinRoom(rooms[index]),
-              );
-            },
-          ),
+          if (rooms.length > 0)
+            ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: rooms.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: RoomsTile(
+                    title: rooms[index].name,
+                    listners: rooms[index].count,
+                    participants: rooms[index].members,
+                  ),
+                  onTap: () => joinRoom(rooms[index]),
+                );
+              },
+            )
+          else
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Image.asset(
+                    'assets/images/no_rooms_found.png',
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    kNoRoomsFound,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      // fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, CreateRoom.pageId);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: StadiumBorder(),
+                      primary: kColorGreen,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        kCreateRoom,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: kCardBgColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           // Needed for keeping list above bottomNavBar
           SizedBox(
             height: 80,
