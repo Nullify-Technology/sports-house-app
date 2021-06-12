@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/user.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/Room.dart';
@@ -79,36 +80,14 @@ class TrendingRoomCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (room.members.length > 0)
-                  Expanded(
-                    child: Container(
-                      // alignment: Alignment.center,
-                      height: 55,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          if (room.members.length > 0 &&
-                              room.members[0].profilePictureUrl != null)
-                            buildCircleAvatar(
-                              imageUrl:
-                                  room.members[0].profilePictureUrl ?? '',
-                              left: MediaQuery.of(context).size.width * 0.22,
-                            ),
-                          if (room.members.length > 1 &&
-                              room.members[1].profilePictureUrl != null)
-                            buildCircleAvatar(
-                              imageUrl:
-                                  room.members[1].profilePictureUrl ?? '',
-                              left: MediaQuery.of(context).size.width * 0.30,
-                            ),
-                          if (room.members.length > 2 &&
-                              room.members[2].profilePictureUrl != null)
-                            buildCircleAvatar(
-                              imageUrl:
-                                  room.members[2].profilePictureUrl ?? '',
-                              left: MediaQuery.of(context).size.width * 0.38,
-                            ),
-                        ],
-                      ),
+                  Container(
+                    alignment: Alignment.center,
+                    width: 100,
+                    // color: Colors.white,
+                    height: 55,
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: buildProfileStack(members: room.members),
                     ),
                   ),
               ],
@@ -164,6 +143,21 @@ class TrendingRoomCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Widget> buildProfileStack({required List<AuthUser> members}) {
+    List<Widget> profileStack = [];
+    for (AuthUser user in members) {
+      if (profileStack.length == 3) break;
+      if (user.profilePictureUrl != null &&
+          user.profilePictureUrl!.isNotEmpty) {
+        Widget avatar = buildCircleAvatar(
+            imageUrl: user.profilePictureUrl ?? '',
+            left: profileStack.length * 25);
+        profileStack.add(avatar);
+      }
+    }
+    return profileStack;
   }
 
   Widget buildCircleAvatar({required String imageUrl, double left = 0}) {

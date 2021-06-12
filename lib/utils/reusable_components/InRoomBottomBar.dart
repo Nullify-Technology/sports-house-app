@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/user.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -37,8 +38,7 @@ class InRoomBottomBar extends StatelessWidget {
                   height: 50,
                   child: Stack(
                     alignment: Alignment.centerRight,
-                    children: room.members.map((member) => buildCircleAvatar(
-                        imageUrl: kDummyParticipants[0], left: 25)).toList()
+                    children: buildProfileStack(members: room.members),
                   ),
                 ),
                 Expanded(
@@ -88,6 +88,20 @@ class InRoomBottomBar extends StatelessWidget {
       ),
     );
   }
+}
+
+List<Widget> buildProfileStack({required List<AuthUser> members}) {
+  List<Widget> profileStack = [];
+  for (AuthUser user in members) {
+    if (profileStack.length == 3) break;
+    if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
+      Widget avatar = buildCircleAvatar(
+          imageUrl: user.profilePictureUrl ?? '',
+          left: profileStack.length * 25);
+      profileStack.add(avatar);
+    }
+  }
+  return profileStack;
 }
 
 Widget buildCircleAvatar({required String imageUrl, double left = 0}) {

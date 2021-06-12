@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({
@@ -93,27 +94,26 @@ class RoomsTile extends StatelessWidget {
           height: 40,
           child: Stack(
             alignment: Alignment.centerRight,
-            children: [
-              if (participants.length > 0 &&
-                  participants[0].profilePictureUrl != null)
-                buildCircleAvatar(
-                    imageUrl: participants[0].profilePictureUrl ?? '',
-                    left: 50),
-              if (participants.length > 1 &&
-                  participants[1].profilePictureUrl != null)
-                buildCircleAvatar(
-                    imageUrl: participants[1].profilePictureUrl ?? '',
-                    left: 25),
-              if (participants.length > 2 &&
-                  participants[2].profilePictureUrl != null)
-                buildCircleAvatar(
-                  imageUrl: participants[2].profilePictureUrl ?? '',
-                ),
-            ],
+            children: buildProfileStack(members: participants),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> buildProfileStack({required List<AuthUser> members}) {
+    List<Widget> profileStack = [];
+    for (AuthUser user in members) {
+      if (profileStack.length == 3) break;
+      if (user.profilePictureUrl != null &&
+          user.profilePictureUrl!.isNotEmpty) {
+        Widget avatar = buildCircleAvatar(
+            imageUrl: user.profilePictureUrl ?? '',
+            left: profileStack.length * 25);
+        profileStack.add(avatar);
+      }
+    }
+    return profileStack;
   }
 
   Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
