@@ -135,7 +135,7 @@ List<DesignRoom> roomList = [
   kDummyRoom,
   kDummyRoom
 ];
-
+const String kPermissionText = "Can not join room with out microphone permission!";
 const String kBaseUrl =
     "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kRTDBUrl =

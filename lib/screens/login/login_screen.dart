@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
@@ -53,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen>
     PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
         (String verificationId) {
       this._verificationId = verificationId;
-      _controller.animateTo(0);
+      // _controller.animateTo(0);
       print( "timeout");
     };
 

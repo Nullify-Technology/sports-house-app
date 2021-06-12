@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/provider/agora_provider.dart';
+import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class RoomScreenArguments {
@@ -22,11 +24,47 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
+
+  Future handleMicroPhonePermission() async {
+    final status = await Permission.microphone.request();
+    if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
+      Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
+          widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room);
+    }else{
+      _showPermissionDialog();
+    }
+  }
+
+  Future<void> _showPermissionDialog() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(kPermissionText),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.popUntil(context, ModalRoute.withName(EventRooms.pageId));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
-    Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
-        widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room);
     super.initState();
+    handleMicroPhonePermission();
   }
 
   @override
