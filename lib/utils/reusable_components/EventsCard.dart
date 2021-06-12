@@ -125,7 +125,7 @@ class EventsCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat.yMMMMd('en_US').add_jm().format(
-                              DateTime.parse(fixture.date),
+                              DateTime.parse(fixture.date).toLocal(),
                             ),
                       ),
                     ],
