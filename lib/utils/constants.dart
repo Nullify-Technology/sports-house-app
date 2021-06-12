@@ -94,7 +94,7 @@ SportsEvent kDummyEvent = new SportsEvent(
   team2Url:
       'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
 );
-Room kDummyRoom = new Room(
+DesignRoom kDummyRoom = new DesignRoom(
   eventName: 'MUN Vs BAR',
   score: '2 - 1',
   talkingCount: '2k',
@@ -128,7 +128,7 @@ List<SportsEvent> eventList = [
   kDummyEvent,
   kDummyEvent
 ];
-List<Room> roomList = [
+List<DesignRoom> roomList = [
   kDummyRoom,
   kDummyRoom,
   kDummyRoom,

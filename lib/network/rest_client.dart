@@ -27,6 +27,9 @@ abstract class RestClient {
   @GET("/fixture")
   Future<ApiResponse<Fixture>> getFixtures();
 
+  @GET("/room/trending/")
+  Future<ApiResponse<Room>> getTrendingRooms();
+
   @GET("/fixture/{fixtureId}/rooms")
   Future<ApiResponse<Room>> getRooms(@Path() String fixtureId);
 

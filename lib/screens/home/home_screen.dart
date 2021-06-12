@@ -4,14 +4,18 @@ import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
+import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
+import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
+import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/EventsCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
@@ -29,14 +33,27 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late FixtureBloc fixtureBloc;
   late AuthUser? currentUser;
+  late RoomsBloc roomsBloc;
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  Future joinRoom(Room room) async {
+    try {
+      AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
+      Navigator.pushNamed(context, RoomScreen.pageId,
+          arguments: RoomScreenArguments(agoraRoom));
+    } catch (e) {
+      print("failed to join room");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     fixtureBloc = FixtureBloc(client: client);
+    roomsBloc = RoomsBloc(client: RestClient.create());
+    roomsBloc.getTrendingRooms();
   }
 
   @override
@@ -168,15 +185,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           enlargeCenterPage: true,
                         ),
                         items: roomList.map((room) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return Container(
-                                width: MediaQuery.of(context).size.width,
-                                // margin: EdgeInsets.symmetric(horizontal: 1.0),
-                                child: TrendingRoomCard(
-                                  room: room,
-                                ),
-                              );
+                          return StreamBuilder<Response<List<Room>>>(
+                            stream: roomsBloc.roomsStream,
+                            builder: (context, snapShot) {
+                              if (snapShot.hasData) {
+                                switch (snapShot.data!.status) {
+                                  case Status.LOADING:
+                                  case Status.ERROR:
+                                    return Container();
+                                  case Status.COMPLETED:
+                                    return TrendingRoomCard(
+                                      room: snapShot.data!.data[0],
+                                    );
+                                }
+                              }
+                              return Container();
                             },
                           );
                         }).toList(),

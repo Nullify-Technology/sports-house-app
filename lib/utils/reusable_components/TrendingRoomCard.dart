@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_house/models/room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/Room.dart';
@@ -44,7 +45,7 @@ class TrendingRoomCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        room.roomName,
+                        room.name,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19,
@@ -53,7 +54,7 @@ class TrendingRoomCard extends StatelessWidget {
                       SizedBox(
                         width: 6,
                       ),
-                      if (room.isVerified)
+                      if (false)
                         Icon(
                           Icons.verified,
                           color: kColorGreen,
@@ -75,7 +76,7 @@ class TrendingRoomCard extends StatelessWidget {
                         width: 4,
                       ),
                       Text(
-                        '${room.listners} $kListners',
+                        '${room.count} $kListners',
                         style: TextStyle(
                           color: Colors.white54,
                         ),
@@ -87,7 +88,7 @@ class TrendingRoomCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (room.participants.length > 0)
+                  if (room.members.length > 0)
                     Expanded(
                       child: Container(
                         // alignment: Alignment.center,
@@ -95,19 +96,19 @@ class TrendingRoomCard extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            if (room.participants.length > 0)
+                            if (room.members.length > 0 && room.members[0].profilePictureUrl != null )
                               buildCircleAvatar(
-                                imageUrl: room.participants[0],
+                                imageUrl: room.members[0].profilePictureUrl??'',
                                 left: MediaQuery.of(context).size.width * 0.22,
                               ),
-                            if (room.participants.length > 1)
+                            if (room.members.length > 1 && room.members[1].profilePictureUrl != null)
                               buildCircleAvatar(
-                                imageUrl: room.participants[1],
+                                imageUrl: room.members[1].profilePictureUrl ?? '',
                                 left: MediaQuery.of(context).size.width * 0.30,
                               ),
-                            if (room.participants.length > 2)
+                            if (room.members.length > 2 && room.members[2].profilePictureUrl != null)
                               buildCircleAvatar(
-                                imageUrl: room.participants[2],
+                                imageUrl: room.members[2].profilePictureUrl ?? '',
                                 left: MediaQuery.of(context).size.width * 0.38,
                               ),
                           ],
@@ -124,9 +125,9 @@ class TrendingRoomCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (room.hostedBy != '')
+                      if (room.createdBy.name != '')
                         Text(
-                          '$kHostedBy ${room.hostedBy}',
+                          '$kHostedBy ${room.createdBy.name}',
                           style: TextStyle(
                             // color: Colors.white54,
                             fontSize: 14,
@@ -138,7 +139,7 @@ class TrendingRoomCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      buildTeamIcon(room.team1Url),
+                      buildTeamIcon(room.fixture.teams.home.logoUrl),
                       Container(
                         padding: EdgeInsets.all(5),
                         child: Text(
@@ -150,7 +151,7 @@ class TrendingRoomCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      buildTeamIcon(room.team2Url),
+                      buildTeamIcon(room.fixture.teams.away.logoUrl),
                     ],
                   ),
                   // Text(
