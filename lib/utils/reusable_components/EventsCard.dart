@@ -21,9 +21,10 @@ class EventsCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, EventRooms.pageId,
+
+        fixture.status != "COMPLETED" ? Navigator.pushNamed(context, EventRooms.pageId,
             arguments: EventRoomsArguments(fixture.id,
-                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
+                fixture.teams.home.name + " Vs " + fixture.teams.away.name)) : showCompletedEventWarning(context);
       },
       child: Card(
         elevation: 5,
@@ -187,5 +188,31 @@ class EventsCard extends StatelessWidget {
           ],
         ),
       );
+  }
+
+  showCompletedEventWarning(context) async {
+    return await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(kCompletedEventText),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                  Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

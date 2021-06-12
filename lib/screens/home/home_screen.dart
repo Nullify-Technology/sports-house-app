@@ -242,7 +242,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       extendBody: true,
-      //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
       bottomNavigationBar: context.watch<AgoraProvider>().isJoined
           ? InRoomBottomBar(
               room: context.watch<AgoraProvider>().room!.room,
