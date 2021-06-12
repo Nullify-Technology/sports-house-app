@@ -18,8 +18,8 @@ class Fixture {
   final Teams teams;
   @JsonKey(name: "externalId")
   final int externalId;
-  @JsonKey(name: "score")
-  final MatchDetails score;
+  @JsonKey(name: "score", includeIfNull: false)
+  final MatchDetails? score;
 
   Fixture(
       this.id, this.venue, this.date, this.teams, this.externalId, this.score);

@@ -101,7 +101,7 @@ class EventsCard extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
                       child: Text(
-                        '${fixture.score.current.home} - ${fixture.score.current.away}',
+                        '${fixture.score?.current.home} - ${fixture.score?.current.away}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
