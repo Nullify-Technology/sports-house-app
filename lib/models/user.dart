@@ -16,6 +16,8 @@ class AuthUser{
  final String? profilePictureUrl;
  @JsonKey(name: "has_access")
  final bool hasAccess;
+ @JsonKey(name: "muted" ,includeIfNull: false)
+ bool? muted = true;
 
  AuthUser({required this.id, required this.phone, this.name, this.profilePictureUrl, required this.hasAccess});
 

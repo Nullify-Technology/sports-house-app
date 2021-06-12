@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/Room.dart';
+import 'package:sports_house/models/room.dart';
+import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class InRoomBottomBar extends StatelessWidget {
   const InRoomBottomBar({Key? key, required this.room}) : super(key: key);
@@ -35,16 +37,8 @@ class InRoomBottomBar extends StatelessWidget {
                   height: 50,
                   child: Stack(
                     alignment: Alignment.centerRight,
-                    children: [
-                      if (room.participants.length > 0)
-                        buildCircleAvatar(
-                            imageUrl: kDummyParticipants[0], left: 50),
-                      if (room.participants.length > 1)
-                        buildCircleAvatar(
-                            imageUrl: kDummyParticipants[1], left: 25),
-                      if (room.participants.length > 2)
-                        buildCircleAvatar(imageUrl: kDummyParticipants[2]),
-                    ],
+                    children: room.members.map((member) => buildCircleAvatar(
+                        imageUrl: kDummyParticipants[0], left: 25)).toList()
                   ),
                 ),
                 Expanded(
@@ -53,7 +47,7 @@ class InRoomBottomBar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        room.roomName,
+                        room.name,
                         maxLines: 1,
                         style: TextStyle(
                           color: kColorBlack,
@@ -61,7 +55,7 @@ class InRoomBottomBar extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$kHostedBy ${room.hostedBy}',
+                        '$kHostedBy ${room.createdBy.name}',
                         maxLines: 1,
                         style: TextStyle(
                           color: kColorBlack,
@@ -73,7 +67,7 @@ class InRoomBottomBar extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    //TODO : Logic to leave Agora chat
+                    context.read<AgoraProvider>().leaveRoom(room.id);
                   },
                   child: Container(
                     padding: EdgeInsets.all(10),

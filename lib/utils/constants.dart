@@ -134,8 +134,5 @@ List<Room> roomList = [
   kDummyRoom
 ];
 
-const String kBaseUrl =
-    "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
-const String kFcmBaseUrl = "https://fcm.googleapis.com";
-const String kFcmAuthorisation =
-    "key=AAAAlO7jT40:APA91bHu7Ga95Vr2LUJjXodvp4dHRa7_GD-v4IR_Ip_SdSHvzHdBFMQ3BIE8M1q-ZdXx0NNbJpfPvVfg1HoT6wrYWnP27XjG3FV7Gwk6Xh4dbJRwtecKbj0BcYOYRw-fkCUJhcQsshYQ";
+const String kBaseUrl = "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
+const String kRTDBUrl = "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";

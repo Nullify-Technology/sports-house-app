@@ -37,9 +37,9 @@ abstract class RestClient {
   @POST("/room/{roomId}/join")
   Future<AgoraRoom> joinRoom(@Path() String roomId);
 
-  @POST("/fcm/send/")
-  @FormUrlEncoded()
-  Future<void> sendFcm(@Field("data") Map<String, String> data, @Field("to") String topic);
+  @POST("/room/{roomId}/leave")
+  Future<void> leaveRoom(@Path() String roomId);
+
 
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
@@ -47,14 +47,6 @@ abstract class RestClient {
     final dio = Dio();
     dio.interceptors.add(HttpLoggingInterceptor());
     dio.options.headers["Content-Type"] = "application/json";
-    return RestClient(dio);
-  }
-
-  static RestClient createFcmClient() {
-    final dio = Dio();
-    dio.interceptors.add(HttpLoggingInterceptor());
-    dio.options.headers["Content-Type"] = "application/json";
-    dio.options.headers["Authorization"] = kFcmAuthorisation;
     return RestClient(dio);
   }
 }

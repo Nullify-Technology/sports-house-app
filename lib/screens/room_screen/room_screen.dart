@@ -1,12 +1,8 @@
-import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/provider/user_provider.dart';
+import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class RoomScreenArguments {
@@ -26,35 +22,16 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  late RtcEngine _engine;
-  late AuthUser currentUser;
-  bool _muted = true;
-  final List<String> _roomUsers = [];
-  final FirebaseMessaging fcmMessaging  = FirebaseMessaging.instance;
-
   @override
   void initState() {
+    Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
+        widget.arguments.agoraRoom.token, widget.arguments.agoraRoom.room);
     super.initState();
-    _handleMicPermission();
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
-    fcmMessaging.subscribeToTopic(widget.arguments.agoraRoom.room.id);
-    initializeAgoraEngine(widget.arguments.agoraRoom.token,
-        widget.arguments.agoraRoom.room.id, currentUser.id);
   }
 
   @override
   void dispose() {
-    _engine.leaveChannel();
-    _engine.destroy();
-    fcmMessaging.unsubscribeFromTopic(widget.arguments.agoraRoom.room.id);
     super.dispose();
-  }
-
-  void _onToggleMute() {
-    setState(() {
-      _muted = !_muted;
-    });
-    _engine.muteLocalAudioStream(_muted);
   }
 
   @override
@@ -95,6 +72,9 @@ class _RoomScreenState extends State<RoomScreen> {
             children: [
               TextButton(
                 onPressed: () {
+                  context
+                      .read<AgoraProvider>()
+                      .leaveRoom(widget.arguments.agoraRoom.room.id);
                   Navigator.pop(context);
                 },
                 style: TextButton.styleFrom(
@@ -123,13 +103,13 @@ class _RoomScreenState extends State<RoomScreen> {
                 ),
               ),
               TextButton(
-                onPressed: _onToggleMute,
+                onPressed: context.read<AgoraProvider>().toggleMute,
                 style: TextButton.styleFrom(
                   backgroundColor: kMuteButtonBgColor,
                   shape: CircleBorder(),
                   padding: EdgeInsets.all(10),
                 ),
-                child: _muted
+                child: context.watch<AgoraProvider>().muted
                     ? Icon(
                         Icons.mic_off_rounded,
                         color: kMutedButtonColor,
@@ -162,7 +142,7 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   Container buildParticipant({
-    required String imageUrl,
+    required String? imageUrl,
     required String name,
     bool isMuted = true,
   }) {
@@ -182,22 +162,21 @@ class _RoomScreenState extends State<RoomScreen> {
                 CircleAvatar(
                   radius: 30,
                   foregroundImage: NetworkImage(
-                    imageUrl,
+                    imageUrl != null ? imageUrl : kDummyImageUrl,
                   ),
                 ),
-                if (false)
-                  Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: kProfileMutedBgColor,
-                    ),
-                    child: Icon(
-                      Icons.mic_off_rounded,
-                      color: kMutedButtonColor,
-                      size: 17,
-                    ),
-                  )
+                Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: kProfileMutedBgColor,
+                  ),
+                  child: Icon(
+                    isMuted ? Icons.mic_off_rounded : Icons.mic,
+                    color: isMuted ? kMutedButtonColor : kUnmutedButtonColor,
+                    size: 17,
+                  ),
+                )
               ],
             ),
           ),
@@ -241,15 +220,6 @@ class _RoomScreenState extends State<RoomScreen> {
                               fontSize: 19,
                             ),
                           ),
-                          // SizedBox(
-                          //   width: 6,
-                          // ),
-                          // if (widget.room.isVerified)
-                          //   Icon(
-                          //     Icons.verified,
-                          //     color: kColorGreen,
-                          //     size: 18,
-                          //   ),
                           TextButton(
                             onPressed: () {
                               //TODO : Add option for sharing room link
@@ -270,14 +240,6 @@ class _RoomScreenState extends State<RoomScreen> {
                       SizedBox(
                         height: 2,
                       ),
-                      // if (widget.room.hostedBy != '')
-                      //   Text(
-                      //     '$kHostedBy ${widget.room.hostedBy}',
-                      //     style: TextStyle(
-                      //       // color: Colors.white54,
-                      //       fontSize: 14,
-                      //     ),
-                      //   ),
                       SizedBox(
                         height: 10,
                       ),
@@ -390,9 +352,26 @@ class _RoomScreenState extends State<RoomScreen> {
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
                         return buildParticipant(
-                            imageUrl: kDummyImageUrl, name: kDummyUserName);
+                            imageUrl: context
+                                .watch<AgoraProvider>()
+                                .roomUsers[index]
+                                .profilePictureUrl,
+                            name: context
+                                .watch<AgoraProvider>()
+                                .roomUsers[index]
+                                .name!,
+                            isMuted: (context
+                                        .watch<AgoraProvider>()
+                                        .roomUsers[index]
+                                        .muted ==
+                                    null ||
+                                context
+                                    .watch<AgoraProvider>()
+                                    .roomUsers[index]
+                                    .muted!));
                       },
-                      itemCount: _roomUsers.length,
+                      itemCount:
+                          context.watch<AgoraProvider>().roomUsers.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisSpacing: 10,
                         crossAxisCount: 4,
@@ -412,59 +391,5 @@ class _RoomScreenState extends State<RoomScreen> {
         ),
       ],
     );
-  }
-
-  Future<void> initializeAgoraEngine(
-      String token, String channelName, String userId) async {
-    _engine = await RtcEngine.create(kAgoraAppId);
-    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
-    await _engine.disableVideo();
-    await _engine.enableAudio();
-    await _engine.setChannelProfile(ChannelProfile.Game);
-    // await _engine.setClientRole(ClientRole.Broadcaster);
-    await _engine.setDefaultAudioRoutetoSpeakerphone(true);
-    addEventHandlers(token, channelName);
-    await _engine.registerLocalUserAccount(kAgoraAppId, userId);
-  }
-
-  void addEventHandlers(token, channelName) {
-    _engine.setEventHandler(RtcEngineEventHandler(
-        error: (code) {},
-        joinChannelSuccess: (channel, uid, elapsed) async {
-          UserInfo uInfo = await _engine.getUserInfoByUid(uid);
-          await _engine.muteLocalAudioStream(_muted);
-          print("onJoinChannel ${uInfo.userAccount}");
-          setState(() {
-            _roomUsers.add(uInfo.userAccount!);
-          });
-        },
-        leaveChannel: (stats) async {
-          print("left");
-        },
-        userJoined: (uid, elapsed) async {
-          UserInfo uInfo = await _engine.getUserInfoByUid(uid);
-          final info = 'userJoined: $uid';
-          print(
-            info,
-          );
-          setState(() {
-            _roomUsers.add(uInfo.userAccount!);
-          });
-        },
-        userOffline: (uid, reason) {
-          final info = 'userOffline: $uid , reason: $reason';
-          print(info);
-        },
-        firstRemoteVideoFrame: (uid, width, height, elapsed) {},
-        localUserRegistered: (uid, userAccount) async {
-          print("user registered $userAccount");
-          await _engine.joinChannelWithUserAccount(
-              token, channelName, userAccount);
-        }));
-  }
-
-  Future<void> _handleMicPermission() async {
-    final status = await Permission.microphone.request();
-    print(status.isDenied);
   }
 }

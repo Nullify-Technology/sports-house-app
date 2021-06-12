@@ -13,13 +13,24 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) {
     name: json['name'] as String?,
     profilePictureUrl: json['profile_picture_url'] as String?,
     hasAccess: json['has_access'] as bool,
-  );
+  )..muted = json['muted'] as bool?;
 }
 
-Map<String, dynamic> _$AuthUserToJson(AuthUser instance) => <String, dynamic>{
-      'id': instance.id,
-      'phone': instance.phone,
-      'name': instance.name,
-      'profile_picture_url': instance.profilePictureUrl,
-      'has_access': instance.hasAccess,
-    };
+Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'phone': instance.phone,
+    'name': instance.name,
+    'profile_picture_url': instance.profilePictureUrl,
+    'has_access': instance.hasAccess,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('muted', instance.muted);
+  return val;
+}

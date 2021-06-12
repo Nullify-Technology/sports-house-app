@@ -4,20 +4,23 @@ import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/RoomsTile.dart';
+import 'package:provider/provider.dart';
 
 class EventRoomsArguments {
   final String fixtureId;
   final String eventName;
 
   EventRoomsArguments(this.fixtureId, this.eventName);
-}
 
+}
 class EventRooms extends StatefulWidget {
+
   final EventRoomsArguments arguments;
   EventRooms({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'EventRooms';
@@ -48,6 +51,7 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -83,10 +87,9 @@ class _EventRoomsState extends State<EventRooms> {
         ),
       ),
       extendBody: true,
-      //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
-      bottomNavigationBar: InRoomBottomBar(
-        room: kDummyRoom,
-      ),
+      bottomNavigationBar: context.watch<AgoraProvider>().isJoined ? InRoomBottomBar(
+        room: context.watch<AgoraProvider>().room!,
+      ) : null,
     );
   }
 

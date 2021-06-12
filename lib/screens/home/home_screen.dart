@@ -1,3 +1,5 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
@@ -27,7 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late FixtureBloc fixtureBloc;
   late AuthUser? currentUser;
   final RestClient client = RestClient.create();
-  final _controller = PageController();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   @override
   void initState() {
     super.initState();
@@ -36,14 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    fixtureBloc.dispose();
     super.dispose();
-    _controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     currentUser = context.watch<UserProvider>().currentUser;
-
     if(currentUser != null){
       if(currentUser!.name == null || currentUser!.name!.isEmpty){
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
@@ -224,9 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       extendBody: true,
       //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
-      bottomNavigationBar: InRoomBottomBar(
-        room: kDummyRoom,
-      ),
+      bottomNavigationBar: context.watch<AgoraProvider>().isJoined ? InRoomBottomBar(
+        room: context.watch<AgoraProvider>().room!,
+      ) : null,
     );
   }
 

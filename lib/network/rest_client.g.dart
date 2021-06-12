@@ -123,18 +123,15 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<void> sendFcm(data, topic) async {
+  Future<void> leaveRoom(roomId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _data = {'data': data, 'to': topic};
-    await _dio.fetch<void>(_setStreamType<void>(Options(
-            method: 'POST',
-            headers: <String, dynamic>{},
-            extra: _extra,
-            contentType: 'application/x-www-form-urlencoded')
-        .compose(_dio.options, '/fcm/send/',
-            queryParameters: queryParameters, data: _data)
-        .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final _data = <String, dynamic>{};
+    await _dio.fetch<void>(_setStreamType<void>(
+        Options(method: 'POST', headers: <String, dynamic>{}, extra: _extra)
+            .compose(_dio.options, '/room/$roomId/leave',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     return null;
   }
 

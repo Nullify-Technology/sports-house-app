@@ -58,6 +58,14 @@ class RoomsBloc{
     }
   }
 
+  Future leaveRoom(String roomId) async {
+    try{
+      await client.leaveRoom(roomId);
+    }catch(e){
+      print(e);
+    }
+  }
+
   dispose() {
     _roomsController.close();
   }
