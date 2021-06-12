@@ -309,7 +309,9 @@ class _RoomScreenState extends State<RoomScreen> {
                                   BorderRadius.all(Radius.circular(40.0)),
                             ),
                             child: Text(
-                              "2",
+                              (room.fixture.score != null)
+                                  ? '${room.fixture.score!.current.home} - ${room.fixture.score!.current.away}'
+                                  : 'Vs',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
