@@ -89,22 +89,23 @@ class RoomsTile extends StatelessWidget {
           ],
         ),
         trailing: Container(
-          // color: Colors.white,
-          // alignment: Alignment.center,
           width: 90,
           height: 40,
           child: Stack(
             alignment: Alignment.centerRight,
             children: [
-              if (participants.length > 0)
+              if (participants.length > 0 &&
+                  participants[0].profilePictureUrl != null)
                 buildCircleAvatar(
                     imageUrl: participants[0].profilePictureUrl ?? '',
                     left: 50),
-              if (participants.length > 1)
+              if (participants.length > 1 &&
+                  participants[1].profilePictureUrl != null)
                 buildCircleAvatar(
                     imageUrl: participants[1].profilePictureUrl ?? '',
                     left: 25),
-              if (participants.length > 2)
+              if (participants.length > 2 &&
+                  participants[2].profilePictureUrl != null)
                 buildCircleAvatar(
                   imageUrl: participants[2].profilePictureUrl ?? '',
                 ),
@@ -124,6 +125,9 @@ class RoomsTile extends StatelessWidget {
         foregroundImage: NetworkImage(
           imageUrl,
         ),
+        onForegroundImageError: (exception, stackTrace) {
+          print('Cannot load image!');
+        },
       ),
     );
   }

@@ -30,7 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late FixtureBloc fixtureBloc;
   late AuthUser? currentUser;
   final RestClient client = RestClient.create();
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -47,10 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     currentUser = context.watch<UserProvider>().currentUser;
-    if(currentUser != null){
-      if(currentUser!.name == null || currentUser!.name!.isEmpty){
+    if (currentUser != null) {
+      if (currentUser!.name == null || currentUser!.name!.isEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
-      }else{
+      } else {
         fixtureBloc.getFixtures();
       }
     }
@@ -110,7 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: (currentUser == null ||
                               currentUser?.profilePictureUrl == null)
                           ? CircleAvatar(
-                              foregroundImage: NetworkImage(kDummyImageUrl))
+                              radius: 20,
+                              foregroundImage: AssetImage(
+                                kProfilePlaceHolder,
+                              ),
+                            )
                           : CircleAvatar(
                               radius: 20,
                               foregroundImage: NetworkImage(
@@ -227,9 +232,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       extendBody: true,
       //TODO : Add logic to show and hide bottomNavigationBar based on In Room / Not in Room conditions
-      bottomNavigationBar: context.watch<AgoraProvider>().isJoined ? InRoomBottomBar(
-        room: context.watch<AgoraProvider>().room!,
-      ) : null,
+      bottomNavigationBar: context.watch<AgoraProvider>().isJoined
+          ? InRoomBottomBar(
+              room: context.watch<AgoraProvider>().room!,
+            )
+          : null,
     );
   }
 

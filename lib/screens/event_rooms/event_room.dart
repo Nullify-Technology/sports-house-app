@@ -17,10 +17,9 @@ class EventRoomsArguments {
   final String eventName;
 
   EventRoomsArguments(this.fixtureId, this.eventName);
-
 }
-class EventRooms extends StatefulWidget {
 
+class EventRooms extends StatefulWidget {
   final EventRoomsArguments arguments;
   EventRooms({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'EventRooms';
@@ -51,7 +50,6 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -87,9 +85,11 @@ class _EventRoomsState extends State<EventRooms> {
         ),
       ),
       extendBody: true,
-      bottomNavigationBar: context.watch<AgoraProvider>().isJoined ? InRoomBottomBar(
-        room: context.watch<AgoraProvider>().room!,
-      ) : null,
+      bottomNavigationBar: context.watch<AgoraProvider>().isJoined
+          ? InRoomBottomBar(
+              room: context.watch<AgoraProvider>().room!,
+            )
+          : null,
     );
   }
 
@@ -132,6 +132,7 @@ class _EventRoomsState extends State<EventRooms> {
                     title: rooms[index].name,
                     listners: rooms[index].count,
                     participants: rooms[index].members,
+                    hostedBy: rooms[index].createdBy.name ?? '',
                   ),
                   onTap: () => joinRoom(rooms[index]),
                 );

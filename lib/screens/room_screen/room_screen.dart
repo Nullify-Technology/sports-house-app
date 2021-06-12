@@ -159,12 +159,19 @@ class _RoomScreenState extends State<RoomScreen> {
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  foregroundImage: NetworkImage(
-                    imageUrl != null ? imageUrl : kDummyImageUrl,
-                  ),
-                ),
+                imageUrl != null
+                    ? CircleAvatar(
+                        radius: 30,
+                        foregroundImage: NetworkImage(
+                          imageUrl,
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 30,
+                        foregroundImage: AssetImage(
+                          kProfilePlaceHolder,
+                        ),
+                      ),
                 Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(

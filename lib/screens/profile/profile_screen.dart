@@ -33,7 +33,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: currentUser == null ? CenterProgressBar() : buildProfileScreen(currentUser!),
+      body: currentUser == null
+          ? CenterProgressBar()
+          : buildProfileScreen(currentUser!),
     );
   }
 
@@ -52,14 +54,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     maxRadius: MediaQuery.of(context).size.width * .25,
                     minRadius: MediaQuery.of(context).size.width * .25,
                     backgroundImage: AssetImage(
-                      'assets/images/profile_soccer.png',
+                      kProfilePlaceHolder,
                     ),
                     foregroundImage: NetworkImage(
                       user.profilePictureUrl ?? '',
                     ),
                   ),
                   onTap: () async {
-                    await context.read<UserProvider>().updateProfilePicture(user.id);
+                    await context
+                        .read<UserProvider>()
+                        .updateProfilePicture(user.id);
                   },
                 ),
               ),
@@ -118,7 +122,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     keyboardType: TextInputType.text,
                     onSaved: (name) async {
-                      await context.read<UserProvider>().updateUserName(name: name);
+                      await context
+                          .read<UserProvider>()
+                          .updateUserName(name: name);
                       Navigator.popAndPushNamed(context, HomeScreen.pageId);
                     },
                     onFieldSubmitted: (v) {},
