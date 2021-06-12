@@ -50,7 +50,7 @@ const String kTrending = 'Trending';
 const String kPeopleTalkingText = 'people are talking about this';
 
 const String kCreate = 'Create';
-const String kTodaysEvents = "Today's Events";
+const String kUpcomingEvents = "Upcoming Events";
 const double kHeadingFontSize = 23;
 
 const String kRoomName = "Room Name";
@@ -79,9 +79,6 @@ const String kAgoraAppId = "c5bc6c712c7f4ff5825e2d9a11ece1f1";
 
 const String kNoRoomsFound = 'No rooms found!';
 const String kProfilePlaceHolder = 'assets/images/profile_soccer.png';
-
-
-
 
 //TODO : Dummy Constants - To be deleted in the end
 const String kDummyProfileImageUrl =
@@ -139,5 +136,7 @@ List<Room> roomList = [
   kDummyRoom
 ];
 
-const String kBaseUrl = "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
-const String kRTDBUrl = "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
+const String kBaseUrl =
+    "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
+const String kRTDBUrl =
+    "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";

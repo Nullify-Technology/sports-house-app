@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 10,
                   ),
                   Text(
-                    kTodaysEvents,
+                    kUpcomingEvents,
                     style: TextStyle(
                       fontSize: kHeadingFontSize,
                       fontWeight: FontWeight.bold,
