@@ -220,12 +220,28 @@ class _RoomScreenState extends State<RoomScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            room.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 19,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                room.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 19,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 2,
+                              ),
+                              if (room.createdBy.name != null)
+                                Text(
+                                  'Hosted By: ${room.createdBy.name}',
+                                  style: TextStyle(
+                                    // color: Colors.white54,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                            ],
                           ),
                           TextButton(
                             onPressed: () {
@@ -245,10 +261,7 @@ class _RoomScreenState extends State<RoomScreen> {
                         ],
                       ),
                       SizedBox(
-                        height: 2,
-                      ),
-                      SizedBox(
-                        height: 10,
+                        height: 6,
                       ),
                       Row(
                         children: [
