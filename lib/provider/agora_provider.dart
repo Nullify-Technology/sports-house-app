@@ -31,7 +31,8 @@ class AgoraProvider with ChangeNotifier {
     await _engine?.setChannelProfile(ChannelProfile.Game);
     await _engine?.setDefaultAudioRoutetoSpeakerphone(true);
     await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
-    print("room token $token ${room.id}");
+    await _engine?.adjustRecordingSignalVolume(400);
+    await _engine?.adjustPlaybackSignalVolume(400);
     muted = true;
     this.room = room;
     addEventHandlers(token, room.id);
@@ -56,7 +57,7 @@ class AgoraProvider with ChangeNotifier {
     muted = !muted;
     currentUser!.muted = muted;
     await _rtDbReference
-        .child("rooms_${room!.id}").set(currentUser!.toJson());
+        .child("rooms_${room!.id}").child(currentUser!.id).set(currentUser!.toJson());
     await _engine?.muteLocalAudioStream(muted);
     notifyListeners();
   }
