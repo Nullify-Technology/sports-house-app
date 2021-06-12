@@ -290,12 +290,11 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (BuildContext context) {
             return Container(
               width: MediaQuery.of(context).size.width,
-              // margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: TrendingRoomCard(
-                room: room,
-                onTap: () {
-                  // joinRoom(room);
-                },
+              child: GestureDetector(
+                child: TrendingRoomCard(
+                  room: room,
+                ),
+                onTap: () => joinRoom(room),
               ),
             );
           },
