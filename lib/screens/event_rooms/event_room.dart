@@ -14,10 +14,9 @@ class EventRoomsArguments {
   final String eventName;
 
   EventRoomsArguments(this.fixtureId, this.eventName);
-
 }
-class EventRooms extends StatefulWidget {
 
+class EventRooms extends StatefulWidget {
   final EventRoomsArguments arguments;
   EventRooms({Key? key, required this.arguments}) : super(key: key);
   static String pageId = 'EventRooms';
@@ -32,10 +31,9 @@ class _EventRoomsState extends State<EventRooms> {
   Future joinRoom(Room room) async {
     try {
       AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
-      Navigator.pushNamed(
-          context, RoomScreen.pageId, arguments: RoomScreenArguments(agoraRoom)
-      );
-    }catch(e){
+      Navigator.pushNamed(context, RoomScreen.pageId,
+          arguments: RoomScreenArguments(agoraRoom));
+    } catch (e) {
       print("failed to join room");
     }
   }
@@ -49,7 +47,6 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,15 +121,14 @@ class _EventRoomsState extends State<EventRooms> {
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: rooms.length,
-            itemBuilder: (context, index){
+            itemBuilder: (context, index) {
               return GestureDetector(
                 child: RoomsTile(
                   title: rooms[index].name,
                   listners: rooms[index].count,
-                  participants: [],
+                  participants: rooms[index].members,
                 ),
-
-                onTap: () => joinRoom(rooms[index])
+                onTap: () => joinRoom(rooms[index]),
               );
             },
           ),

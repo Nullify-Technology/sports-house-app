@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_house/models/user.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class RoomsTile extends StatelessWidget {
@@ -14,7 +15,7 @@ class RoomsTile extends StatelessWidget {
   final bool isVerified;
   final String hostedBy;
   final int listners;
-  final List<String> participants;
+  final List<AuthUser> participants;
 
   @override
   Widget build(BuildContext context) {
@@ -96,11 +97,17 @@ class RoomsTile extends StatelessWidget {
             alignment: Alignment.centerRight,
             children: [
               if (participants.length > 0)
-                buildCircleAvatar(imageUrl: participants[0], left: 50),
+                buildCircleAvatar(
+                    imageUrl: participants[0].profilePictureUrl ?? '',
+                    left: 50),
               if (participants.length > 1)
-                buildCircleAvatar(imageUrl: participants[1], left: 25),
+                buildCircleAvatar(
+                    imageUrl: participants[1].profilePictureUrl ?? '',
+                    left: 25),
               if (participants.length > 2)
-                buildCircleAvatar(imageUrl: participants[2]),
+                buildCircleAvatar(
+                  imageUrl: participants[2].profilePictureUrl ?? '',
+                ),
             ],
           ),
         ),
