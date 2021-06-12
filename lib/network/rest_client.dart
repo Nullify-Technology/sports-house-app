@@ -7,12 +7,13 @@ import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/utils/constants.dart';
 
 import 'interceptors/logging_interceptor.dart';
 
 part 'rest_client.g.dart';
 
-@RestApi(baseUrl: "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app")
+@RestApi(baseUrl: kBaseUrl)
 abstract class RestClient {
   
   @POST("/user")
@@ -36,15 +37,24 @@ abstract class RestClient {
   @POST("/room/{roomId}/join")
   Future<AgoraRoom> joinRoom(@Path() String roomId);
 
+  @POST("/fcm/send/")
+  @FormUrlEncoded()
+  Future<void> sendFcm(@Field("data") Map<String, String> data, @Field("to") String topic);
+
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
-  static RestClient create({String? baseUrl}) {
+  static RestClient create() {
     final dio = Dio();
     dio.interceptors.add(HttpLoggingInterceptor());
     dio.options.headers["Content-Type"] = "application/json";
-    if(baseUrl != null){
-      return RestClient(dio, baseUrl: baseUrl);
-    }
+    return RestClient(dio);
+  }
+
+  static RestClient createFcmClient() {
+    final dio = Dio();
+    dio.interceptors.add(HttpLoggingInterceptor());
+    dio.options.headers["Content-Type"] = "application/json";
+    dio.options.headers["Authorization"] = kFcmAuthorisation;
     return RestClient(dio);
   }
 }

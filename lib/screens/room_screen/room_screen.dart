@@ -1,4 +1,5 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -29,13 +30,14 @@ class _RoomScreenState extends State<RoomScreen> {
   late AuthUser currentUser;
   bool _muted = true;
   final List<String> _roomUsers = [];
+  final FirebaseMessaging fcmMessaging  = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
     _handleMicPermission();
-    currentUser =
-        Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    fcmMessaging.subscribeToTopic(widget.arguments.agoraRoom.room.id);
     initializeAgoraEngine(widget.arguments.agoraRoom.token,
         widget.arguments.agoraRoom.room.id, currentUser.id);
   }
@@ -44,6 +46,7 @@ class _RoomScreenState extends State<RoomScreen> {
   void dispose() {
     _engine.leaveChannel();
     _engine.destroy();
+    fcmMessaging.unsubscribeFromTopic(widget.arguments.agoraRoom.room.id);
     super.dispose();
   }
 

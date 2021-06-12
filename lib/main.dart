@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
@@ -18,6 +19,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth _auth = FirebaseAuth.instance;
+    final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+    _fcm.subscribeToTopic("test");
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("fcm ${message.data}");
+    });
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider(_auth))

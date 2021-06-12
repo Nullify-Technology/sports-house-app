@@ -141,7 +141,9 @@ class _CreateRoomState extends State<CreateRoom> {
                 DropDownList(
                   dropDownList: fixtureDropDown,
                   onChange: (DropDown dropDown){
-                    print(dropDown.key);
+                    setState(() {
+                      selectedFixture = dropDown;
+                    });
                   },
                 ),
                 SizedBox(
@@ -150,7 +152,9 @@ class _CreateRoomState extends State<CreateRoom> {
                 DropDownList(
                   dropDownList: roomTypes,
                   onChange: (DropDown dropDown){
-                    print(dropDown.key);
+                    setState(() {
+                      selectedType = dropDown;
+                    });
                   },
                 ),
                 SizedBox(
