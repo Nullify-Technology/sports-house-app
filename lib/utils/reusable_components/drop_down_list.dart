@@ -6,16 +6,16 @@ class DropDownList extends StatefulWidget {
   final Function(DropDown) onChange;
   final List<DropDown> dropDownList;
 
-  const DropDownList({Key? key, required this.onChange, required this.dropDownList}) : super(key: key);
+  const DropDownList(
+      {Key? key, required this.onChange, required this.dropDownList})
+      : super(key: key);
 
   @override
   _DropDownListState createState() => _DropDownListState();
 }
 
 class _DropDownListState extends State<DropDownList> {
-
   late DropDown _selected;
-
 
   @override
   void initState() {
@@ -51,16 +51,16 @@ class _DropDownListState extends State<DropDownList> {
               ),
               onChanged: (DropDown? newValue) {
                 setState(() {
-                    _selected = newValue!;
+                  _selected = newValue!;
                 });
                 widget.onChange(newValue!);
               },
-              items: widget.dropDownList.map((DropDown dropDown) =>
-                DropdownMenuItem<DropDown>(
-                    value: dropDown,
-                    child: Text(dropDown.value),
-                )
-              ).toList(),
+              items: widget.dropDownList
+                  .map((DropDown dropDown) => DropdownMenuItem<DropDown>(
+                        value: dropDown,
+                        child: Text(dropDown.value),
+                      ))
+                  .toList(),
             ),
           ),
         ),
@@ -69,7 +69,7 @@ class _DropDownListState extends State<DropDownList> {
   }
 }
 
-class DropDown{
+class DropDown {
   final String key;
   final String value;
 
