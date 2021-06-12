@@ -61,7 +61,11 @@ class _CreateRoomState extends State<CreateRoom> {
 
     for (var fixture in fixtures) {
       try {
-        if (formatter.format(DateTime.parse(fixture.date)) == today)
+        print("timess");
+        print(formatter.format(DateTime.parse(fixture.date)));
+        print(today);
+        print("${fixture.teams.home.name} Vs ${fixture.teams.away.name}");
+        if (formatter.format(DateTime.parse(fixture.date).toLocal()) == today && fixture.status != "COMPLETED")
           fixtureDropDown.add(DropDown(
             fixture.id,
             "${fixture.teams.home.name} Vs ${fixture.teams.away.name}",

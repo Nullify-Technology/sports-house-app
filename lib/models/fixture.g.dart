@@ -16,6 +16,7 @@ Fixture _$FixtureFromJson(Map<String, dynamic> json) {
     json['score'] == null
         ? null
         : MatchDetails.fromJson(json['score'] as Map<String, dynamic>),
+    json['status'] as String?,
   );
 }
 
@@ -35,5 +36,6 @@ Map<String, dynamic> _$FixtureToJson(Fixture instance) {
   }
 
   writeNotNull('score', instance.score);
+  writeNotNull('status', instance.status);
   return val;
 }

@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sports_house/models/match_details.dart';
-import 'package:sports_house/models/score.dart';
 import 'package:sports_house/models/teams.dart';
 import 'package:sports_house/models/venue.dart';
 
@@ -20,9 +19,11 @@ class Fixture {
   final int externalId;
   @JsonKey(name: "score", includeIfNull: false)
   final MatchDetails? score;
+  @JsonKey(name: "status", includeIfNull: false)
+  final String? status;
 
   Fixture(
-      this.id, this.venue, this.date, this.teams, this.externalId, this.score);
+      this.id, this.venue, this.date, this.teams, this.externalId, this.score, this.status);
 
   factory Fixture.fromJson(Map<String, dynamic> json) =>
       _$FixtureFromJson(json);
