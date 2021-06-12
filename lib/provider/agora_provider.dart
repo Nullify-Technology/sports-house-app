@@ -55,15 +55,18 @@ class AgoraProvider with ChangeNotifier {
     print(status.isDenied);
     muted = !muted;
     currentUser!.muted = muted;
-    await _rtDbReference.child(currentUser!.id).set(currentUser!.toJson());
+    await _rtDbReference
+        .child("rooms_${room!.id}").set(currentUser!.toJson());
     await _engine?.muteLocalAudioStream(muted);
     notifyListeners();
   }
 
   void addEventHandlers(token, channelName) {
     _engine?.setEventHandler(RtcEngineEventHandler(error: (code) {
+
       print("join failed $code");
     }, joinChannelSuccess: (channel, uid, elapsed) async {
+      await _engine?.muteLocalAudioStream(true);
       _rtDbReference
           .child("rooms_$channelName")
           .child(currentUser!.id)
