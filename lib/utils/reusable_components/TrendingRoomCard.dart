@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
@@ -8,23 +9,15 @@ import 'package:sports_house/utils/constants.dart';
 class TrendingRoomCard extends StatelessWidget {
   const TrendingRoomCard({
     Key? key,
-    required this.room,
+    required this.room,required this.onTap,
   }) : super(key: key);
   final Room room;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => RoomScreen(
-        //       room: room,
-        //     ),
-        //   ),
-        // );
-      },
+      onTap: onTap(),
       child: Card(
         color: kTrendingCardBgColor,
         elevation: 5,
@@ -96,19 +89,25 @@ class TrendingRoomCard extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            if (room.members.length > 0 && room.members[0].profilePictureUrl != null )
+                            if (room.members.length > 0 &&
+                                room.members[0].profilePictureUrl != null)
                               buildCircleAvatar(
-                                imageUrl: room.members[0].profilePictureUrl??'',
+                                imageUrl:
+                                    room.members[0].profilePictureUrl ?? '',
                                 left: MediaQuery.of(context).size.width * 0.22,
                               ),
-                            if (room.members.length > 1 && room.members[1].profilePictureUrl != null)
+                            if (room.members.length > 1 &&
+                                room.members[1].profilePictureUrl != null)
                               buildCircleAvatar(
-                                imageUrl: room.members[1].profilePictureUrl ?? '',
+                                imageUrl:
+                                    room.members[1].profilePictureUrl ?? '',
                                 left: MediaQuery.of(context).size.width * 0.30,
                               ),
-                            if (room.members.length > 2 && room.members[2].profilePictureUrl != null)
+                            if (room.members.length > 2 &&
+                                room.members[2].profilePictureUrl != null)
                               buildCircleAvatar(
-                                imageUrl: room.members[2].profilePictureUrl ?? '',
+                                imageUrl:
+                                    room.members[2].profilePictureUrl ?? '',
                                 left: MediaQuery.of(context).size.width * 0.38,
                               ),
                           ],

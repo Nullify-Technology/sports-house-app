@@ -293,6 +293,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // margin: EdgeInsets.symmetric(horizontal: 1.0),
               child: TrendingRoomCard(
                 room: room,
+                onTap: () {
+                  // joinRoom(room);
+                },
               ),
             );
           },
