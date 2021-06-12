@@ -1,4 +1,4 @@
-class Room {
+class DesignRoom {
   String roomName;
   // String minutes;
   String score;
@@ -10,7 +10,7 @@ class Room {
   final String hostedBy;
   final String listners;
   final List<String> participants;
-  Room({
+  DesignRoom({
     required this.eventName,
     // required this.minutes,
     required this.score,

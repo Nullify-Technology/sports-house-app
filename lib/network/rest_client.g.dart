@@ -72,6 +72,24 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<ApiResponse<Room>> getTrendingRooms() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ApiResponse<Room>>(
+            Options(method: 'GET', headers: <String, dynamic>{}, extra: _extra)
+                .compose(_dio.options, '/room/trending/',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = ApiResponse<Room>.fromJson(
+      _result.data!,
+      (json) => Room.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
   Future<ApiResponse<Room>> getRooms(fixtureId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
