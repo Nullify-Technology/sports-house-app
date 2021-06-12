@@ -13,7 +13,7 @@ class AgoraProvider with ChangeNotifier {
   List<AuthUser> roomUsers = [];
   late DatabaseReference _rtDbReference;
   late RoomsBloc _roomsBloc;
-  bool muted = true;
+  bool muted = false;
   bool isJoined = false;
   late AuthUser? currentUser;
   Room? room;
@@ -26,32 +26,33 @@ class AgoraProvider with ChangeNotifier {
 
   Future joinAgoraRoom(String token, Room room) async {
     _engine = await RtcEngine.create(kAgoraAppId);
-    await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
     await _engine?.disableVideo();
     await _engine?.enableAudio();
     await _engine?.setChannelProfile(ChannelProfile.Game);
     await _engine?.setDefaultAudioRoutetoSpeakerphone(true);
+    await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
+    print("room token $token ${room.id}");
     muted = true;
-    _rtDbReference = _rtDbReference.child("rooms_${room.id}");
-    addFireBaseStorageHandler();
     this.room = room;
     addEventHandlers(token, room.id);
+    addFireBaseStorageHandler(room.id);
     notifyListeners();
   }
 
-  Future leaveRoom(String roomId) async{
-      await _roomsBloc.leaveRoom(roomId);
-      await _rtDbReference.child(currentUser!.id).remove();
-      await _engine?.leaveChannel();
-      isJoined = false;
-      notifyListeners();
+  Future leaveRoom(String roomId) async {
+    isJoined = false;
+    notifyListeners();
+    await _roomsBloc.leaveRoom(roomId);
+    await _rtDbReference.child("rooms_$roomId").child(currentUser!.id).remove();
+    await _engine?.leaveChannel();
   }
 
-  Future toggleMute() async{
+  Future toggleMute() async {
     final status = await Permission.microphone.request();
-    if(status.isDenied || status.isPermanentlyDenied || status.isRestricted){
-      return;
-    }
+    // if (status.isDenied || status.isPermanentlyDenied || status.isRestricted) {
+    //   return;
+    // }
+    print(status.isDenied);
     muted = !muted;
     currentUser!.muted = muted;
     await _rtDbReference.child(currentUser!.id).set(currentUser!.toJson());
@@ -59,12 +60,14 @@ class AgoraProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   void addEventHandlers(token, channelName) {
-    _engine?.setEventHandler(RtcEngineEventHandler(
-        joinChannelSuccess: (channel, uid, elapsed) async {
-      await _engine?.muteLocalAudioStream(muted);
-      _rtDbReference.child(currentUser!.id).set(currentUser!.toJson());
+    _engine?.setEventHandler(RtcEngineEventHandler(error: (code) {
+      print("join failed $code");
+    }, joinChannelSuccess: (channel, uid, elapsed) async {
+      _rtDbReference
+          .child("rooms_$channelName")
+          .child(currentUser!.id)
+          .set(currentUser!.toJson());
       isJoined = true;
       notifyListeners();
     }, localUserRegistered: (uid, userAccount) async {
@@ -72,8 +75,8 @@ class AgoraProvider with ChangeNotifier {
     }));
   }
 
-  void addFireBaseStorageHandler() {
-    _rtDbReference.onValue.listen((event) {
+  void addFireBaseStorageHandler(String channelName) {
+    _rtDbReference.child("rooms_$channelName").onValue.listen((event) {
       if (event.snapshot.value != null) {
         Map<String, dynamic> users =
             new Map<String, dynamic>.from(event.snapshot.value);
@@ -89,7 +92,7 @@ class AgoraProvider with ChangeNotifier {
   @override
   void dispose() {
     super.dispose();
-    if(room != null && isJoined){
+    if (room != null && isJoined) {
       _roomsBloc.leaveRoom(room!.id);
       _rtDbReference.child(currentUser!.id).remove();
     }

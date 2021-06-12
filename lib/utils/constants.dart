@@ -75,7 +75,7 @@ const String kVersus = 'Vs';
 
 const String kParticipants = 'Participants';
 const String kLeaveRoom = 'Leave Room';
-const String kAgoraAppId = "c5bc6c712c7f4ff5825e2d9a11ece1f1";
+const String kAgoraAppId = "6396fd53ea49412ba6fe4d4134f19400";
 
 const String kNoRoomsFound = 'No rooms found!';
 const String kProfilePlaceHolder = 'assets/images/profile_soccer.png';
