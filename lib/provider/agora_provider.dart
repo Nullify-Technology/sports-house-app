@@ -1,7 +1,6 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
@@ -31,8 +30,8 @@ class AgoraProvider with ChangeNotifier {
     await _engine?.setChannelProfile(ChannelProfile.Game);
     await _engine?.setDefaultAudioRoutetoSpeakerphone(true);
     await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
-    await _engine?.adjustRecordingSignalVolume(400);
-    await _engine?.adjustPlaybackSignalVolume(400);
+    await _engine?.adjustRecordingSignalVolume(130);
+    await _engine?.adjustPlaybackSignalVolume(130);
     muted = true;
     this.room = room;
     addEventHandlers(token, room.id);
@@ -49,11 +48,6 @@ class AgoraProvider with ChangeNotifier {
   }
 
   Future toggleMute() async {
-    final status = await Permission.microphone.request();
-    // if (status.isDenied || status.isPermanentlyDenied || status.isRestricted) {
-    //   return;
-    // }
-    print(status.isDenied);
     muted = !muted;
     currentUser!.muted = muted;
     await _rtDbReference
