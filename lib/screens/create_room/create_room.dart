@@ -31,15 +31,14 @@ class _CreateRoomState extends State<CreateRoom> {
 
   createFixtureRoom() async {
     if (_formKey.currentState!.validate()) {
-
-      AgoraRoom? room = await roomsBloc.createRoom(selectedFixture.key, "0", roomNameController.text);
-      Navigator.popAndPushNamed(
-        context, RoomScreen.pageId, arguments: RoomScreenArguments(room!)
-      );
+      AgoraRoom? room = await roomsBloc.createRoom(
+          selectedFixture.key, "0", roomNameController.text);
+      Navigator.popAndPushNamed(context, RoomScreen.pageId,
+          arguments: RoomScreenArguments(room!));
     }
   }
 
-  populateFixturesDropDown(List<Fixture> fixtures){
+  populateFixturesDropDown(List<Fixture> fixtures) {
     fixtureDropDown = fixtures
         .map((Fixture fixture) => DropDown(fixture.id,
             "${fixture.teams.home.name} Vs ${fixture.teams.away.name}"))
@@ -56,7 +55,6 @@ class _CreateRoomState extends State<CreateRoom> {
     fixtureBloc.getFixtures();
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -133,17 +131,18 @@ class _CreateRoomState extends State<CreateRoom> {
                     fillColor: kDropdownBgColor,
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) => value!.isEmpty ? "Room name can not be empty" : null,
+                  validator: (value) =>
+                      value!.isEmpty ? "Room name can not be empty" : null,
                 ),
                 SizedBox(
                   height: 15,
                 ),
                 DropDownList(
                   dropDownList: fixtureDropDown,
-                  onChange: (DropDown dropDown){
-                    setState(() {
-                      selectedFixture = dropDown;
-                    });
+                  onChange: (DropDown dropDown) {
+                    print(dropDown.value);
+
+                    selectedFixture = dropDown;
                   },
                 ),
                 SizedBox(
@@ -151,10 +150,8 @@ class _CreateRoomState extends State<CreateRoom> {
                 ),
                 DropDownList(
                   dropDownList: roomTypes,
-                  onChange: (DropDown dropDown){
-                    setState(() {
-                      selectedType = dropDown;
-                    });
+                  onChange: (DropDown dropDown) {
+                    selectedType = dropDown;
                   },
                 ),
                 SizedBox(
