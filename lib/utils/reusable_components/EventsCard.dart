@@ -15,16 +15,15 @@ class EventsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    late DatabaseReference databaseReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference()
+    late DatabaseReference databaseReference = FirebaseDatabase(
+        databaseURL: kRTDBUrl).reference()
         .child("fixture").child("fixture_${fixture.id}");
 
     return GestureDetector(
       onTap: () {
-
-        fixture.status != "COMPLETED" ? Navigator.pushNamed(context, EventRooms.pageId,
+        Navigator.pushNamed(context, EventRooms.pageId,
             arguments: EventRoomsArguments(fixture.id,
-                fixture.teams.home.name + " Vs " + fixture.teams.away.name)) : showCompletedEventWarning(context);
+                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
       },
       child: Card(
         elevation: 5,
@@ -52,12 +51,16 @@ class EventsCard extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder<Event>(
-                    stream: databaseReference.child("status").onValue,
-                    builder: (context, snapShot){
-                      if(snapShot.hasData){
-                        if(snapShot.data!.snapshot.value != null){
-                          Map<String, dynamic> status = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
-                          return buildTimerWidget(status["short"], status["elapsed"]);
+                    stream: databaseReference
+                        .child("status")
+                        .onValue,
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        if (snapShot.data!.snapshot.value != null) {
+                          Map<String, dynamic> status = new Map<String,
+                              dynamic>.from(snapShot.data!.snapshot.value);
+                          return buildTimerWidget(
+                              status["short"], status["elapsed"]);
                         }
                       }
                       return Container();
@@ -84,18 +87,23 @@ class EventsCard extends StatelessWidget {
                     buildTeamIcon(fixture.teams.home.logoUrl),
                     Container(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: new BoxDecoration(
                         color: kCardBgColor,
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.all(Radius.circular(40.0)),
                       ),
                       child: StreamBuilder<Event>(
-                        stream: databaseReference.child("score").child("current").onValue,
-                        builder: (context, snapShot){
-                          if(snapShot.hasData){
-                            if(snapShot.data!.snapshot.value != null){
-                              Map<String, dynamic> score = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                        stream: databaseReference
+                            .child("score")
+                            .child("current")
+                            .onValue,
+                        builder: (context, snapShot) {
+                          if (snapShot.hasData) {
+                            if (snapShot.data!.snapshot.value != null) {
+                              Map<String, dynamic> score = new Map<
+                                  String,
+                                  dynamic>.from(snapShot.data!.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(
@@ -132,8 +140,8 @@ class EventsCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat.yMMMMd('en_US').add_jm().format(
-                              DateTime.parse(fixture.date).toLocal(),
-                            ),
+                          DateTime.parse(fixture.date).toLocal(),
+                        ),
                       ),
                     ],
                   ),
@@ -161,33 +169,36 @@ class EventsCard extends StatelessWidget {
     );
   }
 
-  Widget buildTimerWidget(String? short, int elapsed){
-      return Container(
-        padding:
-        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: new BoxDecoration(
-          color: (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.all(Radius.circular(40.0)),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.timer,
-              size: 16,
+  Widget buildTimerWidget(String? short, int elapsed) {
+    return Container(
+      padding:
+      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: new BoxDecoration(
+        color: (short != null && short == "FT") ? kCardBgColor : Colors
+            .redAccent,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.timer,
+            size: 16,
+          ),
+          SizedBox(
+            width: 4,
+          ),
+          Text(
+            (short != null && short == "FT") ? "Full Time" : (short == "HT"
+                ? "Half Time"
+                : elapsed.toString()),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
             ),
-            SizedBox(
-              width: 4,
-            ),
-            Text(
-              (short != null && short == "FT") ? "Full Time" : (short == "HT" ? "Half Time" : elapsed.toString()),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   showCompletedEventWarning(context) async {
@@ -207,7 +218,7 @@ class EventsCard extends StatelessWidget {
             TextButton(
               child: const Text('Ok'),
               onPressed: () {
-                  Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
             ),
           ],
