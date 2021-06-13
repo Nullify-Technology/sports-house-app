@@ -488,6 +488,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                           .map((event) => MatchEvent.fromDb(event))
                           .toList() as List<dynamic>;
                       // for (var event in events) {
+
                       matchEvents = List.from(matchEvents.reversed);
                       return ListView.builder(
                         itemCount: matchEvents.length,
@@ -541,16 +542,23 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Container buildEventCard(MatchEvent event, Position position) {
-    String icon = '';
+    IconData icon = Icons.sports;
+    Color color = kColorGreen;
+
     switch (event.type) {
       case 'Goal':
-        icon = 'Goal';
+        // color = Colors.white;
+        icon = Icons.sports_soccer;
         break;
       case 'subst':
-        icon = 'Sub';
+        icon = Icons.change_circle_outlined;
+        color = Colors.white54;
         break;
       case 'Card':
-        icon = 'Card';
+        icon = Icons.crop_portrait;
+        if (event.detail == 'Yellow Card')
+          color = Colors.yellowAccent;
+        else if (event.detail == 'Red Card') color = Colors.redAccent;
         break;
     }
     return Container(
@@ -562,14 +570,14 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         child: Row(
           children: [
             // Icon( == 'Goal'?),
-            if (position == Position.right) buildVerticalText(icon),
+            if (position == Position.right) buildEventTypeIcon(icon, color),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Text(event.detail),
                   Text(
-                    'Player: ${event.player.name}',
+                    '${event.player.name}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -578,34 +586,47 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   if (event.type != 'Card' &&
                       event.assist.id != -1 &&
                       event.assist.name != '')
-                    Text(event.type == 'subst'
-                        ? 'Sub: ' + event.assist.name
-                        : 'Assist: ' + event.assist.name),
+                    Text(
+                      event.type == 'subst'
+                          ? 'Sub: ' + event.assist.name
+                          : 'Assist: ' + event.assist.name,
+                    )
+                  else if (event.type == 'Card')
+                    Text(
+                      'For: ' + event.comments,
+                    ),
                 ],
               ),
             ),
-            if (position == Position.left) buildVerticalText(icon),
+            if (position == Position.left) buildEventTypeIcon(icon, color),
           ],
         ),
       ),
     ));
   }
 
-  Padding buildVerticalText(String icon) {
+  Padding buildEventTypeIcon(IconData icon, Color color) {
     return Padding(
       padding: const EdgeInsets.only(
         right: 3,
       ),
-      child: RotatedBox(
-        child: Text(
-          icon,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: kColorGreen,
-          ),
-        ),
-        quarterTurns: 3,
-      ),
+      child: icon != Icons.crop_portrait
+          ? Icon(
+              icon,
+              color: color,
+            )
+          : Container(
+              width: 12,
+              height: 18,
+              alignment: Alignment.center,
+              margin: EdgeInsets.symmetric(
+                horizontal: 6,
+              ),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(1.5),
+              ),
+            ),
     );
   }
 
