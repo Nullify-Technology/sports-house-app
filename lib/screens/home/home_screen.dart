@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBody: true,
       bottomNavigationBar: context.watch<AgoraProvider>().isJoined
           ? InRoomBottomBar(
-              agoraRoom: context.watch<AgoraProvider>().room!,
+              agoraRoom: context.watch<AgoraProvider>().room,
             )
           : null,
     );

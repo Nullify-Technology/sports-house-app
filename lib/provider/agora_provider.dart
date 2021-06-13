@@ -12,11 +12,11 @@ class AgoraProvider with ChangeNotifier {
   List<AuthUser> roomUsers = [];
   late DatabaseReference _rtDbReference;
   late RoomsBloc _roomsBloc;
-  bool muted = false;
   bool isJoined = false;
-  late AuthUser? currentUser;
-  AgoraRoom? room;
+  AuthUser? currentUser;
+  late AgoraRoom room;
 
+  bool get muted => (currentUser == null || currentUser?.muted == null || currentUser!.muted!);
   AgoraProvider({this.currentUser}) {
     _roomsBloc = RoomsBloc(client: RestClient.create());
     _rtDbReference =
@@ -24,7 +24,9 @@ class AgoraProvider with ChangeNotifier {
   }
 
   Future joinAgoraRoom(String token, AgoraRoom room) async {
+    this.room = room;
     _engine = await RtcEngine.create(kAgoraAppId);
+    currentUser!.muted = true;
     await _engine?.disableVideo();
     await _engine?.enableAudio();
     await _engine?.setChannelProfile(ChannelProfile.Game);
@@ -32,8 +34,6 @@ class AgoraProvider with ChangeNotifier {
     await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
     await _engine?.adjustRecordingSignalVolume(130);
     await _engine?.adjustPlaybackSignalVolume(130);
-    muted = true;
-    this.room = room;
     addEventHandlers(token, room.room.id);
     addFireBaseStorageHandler(room.room.id);
     notifyListeners();
@@ -45,14 +45,14 @@ class AgoraProvider with ChangeNotifier {
     await _engine?.leaveChannel();
     await _rtDbReference.child("rooms_$roomId").child(currentUser!.id).remove();
     await _roomsBloc.leaveRoom(roomId);
+    await _engine?.destroy();
   }
 
   Future toggleMute() async {
-    muted = !muted;
-    currentUser!.muted = muted;
+    currentUser!.muted = !(currentUser!.muted!);
     await _rtDbReference
-        .child("rooms_${room!.room.id}").child(currentUser!.id).set(currentUser!.toJson());
-    await _engine?.muteLocalAudioStream(muted);
+        .child("rooms_${room.room.id}").child(currentUser!.id).set(currentUser!.toJson());
+    await _engine?.muteLocalAudioStream(currentUser!.muted!);
     notifyListeners();
   }
 
@@ -65,7 +65,7 @@ class AgoraProvider with ChangeNotifier {
       _rtDbReference
           .child("rooms_$channelName")
           .child(currentUser!.id)
-          .set(currentUser!.toJson());
+          .set(currentUser?.toJson());
       isJoined = true;
       notifyListeners();
     }, localUserRegistered: (uid, userAccount) async {
@@ -90,8 +90,8 @@ class AgoraProvider with ChangeNotifier {
   @override
   void dispose() {
     super.dispose();
-    if (room != null && isJoined) {
-      _roomsBloc.leaveRoom(room!.room.id);
+    if (isJoined) {
+      _roomsBloc.leaveRoom(room.room.id);
       _rtDbReference.child(currentUser!.id).remove();
     }
     _engine?.destroy();
