@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:loader_skeleton/loader_skeleton.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -168,8 +168,7 @@ class EventsCard extends StatelessWidget {
       ),
       child: CachedNetworkImage(
         imageUrl: url,
-        progressIndicatorBuilder: (context, url, downloadProgress) =>
-            CircularProgressIndicator(value: downloadProgress.progress),
+        //placeholder: (context, url) => CircularProgressIndicator(),
         errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 50,
         height: 50,

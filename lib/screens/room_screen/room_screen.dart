@@ -182,7 +182,7 @@ class _RoomScreenState extends State<RoomScreen> {
       ),
       child: CachedNetworkImage(
         imageUrl: url,
-        // placeholder: (context, url) => CircularProgressIndicator(),
+        //placeholder: (context, url) => CircularProgressIndicator(),
         errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 40,
         height: 40,
