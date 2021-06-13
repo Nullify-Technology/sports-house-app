@@ -21,17 +21,19 @@ class UserProvider with ChangeNotifier {
 
   AuthUser? get currentUser => _authUser;
 
-  UserProvider(this.auth){
+  UserProvider(this.auth) {
     authenticateUser();
   }
 
   Future authenticateUser() async {
-    if(auth.currentUser != null) {
+    if (auth.currentUser != null) {
       String idToken = await auth.currentUser?.getIdToken(false) as String;
       String phoneNumber = auth.currentUser?.phoneNumber as String;
       _authUser = await getUser(idToken, phoneNumber);
       auth.idTokenChanges().listen((user) async {
-        if(user != null && user.refreshToken != null && user.refreshToken!.isNotEmpty){
+        if (user != null &&
+            user.refreshToken != null &&
+            user.refreshToken!.isNotEmpty) {
           String idToken = user.refreshToken as String;
           String phoneNumber = user.phoneNumber as String;
           _authUser = await getUser(idToken, phoneNumber);
@@ -42,37 +44,50 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<AuthUser?> getUser(idToken, phoneNumber) async {
-    try{
+    try {
       Auth response = await client.getUser(phoneNumber, idToken);
-      await flutterStorage.write(key: kAccessToken, value: response.accessToken);
+      await flutterStorage.write(
+          key: kAccessToken, value: response.accessToken);
       return response.user;
-    }catch(e){
+    } catch (e) {
       print(e);
     }
   }
 
   Future<void> updateUserName({String? name}) async {
-    try{
+    try {
       Auth response = await client.updateUser(name: name);
       _authUser = response.user;
-    }catch(e){
+    } catch (e) {
       print(e);
     }
     notifyListeners();
   }
 
-  Future<void> updateProfilePicture(String userId) async {
-    try{
-      final pickedFile = await picker.getImage(source: ImageSource.gallery);
-      File image = File(pickedFile!.path);
-      TaskSnapshot snapshot = await _storage.ref("user_profiles/$userId.png").putFile(image);
+  Future<void> updateProfilePicture(String userId, File image) async {
+    try {
+      TaskSnapshot snapshot =
+          await _storage.ref("user_profiles/$userId.png").putFile(image);
       String url = (await snapshot.ref.getDownloadURL()).toString();
       Auth response = await client.updateUser(profileUrl: url);
       _authUser = response.user;
-    }catch(e){
+    } catch (e) {
       print(e);
     }
     notifyListeners();
   }
+  // Future<void> updateProfilePicture(String userId) async {
+  //   try{
+  //     final pickedFile = await picker.getImage(source: ImageSource.gallery);
+  //     File image = File(pickedFile!.path);
+  //     TaskSnapshot snapshot = await _storage.ref("user_profiles/$userId.png").putFile(image);
+  //     String url = (await snapshot.ref.getDownloadURL()).toString();
+  //     Auth response = await client.updateUser(profileUrl: url);
+  //     _authUser = response.user;
+  //   }catch(e){
+  //     print(e);
+  //   }
+  //   notifyListeners();
+  // }
 
 }

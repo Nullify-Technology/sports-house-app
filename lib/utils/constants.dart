@@ -135,6 +135,7 @@ List<DesignRoom> roomList = [
   kDummyRoom,
   kDummyRoom
 ];
+
 const String kPermissionText =
     "Inorder to join a room, you must allow $kAppName to access your microphone!";
 const String kCompletedEventText = "Cannot join room of a completed event!";
@@ -142,3 +143,11 @@ const String kBaseUrl =
     "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kRTDBUrl =
     "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
+
+const String kCropImageTitle = "Crop Profile";
+
+enum AppState {
+  free,
+  picked,
+  cropped,
+}

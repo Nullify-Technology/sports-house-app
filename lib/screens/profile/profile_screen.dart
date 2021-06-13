@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/user_provider.dart';
@@ -7,6 +8,9 @@ import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 import 'package:provider/provider.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'dart:async';
+import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen();
@@ -20,6 +24,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
   String profileUrl = "";
   late AuthUser? currentUser;
+  final ImagePicker picker = ImagePicker();
+  late AppState state;
+  File? imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   onTap: () async {
-                    await context
-                        .read<UserProvider>()
-                        .updateProfilePicture(user.id);
+                    _pickImage(user);
                   },
                 ),
               ),
@@ -155,10 +160,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    state = AppState.free;
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<void> updateProfilePicture(String userId) async {
+    try {
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      File image = File(pickedFile!.path);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<Null> _pickImage(AuthUser user) async {
+    final pickedImage =
+        await ImagePicker().getImage(source: ImageSource.gallery);
+    imageFile = pickedImage != null ? File(pickedImage.path) : null;
+    if (imageFile != null) {
+      setState(() {
+        state = AppState.picked;
+      });
+      _cropImage(user);
+    }
+  }
+
+  Future<Null> _cropImage(AuthUser user) async {
+    File? croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFile!.path,
+        maxHeight: 400,
+        maxWidth: 400,
+        compressQuality: 70,
+        cropStyle: CropStyle.circle,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+              ]
+            : [
+                CropAspectRatioPreset.square,
+              ],
+        androidUiSettings: AndroidUiSettings(
+          toolbarTitle: '',
+          toolbarColor: kColorBlack,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+          activeControlsWidgetColor: Colors.white,
+          cropFrameColor: Colors.white,
+          // dimmedLayerColor: kColorBlack,
+          backgroundColor: kColorBlack,
+          statusBarColor: kColorBlack,
+        ),
+        iosUiSettings: IOSUiSettings(
+          title: '',
+        ));
+    if (croppedFile != null) {
+      imageFile = croppedFile;
+      print(imageFile);
+      setState(() {
+        state = AppState.cropped;
+      });
+      await context
+          .read<UserProvider>()
+          .updateProfilePicture(user.id, imageFile!);
+      _clearImage();
+    }
+  }
+
+  void _clearImage() {
+    imageFile = null;
+    setState(() {
+      state = AppState.free;
+    });
   }
 }
