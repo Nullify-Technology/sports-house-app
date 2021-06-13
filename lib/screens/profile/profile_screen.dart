@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sports_house/models/user.dart';
@@ -57,16 +58,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 alignment: Alignment.center,
                 child: GestureDetector(
                   child: CircleAvatar(
-                    backgroundColor: kCardBgColor,
-                    maxRadius: MediaQuery.of(context).size.width * .25,
-                    minRadius: MediaQuery.of(context).size.width * .25,
-                    backgroundImage: AssetImage(
-                      kProfilePlaceHolder,
-                    ),
-                    foregroundImage: NetworkImage(
-                      user.profilePictureUrl ?? '',
-                    ),
-                  ),
+                      backgroundColor: kCardBgColor,
+                      maxRadius: MediaQuery.of(context).size.width * .25,
+                      minRadius: MediaQuery.of(context).size.width * .25,
+                      backgroundImage: AssetImage(
+                        kProfilePlaceHolder,
+                      ),
+                      foregroundImage: CachedNetworkImageProvider(
+                        user.profilePictureUrl ?? kProfilePlaceHolderUrl,
+                      ),
+                      onForegroundImageError: (exception, stackTrace) {
+                        print(exception);
+                      }),
                   onTap: () async {
                     _pickImage(user);
                   },

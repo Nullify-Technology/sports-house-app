@@ -1,6 +1,10 @@
+import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -15,9 +19,11 @@ class EventsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late DatabaseReference databaseReference = FirebaseDatabase(
-        databaseURL: kRTDBUrl).reference()
-        .child("fixture").child("fixture_${fixture.id}");
+    late DatabaseReference databaseReference =
+        FirebaseDatabase(databaseURL: kRTDBUrl)
+            .reference()
+            .child("fixture")
+            .child("fixture_${fixture.id}");
 
     return GestureDetector(
       onTap: () {
@@ -51,14 +57,13 @@ class EventsCard extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder<Event>(
-                    stream: databaseReference
-                        .child("status")
-                        .onValue,
+                    stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
                         if (snapShot.data!.snapshot.value != null) {
-                          Map<String, dynamic> status = new Map<String,
-                              dynamic>.from(snapShot.data!.snapshot.value);
+                          Map<String, dynamic> status =
+                              new Map<String, dynamic>.from(
+                                  snapShot.data!.snapshot.value);
                           return buildTimerWidget(
                               status["short"], status["elapsed"]);
                         }
@@ -87,7 +92,7 @@ class EventsCard extends StatelessWidget {
                     buildTeamIcon(fixture.teams.home.logoUrl),
                     Container(
                       padding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: new BoxDecoration(
                         color: kCardBgColor,
                         shape: BoxShape.rectangle,
@@ -101,9 +106,9 @@ class EventsCard extends StatelessWidget {
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
                             if (snapShot.data!.snapshot.value != null) {
-                              Map<String, dynamic> score = new Map<
-                                  String,
-                                  dynamic>.from(snapShot.data!.snapshot.value);
+                              Map<String, dynamic> score =
+                                  new Map<String, dynamic>.from(
+                                      snapShot.data!.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(
@@ -140,8 +145,8 @@ class EventsCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat.yMMMMd('en_US').add_jm().format(
-                          DateTime.parse(fixture.date).toLocal(),
-                        ),
+                              DateTime.parse(fixture.date).toLocal(),
+                            ),
                       ),
                     ],
                   ),
@@ -161,8 +166,11 @@ class EventsCard extends StatelessWidget {
         color: kCardBgColor,
         shape: BoxShape.circle,
       ),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            CircularProgressIndicator(value: downloadProgress.progress),
+        errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 50,
         height: 50,
       ),
@@ -171,11 +179,10 @@ class EventsCard extends StatelessWidget {
 
   Widget buildTimerWidget(String? short, int elapsed) {
     return Container(
-      padding:
-      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: new BoxDecoration(
-        color: (short != null && short == "FT") ? kCardBgColor : Colors
-            .redAccent,
+        color:
+            (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(40.0)),
       ),
@@ -189,9 +196,9 @@ class EventsCard extends StatelessWidget {
             width: 4,
           ),
           Text(
-            (short != null && short == "FT") ? "Full Time" : (short == "HT"
-                ? "Half Time"
-                : elapsed.toString()),
+            (short != null && short == "FT")
+                ? "Full Time"
+                : (short == "HT" ? "Half Time" : elapsed.toString()),
             style: TextStyle(
               fontWeight: FontWeight.bold,
             ),

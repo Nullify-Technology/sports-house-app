@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
@@ -166,7 +167,8 @@ class TrendingRoomCard extends StatelessWidget {
       child: CircleAvatar(
         backgroundColor: kDropdownBgColor,
         radius: 25,
-        foregroundImage: NetworkImage(
+        backgroundImage: AssetImage(kProfilePlaceHolder),
+        foregroundImage: CachedNetworkImageProvider(
           imageUrl,
         ),
       ),
@@ -180,8 +182,10 @@ class TrendingRoomCard extends StatelessWidget {
         color: kCardBgColor,
         shape: BoxShape.circle,
       ),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
+        // placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 23,
         height: 23,
       ),

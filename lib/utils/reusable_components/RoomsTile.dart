@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -122,7 +123,8 @@ class RoomsTile extends StatelessWidget {
       child: CircleAvatar(
         backgroundColor: kDropdownBgColor,
         radius: 20,
-        foregroundImage: NetworkImage(
+        backgroundImage: AssetImage(kProfilePlaceHolder),
+        foregroundImage: CachedNetworkImageProvider(
           imageUrl,
         ),
         onForegroundImageError: (exception, stackTrace) {

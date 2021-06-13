@@ -19,6 +19,7 @@ import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/EventsCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -124,19 +125,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 10,
                     ),
                     TextButton(
-                      child: (currentUser == null ||
-                              currentUser?.profilePictureUrl == null)
-                          ? CircleAvatar(
-                              radius: 20,
-                              foregroundImage: AssetImage(
-                                kProfilePlaceHolder,
-                              ),
-                            )
-                          : CircleAvatar(
-                              radius: 20,
-                              foregroundImage: NetworkImage(
-                                  currentUser?.profilePictureUrl ?? ''),
-                            ),
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: kHomeAppBarBgColor,
+                        backgroundImage: AssetImage(kProfilePlaceHolder),
+                        foregroundImage: CachedNetworkImageProvider(
+                          currentUser?.profilePictureUrl ??
+                              kProfilePlaceHolderUrl,
+                        ),
+                        onForegroundImageError: (exception, stackTrace) {
+                          print(exception);
+                        },
+                      ),
                       onPressed: () {
                         Navigator.pushNamed(context, ProfileScreen.pageId);
                       },

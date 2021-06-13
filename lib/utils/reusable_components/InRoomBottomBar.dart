@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
@@ -111,9 +112,15 @@ Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
       child: CircleAvatar(
         backgroundColor: kDropdownBgColor,
         radius: 18,
-        foregroundImage: NetworkImage(
+        backgroundImage: AssetImage(
+          kProfilePlaceHolder,
+        ),
+        foregroundImage: CachedNetworkImageProvider(
           imageUrl,
         ),
+        onForegroundImageError: (exception, stackTrace) {
+          print(exception);
+        },
       ),
     ),
   );

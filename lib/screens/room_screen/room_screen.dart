@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,14 +26,17 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  late DatabaseReference databaseReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference()
-      .child("fixture").child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
+  late DatabaseReference databaseReference =
+      FirebaseDatabase(databaseURL: kRTDBUrl)
+          .reference()
+          .child("fixture")
+          .child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
   Future handleMicroPhonePermission() async {
     final status = await Permission.microphone.request();
     if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
       Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
           widget.arguments.agoraRoom.token, widget.arguments.agoraRoom);
-    }else{
+    } else {
       _showPermissionDialog();
     }
   }
@@ -54,7 +58,8 @@ class _RoomScreenState extends State<RoomScreen> {
             TextButton(
               child: const Text('Ok'),
               onPressed: () {
-                Navigator.popUntil(context, ModalRoute.withName(EventRooms.pageId));
+                Navigator.popUntil(
+                    context, ModalRoute.withName(EventRooms.pageId));
               },
             ),
           ],
@@ -66,7 +71,7 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    if(!Provider.of<AgoraProvider>(context, listen: false).isJoined){
+    if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
       handleMicroPhonePermission();
     }
   }
@@ -175,8 +180,10 @@ class _RoomScreenState extends State<RoomScreen> {
         color: kCardBgColor,
         shape: BoxShape.circle,
       ),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
+        // placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 40,
         height: 40,
       ),
@@ -201,19 +208,18 @@ class _RoomScreenState extends State<RoomScreen> {
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
-                imageUrl != null
-                    ? CircleAvatar(
-                        radius: 30,
-                        foregroundImage: NetworkImage(
-                          imageUrl,
-                        ),
-                      )
-                    : CircleAvatar(
-                        radius: 30,
-                        foregroundImage: AssetImage(
-                          kProfilePlaceHolder,
-                        ),
-                      ),
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage(
+                    kProfilePlaceHolder,
+                  ),
+                  foregroundImage: CachedNetworkImageProvider(
+                    imageUrl ?? kProfilePlaceHolderUrl,
+                  ),
+                  onForegroundImageError: (exception, stackTrace) {
+                    print(exception);
+                  },
+                ),
                 Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -351,11 +357,16 @@ class _RoomScreenState extends State<RoomScreen> {
                                   BorderRadius.all(Radius.circular(40.0)),
                             ),
                             child: StreamBuilder<Event>(
-                              stream: databaseReference.child("score").child("current").onValue,
-                              builder: (context, snapShot){
-                                if(snapShot.hasData){
-                                  if(snapShot.data!.snapshot.value != null){
-                                    Map<String, dynamic> score = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                              stream: databaseReference
+                                  .child("score")
+                                  .child("current")
+                                  .onValue,
+                              builder: (context, snapShot) {
+                                if (snapShot.hasData) {
+                                  if (snapShot.data!.snapshot.value != null) {
+                                    Map<String, dynamic> score =
+                                        new Map<String, dynamic>.from(
+                                            snapShot.data!.snapshot.value);
                                     return Text(
                                       '${score["home"]} - ${score["away"]}',
                                       style: TextStyle(
