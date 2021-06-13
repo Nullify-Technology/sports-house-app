@@ -153,3 +153,8 @@ enum AppState {
   picked,
   cropped,
 }
+
+enum Position {
+  left,
+  right,
+}

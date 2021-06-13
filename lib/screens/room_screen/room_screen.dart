@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:expandable_bottom_bar/expandable_bottom_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,7 +11,9 @@ import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
+import 'package:sports_house/utils/classes/event_classes.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:timeline_tile/timeline_tile.dart';
 
 class RoomScreenArguments {
   final AgoraRoom agoraRoom;
@@ -25,12 +31,14 @@ class RoomScreen extends StatefulWidget {
   _RoomScreenState createState() => _RoomScreenState();
 }
 
-class _RoomScreenState extends State<RoomScreen> {
+class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   late DatabaseReference databaseReference =
       FirebaseDatabase(databaseURL: kRTDBUrl)
           .reference()
           .child("fixture")
           .child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
+  late BottomBarController _bottomBarController;
+
   Future handleMicroPhonePermission() async {
     final status = await Permission.microphone.request();
     if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
@@ -71,6 +79,9 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
+    _bottomBarController = new BottomBarController(
+      vsync: this,
+    );
     if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
       handleMicroPhonePermission();
     }
@@ -98,76 +109,141 @@ class _RoomScreenState extends State<RoomScreen> {
       backgroundColor: kColorBlack,
       body: buildUi(widget.arguments.agoraRoom.room),
       extendBody: true,
-      bottomNavigationBar: Card(
-        clipBehavior: Clip.hardEdge,
-        margin: EdgeInsets.all(0),
-        elevation: 10,
-        color: kBottomBarBgColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: kCreateRoomCardRadius,
-            topRight: kCreateRoomCardRadius,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 10,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () {
-                  context
-                      .read<AgoraProvider>()
-                      .leaveRoom(widget.arguments.agoraRoom.room.id);
-                  Navigator.pop(context);
-                },
-                style: TextButton.styleFrom(
-                  primary: Colors.redAccent,
-                  backgroundColor: kMuteButtonBgColor,
-                  shape: StadiumBorder(),
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: GestureDetector(
+        //
+        // Set onVerticalDrag event to drag handlers of controller for swipe effect
+        onVerticalDragUpdate: _bottomBarController.onDrag,
+        onVerticalDragEnd: _bottomBarController.onDragEnd,
+        child: FloatingActionButton.extended(
+          label: AnimatedBuilder(
+            animation: _bottomBarController.state,
+            builder: (context, child) => Row(
+              children: [
+                Text(
+                  _bottomBarController.isOpen ? kParticipants : kParticipants,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Product Sans',
+                    letterSpacing: 0,
+                    fontSize: 16,
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.exit_to_app,
+                const SizedBox(width: 4.0),
+                AnimatedBuilder(
+                  animation: _bottomBarController.state,
+                  builder: (context, child) => Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.diagonal3Values(
+                      1,
+                      _bottomBarController.state.value * 2 - 1,
+                      1,
+                    ),
+                    child: child,
+                  ),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          elevation: 2,
+          backgroundColor: kColorGreen,
+          foregroundColor: kColorBlack,
+          //
+          //Set onPressed event to swap state of bottom bar
+          onPressed: () => _bottomBarController.swap(),
+        ),
+      ),
+      bottomNavigationBar: BottomExpandableAppBar(
+        appBarHeight: 70,
+        bottomAppBarColor: Colors.transparent,
+        controller: _bottomBarController,
+        horizontalMargin: 0,
+        shape: AutomaticNotchedShape(
+            RoundedRectangleBorder(), StadiumBorder(side: BorderSide())),
+        expandedBackColor: Colors.transparent,
+        expandedBody: buildParticipantsView(),
+        bottomAppBarBody: buildBottomNavigationBar(context),
+      ),
+    );
+  }
+
+  Card buildBottomNavigationBar(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      margin: EdgeInsets.zero,
+      elevation: 10,
+      color: kBottomBarBgColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: kCreateRoomCardRadius,
+          topRight: kCreateRoomCardRadius,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () {
+                context
+                    .read<AgoraProvider>()
+                    .leaveRoom(widget.arguments.agoraRoom.room.id);
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(
+                primary: Colors.redAccent,
+                backgroundColor: kMuteButtonBgColor,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: Colors.redAccent,
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    kLeaveRoom,
+                    style: TextStyle(
                       color: Colors.redAccent,
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      kLeaveRoom,
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              TextButton(
-                onPressed: context.read<AgoraProvider>().toggleMute,
-                style: TextButton.styleFrom(
-                  backgroundColor: kMuteButtonBgColor,
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(10),
-                ),
-                child: context.watch<AgoraProvider>().muted
-                    ? Icon(
-                        Icons.mic_off_rounded,
-                        color: kMutedButtonColor,
-                      )
-                    : Icon(
-                        Icons.mic_rounded,
-                        color: kUnmutedButtonColor,
-                      ),
-              )
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: context.read<AgoraProvider>().toggleMute,
+              style: TextButton.styleFrom(
+                backgroundColor: kMuteButtonBgColor,
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(10),
+              ),
+              child: context.watch<AgoraProvider>().muted
+                  ? Icon(
+                      Icons.mic_off_rounded,
+                      color: kMutedButtonColor,
+                    )
+                  : Icon(
+                      Icons.mic_rounded,
+                      color: kUnmutedButtonColor,
+                    ),
+            )
+          ],
         ),
       ),
     );
@@ -389,14 +465,6 @@ class _RoomScreenState extends State<RoomScreen> {
                           buildTeamIcon(room.fixture.teams.away.logoUrl),
                         ],
                       ),
-                      // Text(
-                      //   widget.room.eventName,
-                      //   style: TextStyle(
-                      //     fontWeight: FontWeight.bold,
-                      //     fontSize: 12,
-                      //     color: Colors.white54,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ],
@@ -405,81 +473,216 @@ class _RoomScreenState extends State<RoomScreen> {
           ],
         ),
         Expanded(
-          child: Card(
-            margin: EdgeInsets.all(0),
-            color: kCardBgColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: kCreateRoomCardRadius,
-                topRight: kCreateRoomCardRadius,
-              ),
+          child: Container(
+            margin: EdgeInsets.only(
+              bottom: 30,
             ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          kParticipants,
-                          style: TextStyle(
-                            fontSize: kHeadingFontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (BuildContext context, int index) {
-                        return buildParticipant(
-                            imageUrl: context
-                                .watch<AgoraProvider>()
-                                .roomUsers[index]
-                                .profilePictureUrl,
-                            name: context
-                                .watch<AgoraProvider>()
-                                .roomUsers[index]
-                                .name!,
-                            isMuted: (context
-                                        .watch<AgoraProvider>()
-                                        .roomUsers[index]
-                                        .muted ==
-                                    null ||
-                                context
-                                    .watch<AgoraProvider>()
-                                    .roomUsers[index]
-                                    .muted!));
-                      },
-                      itemCount:
-                          context.watch<AgoraProvider>().roomUsers.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.5,
-                      ),
-                    ),
-
-                    //Needed for padding bottomNavBar
-                    SizedBox(
-                      height: 60,
-                    ),
-                  ],
-                ),
+            child: Center(
+              child: StreamBuilder<Event>(
+                stream: databaseReference.child("events").onValue,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    if (snapShot.data!.snapshot.value != null) {
+                      var events = snapShot.data!.snapshot.value;
+                      List<dynamic> matchEvents = events
+                          .map((event) => MatchEvent.fromDb(event))
+                          .toList() as List<dynamic>;
+                      // for (var event in events) {
+                      matchEvents = List.from(matchEvents.reversed);
+                      return ListView.builder(
+                        itemCount: matchEvents.length,
+                        itemBuilder: (context, int i) {
+                          MatchEvent event = matchEvents[i];
+                          return TimelineTile(
+                            alignment: TimelineAlign.center,
+                            isFirst: i == 0,
+                            isLast: i == matchEvents.length - 1,
+                            indicatorStyle: IndicatorStyle(
+                              color: kColorGreen,
+                              indicatorXY: 0.5,
+                              indicator: Container(
+                                // padding: EdgeInsets.all(),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: kColorGreen,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    event.time.elapsed.toString(),
+                                    style: TextStyle(
+                                      color: kCardBgColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            startChild: (event.team.name ==
+                                    room.fixture.teams.home.name)
+                                ? buildEventCard(event, Position.left)
+                                : Center(),
+                            endChild: (matchEvents[i].team.name ==
+                                    room.fixture.teams.away.name)
+                                ? buildEventCard(event, Position.right)
+                                : Center(),
+                          );
+                        },
+                      );
+                    }
+                  }
+                  return Center();
+                },
               ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Container buildEventCard(MatchEvent event, Position position) {
+    String icon = '';
+    switch (event.type) {
+      case 'Goal':
+        icon = 'Goal';
+        break;
+      case 'subst':
+        icon = 'Sub';
+        break;
+      case 'Card':
+        icon = 'Card';
+        break;
+    }
+    return Container(
+        child: Card(
+      color: kCardBgColor,
+      margin: EdgeInsets.all(7),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            // Icon( == 'Goal'?),
+            if (position == Position.right) buildVerticalText(icon),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text(event.detail),
+                  Text(
+                    'Player: ${event.player.name}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (event.type != 'Card' &&
+                      event.assist.id != -1 &&
+                      event.assist.name != '')
+                    Text(event.type == 'subst'
+                        ? 'Sub: ' + event.assist.name
+                        : 'Assist: ' + event.assist.name),
+                ],
+              ),
+            ),
+            if (position == Position.left) buildVerticalText(icon),
+          ],
+        ),
+      ),
+    ));
+  }
+
+  Padding buildVerticalText(String icon) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        right: 3,
+      ),
+      child: RotatedBox(
+        child: Text(
+          icon,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: kColorGreen,
+          ),
+        ),
+        quarterTurns: 3,
+      ),
+    );
+  }
+
+  Expanded buildParticipantsView() {
+    return Expanded(
+      child: Card(
+        margin: EdgeInsets.all(0),
+        color: kCardBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: kCreateRoomCardRadius,
+            topRight: kCreateRoomCardRadius,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      kParticipants,
+                      style: TextStyle(
+                        fontSize: kHeadingFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: ClampingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (BuildContext context, int index) {
+                    return buildParticipant(
+                        imageUrl: context
+                            .watch<AgoraProvider>()
+                            .roomUsers[index]
+                            .profilePictureUrl,
+                        name: context
+                            .watch<AgoraProvider>()
+                            .roomUsers[index]
+                            .name!,
+                        isMuted: (context
+                                    .watch<AgoraProvider>()
+                                    .roomUsers[index]
+                                    .muted ==
+                                null ||
+                            context
+                                .watch<AgoraProvider>()
+                                .roomUsers[index]
+                                .muted!));
+                  },
+                  itemCount: context.watch<AgoraProvider>().roomUsers.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 10,
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.5,
+                  ),
+                ),
+
+                //Needed for padding bottomNavBar
+                SizedBox(
+                  height: 60,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
