@@ -344,28 +344,30 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                room.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 19,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 2,
-                              ),
-                              if (room.createdBy.name != null)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  'Hosted By: ${room.createdBy.name}',
+                                  room.name,
                                   style: TextStyle(
-                                    // color: Colors.white54,
-                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19,
                                   ),
                                 ),
-                            ],
+                                SizedBox(
+                                  height: 2,
+                                ),
+                                if (room.createdBy.name != null)
+                                  Text(
+                                    'Hosted By: ${room.createdBy.name}',
+                                    style: TextStyle(
+                                      // color: Colors.white54,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                           TextButton(
                             onPressed: () {
