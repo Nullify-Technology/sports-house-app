@@ -175,7 +175,7 @@ class EventsCard extends StatelessWidget {
     );
   }
 
-  Widget buildTimerWidget(String? short, int elapsed) {
+  static Widget buildTimerWidget(String? short, int elapsed) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: new BoxDecoration(

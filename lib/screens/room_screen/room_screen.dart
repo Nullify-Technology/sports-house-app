@@ -14,6 +14,7 @@ import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/classes/event_classes.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/EventsCard.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class RoomScreenArguments {
@@ -396,21 +397,70 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                       ),
                       Row(
                         children: [
-                          Icon(
-                            Icons.hearing,
-                            size: 18,
-                            color: Colors.white54,
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            '${room.count} $kListners',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 17,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.hearing,
+                                  size: 18,
+                                  color: Colors.white54,
+                                ),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                Text(
+                                  '${room.count} $kListners',
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 17,
+                                  ),
+                                )
+                              ],
                             ),
-                          )
+                          ),
+                          StreamBuilder<Event>(
+                            stream: databaseReference.child("status").onValue,
+                            builder: (context, snapShot) {
+                              if (snapShot.hasData) {
+                                if (snapShot.data!.snapshot.value != null) {
+                                  Map<String, dynamic> status =
+                                      new Map<String, dynamic>.from(
+                                          snapShot.data!.snapshot.value);
+                                  return EventsCard.buildTimerWidget(
+                                      status["short"], status["elapsed"]);
+                                }
+                              }
+                              return Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 5,
+                                  horizontal: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: kCardBgColor,
+                                    borderRadius: BorderRadius.circular(
+                                      20,
+                                    )),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.timer,
+                                      size: 16,
+                                    ),
+                                    SizedBox(
+                                      width: 4,
+                                    ),
+                                    Text(
+                                      kNotStarted,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ],
@@ -450,12 +500,16 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                     Map<String, dynamic> score =
                                         new Map<String, dynamic>.from(
                                             snapShot.data!.snapshot.value);
-                                    return Text(
-                                      '${score["home"]} - ${score["away"]}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
+                                    return Column(
+                                      children: [
+                                        Text(
+                                          '${score["home"]} - ${score["away"]}',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ],
                                     );
                                   }
                                 }
@@ -480,8 +534,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           ],
         ),
         buildMatchTimeline(room),
-        buildStartingXIHomeAndAway(room),
-        buildSubstitutesHomeAndAway(room),
+        if (room.fixture.teams.home.lineups.startXI != null &&
+            room.fixture.teams.home.lineups.startXI != null)
+          buildStartingXIHomeAndAway(room),
+        if (room.fixture.teams.home.lineups.substitutes != null &&
+            room.fixture.teams.home.lineups.substitutes != null)
+          buildSubstitutesHomeAndAway(room),
       ],
     );
   }

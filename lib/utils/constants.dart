@@ -150,6 +150,7 @@ const String kCropImageTitle = "Crop Profile";
 const String kTimelineNotAvailable = "Timeline not available";
 const String kStartingXI = "Starting XI";
 const String kSubtitutes = "Subtitutes";
+const String kNotStarted = "Not Started";
 
 enum AppState {
   free,
