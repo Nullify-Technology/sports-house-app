@@ -12,6 +12,7 @@ Team _$TeamFromJson(Map<String, dynamic> json) {
     json['name'] as String,
     json['externalId'] as int,
     json['logo_url'] as String,
+    Lineup.fromJson(json['lineups'] as Map<String, dynamic>),
   );
 }
 
@@ -20,4 +21,5 @@ Map<String, dynamic> _$TeamToJson(Team instance) => <String, dynamic>{
       'name': instance.name,
       'externalId': instance.externalId,
       'logo_url': instance.logoUrl,
+      'lineups': instance.lineups,
     };

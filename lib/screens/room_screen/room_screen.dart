@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
+import 'package:sports_house/models/lineup.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
@@ -107,7 +108,11 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         elevation: 0,
       ),
       backgroundColor: kColorBlack,
-      body: buildUi(widget.arguments.agoraRoom.room),
+      body: SingleChildScrollView(
+        child: buildUi(
+          widget.arguments.agoraRoom.room,
+        ),
+      ),
       extendBody: true,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: GestureDetector(
@@ -474,72 +479,234 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.only(
-              bottom: 30,
-            ),
-            child: Center(
-              child: StreamBuilder<Event>(
-                stream: databaseReference.child("events").onValue,
-                builder: (context, snapShot) {
-                  if (snapShot.hasData) {
-                    if (snapShot.data!.snapshot.value != null) {
-                      var events = snapShot.data!.snapshot.value;
-                      List<dynamic> matchEvents = events
-                          .map((event) => MatchEvent.fromDb(event))
-                          .toList() as List<dynamic>;
-                      // for (var event in events) {
+        buildMatchTimeline(room),
+        buildStartingXIHomeAndAway(room),
+        buildSubstitutesHomeAndAway(room),
+      ],
+    );
+  }
 
-                      matchEvents = List.from(matchEvents.reversed);
-                      return ListView.builder(
-                        itemCount: matchEvents.length,
-                        itemBuilder: (context, int i) {
-                          MatchEvent event = matchEvents[i];
-                          return TimelineTile(
-                            alignment: TimelineAlign.center,
-                            isFirst: i == 0,
-                            isLast: i == matchEvents.length - 1,
-                            indicatorStyle: IndicatorStyle(
-                              color: kColorGreen,
-                              indicatorXY: 0.5,
-                              indicator: Container(
-                                // padding: EdgeInsets.all(),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: kColorGreen,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    event.time.elapsed.toString(),
-                                    style: TextStyle(
-                                      color: kCardBgColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            startChild: (event.team.name ==
-                                    room.fixture.teams.home.name)
-                                ? buildEventCard(event, Position.left)
-                                : Center(),
-                            endChild: (matchEvents[i].team.name ==
-                                    room.fixture.teams.away.name)
-                                ? buildEventCard(event, Position.right)
-                                : Center(),
-                          );
-                        },
-                      );
-                    }
-                  }
-                  return Center();
-                },
+  Widget buildStartingXIHomeAndAway(Room room) {
+    return Card(
+      color: kCardBgColor,
+      margin: EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 30,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 15,
+              ),
+              child: Text(
+                kStartingXI,
+                style: TextStyle(
+                  color: kColorGreen,
+                  fontSize: kHeadingFontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: buildStartingXI(room, 'home'),
+                ),
+                Expanded(
+                  child: buildStartingXI(room, 'away'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSubstitutesHomeAndAway(Room room) {
+    return Card(
+      color: kCardBgColor,
+      margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 30,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 15,
+              ),
+              child: Text(
+                kSubtitutes,
+                style: TextStyle(
+                  color: kColorGreen,
+                  fontSize: kHeadingFontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: buildSubstitutes(room, 'home'),
+                ),
+                Expanded(
+                  child: buildSubstitutes(room, 'away'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ListView buildStartingXI(Room room, String team) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: team == 'home'
+          ? room.fixture.teams.home.lineups.startXI!.length
+          : room.fixture.teams.away.lineups.startXI!.length,
+      itemBuilder: (context, i) {
+        Lineup lineup = team == 'home'
+            ? room.fixture.teams.home.lineups
+            : room.fixture.teams.away.lineups;
+        return ListTile(
+          title: Text(
+            '${lineup.startXI![i].name}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          leading: Container(
+            height: 40,
+            width: 40,
+            // padding: EdgeInsets.all(15),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: kDropdownBgColor,
+            ),
+            child: Text(
+              '${lineup.startXI![i].pos}',
+              style: TextStyle(
+                color: kColorGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
             ),
           ),
-        ),
-      ],
+        );
+      },
+    );
+  }
+
+  ListView buildSubstitutes(Room room, String team) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: team == 'home'
+          ? room.fixture.teams.home.lineups.substitutes!.length
+          : room.fixture.teams.away.lineups.substitutes!.length,
+      itemBuilder: (context, i) {
+        Lineup lineup = team == 'home'
+            ? room.fixture.teams.home.lineups
+            : room.fixture.teams.away.lineups;
+        return ListTile(
+          title: Text(
+            '${lineup.substitutes![i].name}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          leading: Container(
+            height: 40,
+            width: 40,
+            // padding: EdgeInsets.all(15),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: kDropdownBgColor,
+            ),
+            child: Text(
+              '${lineup.substitutes![i].pos}',
+              style: TextStyle(
+                color: kColorGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  StreamBuilder<Event> buildMatchTimeline(Room room) {
+    return StreamBuilder<Event>(
+      stream: databaseReference.child("events").onValue,
+      builder: (context, snapShot) {
+        if (snapShot.hasData) {
+          if (snapShot.data!.snapshot.value != null) {
+            var events = snapShot.data!.snapshot.value;
+            List<dynamic> matchEvents = events
+                .map((event) => MatchEvent.fromDb(event))
+                .toList() as List<dynamic>;
+            // for (var event in events) {
+
+            matchEvents = List.from(matchEvents.reversed);
+            return ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: matchEvents.length,
+              itemBuilder: (context, int i) {
+                MatchEvent event = matchEvents[i];
+                return TimelineTile(
+                  alignment: TimelineAlign.center,
+                  isFirst: i == 0,
+                  isLast: i == matchEvents.length - 1,
+                  indicatorStyle: IndicatorStyle(
+                    color: kColorGreen,
+                    indicatorXY: 0.5,
+                    indicator: Container(
+                      // padding: EdgeInsets.all(),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: kColorGreen,
+                      ),
+                      child: Center(
+                        child: Text(
+                          event.time.elapsed.toString(),
+                          style: TextStyle(
+                            color: kCardBgColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  startChild: (event.team.name == room.fixture.teams.home.name)
+                      ? buildEventCard(event, Position.left)
+                      : Center(),
+                  endChild:
+                      (matchEvents[i].team.name == room.fixture.teams.away.name)
+                          ? buildEventCard(event, Position.right)
+                          : Center(),
+                );
+              },
+            );
+          }
+        }
+        return Center();
+      },
     );
   }
 
