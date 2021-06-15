@@ -570,7 +570,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               SizedBox(
                 height: 20,
               ),
-              buildStartingXI(room, 'home'),
+              buildStartingXI(room, 'away'),
               SizedBox(
                 height: 90,
               ),
