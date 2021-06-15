@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:expandable_bottom_bar/expandable_bottom_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -41,7 +40,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           .reference()
           .child("fixture")
           .child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
-  late BottomBarController _bottomBarController;
 
   Future handleMicroPhonePermission() async {
     final status = await Permission.microphone.request();
@@ -83,9 +81,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _bottomBarController = new BottomBarController(
-      vsync: this,
-    );
     if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
       handleMicroPhonePermission();
     }
@@ -265,7 +260,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 5,
-        vertical: 10,
+        vertical: 5,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -608,7 +603,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         Text(
           team.name,
           style: TextStyle(
-            color: kColorGreen,
+            // color: kColorGreen,
             fontSize: kHeadingFontSize,
             fontWeight: FontWeight.bold,
           ),
@@ -919,7 +914,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
+        padding: const EdgeInsets.fromLTRB(
+          30,
+          30,
+          30,
+          70,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
@@ -943,22 +943,21 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               shrinkWrap: true,
               physics: ClampingScrollPhysics(),
               scrollDirection: Axis.vertical,
+              padding: EdgeInsets.zero,
               itemBuilder: (BuildContext context, int index) {
                 return buildParticipant(
-                    imageUrl: context
-                        .watch<AgoraProvider>()
-                        .roomUsers[index]
-                        .profilePictureUrl,
-                    name: context.watch<AgoraProvider>().roomUsers[index].name!,
-                    isMuted: (context
-                                .watch<AgoraProvider>()
-                                .roomUsers[index]
-                                .muted ==
-                            null ||
-                        context
-                            .watch<AgoraProvider>()
-                            .roomUsers[index]
-                            .muted!));
+                  imageUrl: context
+                      .watch<AgoraProvider>()
+                      .roomUsers[index]
+                      .profilePictureUrl,
+                  name: context.watch<AgoraProvider>().roomUsers[index].name!,
+                  isMuted: (context
+                              .watch<AgoraProvider>()
+                              .roomUsers[index]
+                              .muted ==
+                          null ||
+                      context.watch<AgoraProvider>().roomUsers[index].muted!),
+                );
               },
               itemCount: context.watch<AgoraProvider>().roomUsers.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
