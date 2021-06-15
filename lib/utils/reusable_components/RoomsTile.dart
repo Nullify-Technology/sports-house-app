@@ -36,11 +36,13 @@ class RoomsTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 19,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -50,7 +52,7 @@ class RoomsTile extends StatelessWidget {
                   Icon(
                     Icons.verified,
                     color: kColorGreen,
-                    size: 18,
+                    size: 16,
                   ),
               ],
             ),
@@ -59,7 +61,7 @@ class RoomsTile extends StatelessWidget {
                 '$kHostedBy $hostedBy',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 13,
                 ),
               ),
           ],

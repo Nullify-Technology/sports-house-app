@@ -199,6 +199,7 @@ class EventsCard extends StatelessWidget {
                 : (short == "HT" ? "Half Time" : elapsed.toString()),
             style: TextStyle(
               fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
           ),
         ],

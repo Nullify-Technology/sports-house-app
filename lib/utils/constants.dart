@@ -151,6 +151,8 @@ const String kTimelineNotAvailable = "Timeline not available";
 const String kStartingXI = "Starting XI";
 const String kSubtitutes = "Subtitutes";
 const String kNotStarted = "Not Started";
+const String kSquadDetailsUnavailable = "Squad Unavailable!";
+const String kTimeLineUnavailable = "Timeline Unavailable!";
 
 enum AppState {
   free,
