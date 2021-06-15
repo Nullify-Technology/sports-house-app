@@ -408,6 +408,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                               Map<String, dynamic> status =
                                   new Map<String, dynamic>.from(
                                       snapShot.data!.snapshot.value);
+
                               return EventsCard.buildTimerWidget(
                                   status["short"], status["elapsed"]);
                             }
