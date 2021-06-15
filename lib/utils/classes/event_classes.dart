@@ -5,7 +5,7 @@ class MatchEvent {
   final String detail;
   final Player player;
   Player assist = Player(id: -1, name: '');
-  final Team team;
+  final RtTeam team;
   final Time time;
   final String type;
   MatchEvent(
@@ -21,7 +21,7 @@ class MatchEvent {
     String? comments,
     String? detail,
     Player? player,
-    Team? team,
+    RtTeam? team,
     Time? time,
     String? type,
   }) {
@@ -53,7 +53,7 @@ class MatchEvent {
       detail: map['detail'],
       player: Player.fromMap(map['player']),
       assist: Player.fromMap(map['assist']),
-      team: Team.fromMap(map['team']),
+      team: RtTeam.fromMap(map['team']),
       time: Time.fromMap(map['time']),
       type: map['type'],
     );
@@ -66,7 +66,7 @@ class MatchEvent {
       assist: map['assist'] == null
           ? Player(id: -1, name: '')
           : Player.fromDb(map['assist']),
-      team: Team.fromDb(map['team']),
+      team: RtTeam.fromDb(map['team']),
       time: Time.fromDb(map['time']),
       type: map['type'],
     );
@@ -162,22 +162,22 @@ class Player {
   int get hashCode => id.hashCode ^ name.hashCode;
 }
 
-class Team {
+class RtTeam {
   final int id;
   final String logo;
   final String name;
-  Team({
+  RtTeam({
     required this.id,
     required this.logo,
     required this.name,
   });
 
-  Team copyWith({
+  RtTeam copyWith({
     int? id,
     String? logo,
     String? name,
   }) {
-    return Team(
+    return RtTeam(
       id: id ?? this.id,
       logo: logo ?? this.logo,
       name: name ?? this.name,
@@ -192,15 +192,15 @@ class Team {
     };
   }
 
-  factory Team.fromMap(Map<String, dynamic> map) {
-    return Team(
+  factory RtTeam.fromMap(Map<String, dynamic> map) {
+    return RtTeam(
       id: map['id']?.toInt(),
       logo: map['logo'],
       name: map['name'],
     );
   }
-  factory Team.fromDb(dynamic map) {
-    return Team(
+  factory RtTeam.fromDb(dynamic map) {
+    return RtTeam(
       id: map['id']?.toInt(),
       logo: map['logo'],
       name: map['name'],
@@ -209,7 +209,7 @@ class Team {
 
   String toJson() => json.encode(toMap());
 
-  factory Team.fromJson(String source) => Team.fromMap(json.decode(source));
+  factory RtTeam.fromJson(String source) => RtTeam.fromMap(json.decode(source));
 
   @override
   String toString() => 'Team(id: $id, logo: $logo, name: $name)';
@@ -218,7 +218,7 @@ class Team {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Team &&
+    return other is RtTeam &&
         other.id == id &&
         other.logo == logo &&
         other.name == name;

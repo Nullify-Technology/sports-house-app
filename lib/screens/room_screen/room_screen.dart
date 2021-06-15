@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/lineup.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/team.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/classes/event_classes.dart';
@@ -102,7 +103,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       extendBody: true,
       bottomNavigationBar: buildBottomNavigationBar(context),
       body: DefaultTabController(
-        length: 4,
+        length: 3,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -138,7 +139,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                     Tab(
                       icon: Icon(Icons.sports_soccer),
                     ),
-                    Tab(icon: Icon(Icons.change_circle)),
+                    // Tab(icon: Icon(Icons.change_circle)),
                   ],
                 ),
               ),
@@ -154,8 +155,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                 buildMatchTimeline(
                   widget.arguments.agoraRoom.room,
                 ),
-                buildStartingXIHomeAndAway(widget.arguments.agoraRoom.room),
-                buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
+                buildMatchXI(widget.arguments.agoraRoom.room),
+                // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
               ],
             ),
           ),
@@ -310,13 +311,6 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
-    );
-  }
-
-  Widget buildUi(Room room) {
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [],
     );
   }
 
@@ -522,41 +516,34 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget buildStartingXIHomeAndAway(Room room) {
+  Widget buildMatchXI(Room room) {
     if (room.fixture.teams.home.lineups.startXI != null &&
         room.fixture.teams.home.lineups.startXI != null) {
       return SingleChildScrollView(
-        child: Card(
-          color: kCardBgColor,
-          margin: EdgeInsets.zero,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 30,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  kStartingXI,
-                  style: TextStyle(
-                    color: kColorGreen,
-                    fontSize: kHeadingFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: buildStartingXI(room, 'home'),
-                    ),
-                    Expanded(
-                      child: buildStartingXI(room, 'away'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 30,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildTeamTitle(room.fixture.teams.home),
+              SizedBox(
+                height: 20,
+              ),
+              buildStartingXI(room, 'home'),
+              SizedBox(
+                height: 40,
+              ),
+              buildTeamTitle(room.fixture.teams.away),
+              SizedBox(
+                height: 20,
+              ),
+              buildStartingXI(room, 'home'),
+              SizedBox(
+                height: 90,
+              ),
+            ],
           ),
         ),
       );
@@ -567,6 +554,31 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         icon: Icons.sports_soccer,
       );
     ;
+  }
+
+  Row buildTeamTitle(Team team) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 20,
+        ),
+        CachedNetworkImage(
+          width: 40,
+          imageUrl: team.logoUrl,
+        ),
+        SizedBox(
+          width: 15,
+        ),
+        Text(
+          team.name,
+          style: TextStyle(
+            color: kColorGreen,
+            fontSize: kHeadingFontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget buildSubstitutesHomeAndAway(Room room) {
@@ -620,45 +632,48 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       );
   }
 
-  ListView buildStartingXI(Room room, String team) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: team == 'home'
-          ? room.fixture.teams.home.lineups.startXI!.length
-          : room.fixture.teams.away.lineups.startXI!.length,
-      itemBuilder: (context, i) {
-        Lineup lineup = team == 'home'
-            ? room.fixture.teams.home.lineups
-            : room.fixture.teams.away.lineups;
-        return ListTile(
-          title: Text(
-            '${lineup.startXI![i].name}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          leading: Container(
-            height: 40,
-            width: 40,
-            // padding: EdgeInsets.all(15),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kDropdownBgColor,
-            ),
-            child: Text(
-              '${lineup.startXI![i].pos}',
+  Widget buildStartingXI(Room room, String team) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 15,
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: team == 'home'
+            ? room.fixture.teams.home.lineups.startXI!.length
+            : room.fixture.teams.away.lineups.startXI!.length,
+        itemBuilder: (context, i) {
+          Lineup lineup = team == 'home'
+              ? room.fixture.teams.home.lineups
+              : room.fixture.teams.away.lineups;
+          return ListTile(
+            title: Text(
+              '${lineup.startXI![i].name} ( ${lineup.startXI![i].number} )',
               style: TextStyle(
-                color: kColorGreen,
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 16,
               ),
             ),
-          ),
-        );
-      },
+            leading: Container(
+              height: 40,
+              width: 40,
+              // padding: EdgeInsets.all(15),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kDropdownBgColor,
+              ),
+              child: CircleAvatar(
+                foregroundImage: CachedNetworkImageProvider(room.fixture
+                        .players![lineup.startXI![i].id.toString()]!.photo ??
+                    kDummyProfileImageUrl),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
