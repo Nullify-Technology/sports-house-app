@@ -142,3 +142,8 @@ const String kBaseUrl =
     "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kRTDBUrl =
     "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
+
+const String kOffer = "offer";
+const String kAnswer = "answer";
+const String kCandidates = "candidates";
+const String kRTCRoom = "rtc_room";
