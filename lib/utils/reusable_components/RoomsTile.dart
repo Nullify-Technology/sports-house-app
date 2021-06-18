@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -35,11 +36,13 @@ class RoomsTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 19,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -49,7 +52,7 @@ class RoomsTile extends StatelessWidget {
                   Icon(
                     Icons.verified,
                     color: kColorGreen,
-                    size: 18,
+                    size: 16,
                   ),
               ],
             ),
@@ -58,7 +61,7 @@ class RoomsTile extends StatelessWidget {
                 '$kHostedBy $hostedBy',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 13,
                 ),
               ),
           ],
@@ -122,7 +125,8 @@ class RoomsTile extends StatelessWidget {
       child: CircleAvatar(
         backgroundColor: kDropdownBgColor,
         radius: 20,
-        foregroundImage: NetworkImage(
+        backgroundImage: AssetImage(kProfilePlaceHolder),
+        foregroundImage: CachedNetworkImageProvider(
           imageUrl,
         ),
         onForegroundImageError: (exception, stackTrace) {

@@ -95,7 +95,7 @@ class _EventRoomsState extends State<EventRooms> {
 
   Widget buildRoomList(List<Room> rooms) {
     return Padding(
-      padding: const EdgeInsets.all(30),
+      padding: const EdgeInsets.all(25),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -139,55 +139,59 @@ class _EventRoomsState extends State<EventRooms> {
               },
             )
           else
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Image.asset(
-                    'assets/images/no_rooms_found.png',
-                    width: MediaQuery.of(context).size.width * 0.6,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    kNoRoomsFound,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      // fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, CreateRoom.pageId);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: StadiumBorder(),
-                      primary: kColorGreen,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(
-                        kCreateRoom,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: kCardBgColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            buildNoRoomsAvailableError(),
           // Needed for keeping list above bottomNavBar
           SizedBox(
             height: 80,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded buildNoRoomsAvailableError() {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Image.asset(
+            'assets/images/no_rooms_found.png',
+            width: MediaQuery.of(context).size.width * 0.6,
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Text(
+            kNoRoomsFound,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
+              // fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, CreateRoom.pageId);
+            },
+            style: ElevatedButton.styleFrom(
+              shape: StadiumBorder(),
+              primary: kColorGreen,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                kCreateRoom,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: kCardBgColor,
+                ),
+              ),
+            ),
           ),
         ],
       ),

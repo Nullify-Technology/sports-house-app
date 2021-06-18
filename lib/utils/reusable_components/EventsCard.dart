@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,9 +18,11 @@ class EventsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late DatabaseReference databaseReference = FirebaseDatabase(
-        databaseURL: kRTDBUrl).reference()
-        .child("fixture").child("fixture_${fixture.id}");
+    late DatabaseReference databaseReference =
+        FirebaseDatabase(databaseURL: kRTDBUrl)
+            .reference()
+            .child("fixture")
+            .child("fixture_${fixture.id}");
 
     return GestureDetector(
       onTap: () {
@@ -51,16 +56,16 @@ class EventsCard extends StatelessWidget {
                     ),
                   ),
                   StreamBuilder<Event>(
-                    stream: databaseReference
-                        .child("status")
-                        .onValue,
+                    stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
                         if (snapShot.data!.snapshot.value != null) {
-                          Map<String, dynamic> status = new Map<String,
-                              dynamic>.from(snapShot.data!.snapshot.value);
-                          return buildTimerWidget(
-                              status["short"], status["elapsed"]);
+                          Map<String, dynamic> status =
+                              new Map<String, dynamic>.from(
+                                  snapShot.data!.snapshot.value);
+
+                          return buildTimerWidget(status);
+                          // return Center();
                         }
                       }
                       return Container();
@@ -87,7 +92,7 @@ class EventsCard extends StatelessWidget {
                     buildTeamIcon(fixture.teams.home.logoUrl),
                     Container(
                       padding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: new BoxDecoration(
                         color: kCardBgColor,
                         shape: BoxShape.rectangle,
@@ -101,9 +106,9 @@ class EventsCard extends StatelessWidget {
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
                             if (snapShot.data!.snapshot.value != null) {
-                              Map<String, dynamic> score = new Map<
-                                  String,
-                                  dynamic>.from(snapShot.data!.snapshot.value);
+                              Map<String, dynamic> score =
+                                  new Map<String, dynamic>.from(
+                                      snapShot.data!.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(
@@ -140,8 +145,8 @@ class EventsCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat.yMMMMd('en_US').add_jm().format(
-                          DateTime.parse(fixture.date).toLocal(),
-                        ),
+                              DateTime.parse(fixture.date).toLocal(),
+                            ),
                       ),
                     ],
                   ),
@@ -161,21 +166,24 @@ class EventsCard extends StatelessWidget {
         color: kCardBgColor,
         shape: BoxShape.circle,
       ),
-      child: Image.network(
-        url,
+      child: CachedNetworkImage(
+        imageUrl: url,
+        //placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.flag),
         width: 50,
         height: 50,
       ),
     );
   }
 
-  Widget buildTimerWidget(String? short, int elapsed) {
+  static Widget buildTimerWidget(Map<String, dynamic> status) {
+    var short = status['short'];
+    var elapsed = status['elapsed'];
     return Container(
-      padding:
-      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: new BoxDecoration(
-        color: (short != null && short == "FT") ? kCardBgColor : Colors
-            .redAccent,
+        color:
+            (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(40.0)),
       ),
@@ -189,11 +197,16 @@ class EventsCard extends StatelessWidget {
             width: 4,
           ),
           Text(
-            (short != null && short == "FT") ? "Full Time" : (short == "HT"
-                ? "Half Time"
-                : elapsed.toString()),
+            (short != null && short == "FT")
+                ? "Full Time"
+                : (short != null && short == "HT"
+                    ? "Half Time"
+                    : (short != null && short == "NS")
+                        ? "Not Started"
+                        : elapsed.toString()),
             style: TextStyle(
               fontWeight: FontWeight.bold,
+              fontSize: 10,
             ),
           ),
         ],

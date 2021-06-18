@@ -135,6 +135,7 @@ List<DesignRoom> roomList = [
   kDummyRoom,
   kDummyRoom
 ];
+
 const String kPermissionText =
     "Inorder to join a room, you must allow $kAppName to access your microphone!";
 const String kCompletedEventText = "Cannot join room of a completed event!";
@@ -142,6 +143,27 @@ const String kBaseUrl =
     "https://asia-south1-sports-house-1b0a9.cloudfunctions.net/app";
 const String kRTDBUrl =
     "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
+const String kProfilePlaceHolderUrl =
+    "https://firebasestorage.googleapis.com/v0/b/sports-house-1b0a9.appspot.com/o/user_profiles%2Fprofile_soccer.png?alt=media&token=867c80e2-8391-4b96-9b39-ee6b0e055522";
+
+const String kCropImageTitle = "Crop Profile";
+const String kTimelineNotAvailable = "Timeline not available";
+const String kStartingXI = "Starting XI";
+const String kSubtitutes = "Subtitutes";
+const String kNotStarted = "Not Started";
+const String kSquadDetailsUnavailable = "Squad Unavailable!";
+const String kTimeLineUnavailable = "Timeline Unavailable!";
+
+enum AppState {
+  free,
+  picked,
+  cropped,
+}
+
+enum Position {
+  left,
+  right,
+}
 
 const String kOffer = "offer";
 const String kAnswer = "answer";
