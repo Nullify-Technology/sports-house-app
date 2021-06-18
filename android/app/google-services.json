@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "639663034253",
+    "firebase_url": "https://sports-house-1b0a9-default-rtdb.firebaseio.com",
     "project_id": "sports-house-1b0a9",
     "storage_bucket": "sports-house-1b0a9.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "639663034253-ak4ag51n17l4nrd6q4lj82qitji5vkfb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sportshouse.sports_house",
+            "certificate_hash": "eb2de516a80e9e0f492a428d3debdd4e654730f5"
+          }
+        },
         {
           "client_id": "639663034253-elvs1m2ro83hfjmvn3qvh18dr9l3e3ms.apps.googleusercontent.com",
           "client_type": 1,

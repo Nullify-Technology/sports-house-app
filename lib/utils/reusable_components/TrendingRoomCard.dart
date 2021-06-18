@@ -36,11 +36,13 @@ class TrendingRoomCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      room.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 19,
+                    Expanded(
+                      child: Text(
+                        room.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 19,
+                        ),
                       ),
                     ),
                     SizedBox(

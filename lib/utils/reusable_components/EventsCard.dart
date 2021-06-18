@@ -63,8 +63,9 @@ class EventsCard extends StatelessWidget {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
                                   snapShot.data!.snapshot.value);
-                          return buildTimerWidget(
-                              status["short"], status["elapsed"]);
+
+                          return buildTimerWidget(status);
+                          // return Center();
                         }
                       }
                       return Container();
@@ -175,7 +176,9 @@ class EventsCard extends StatelessWidget {
     );
   }
 
-  Widget buildTimerWidget(String? short, int elapsed) {
+  static Widget buildTimerWidget(Map<String, dynamic> status) {
+    var short = status['short'];
+    var elapsed = status['elapsed'];
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: new BoxDecoration(
@@ -196,9 +199,14 @@ class EventsCard extends StatelessWidget {
           Text(
             (short != null && short == "FT")
                 ? "Full Time"
-                : (short == "HT" ? "Half Time" : elapsed.toString()),
+                : (short != null && short == "HT"
+                    ? "Half Time"
+                    : (short != null && short == "NS")
+                        ? "Not Started"
+                        : elapsed.toString()),
             style: TextStyle(
               fontWeight: FontWeight.bold,
+              fontSize: 10,
             ),
           ),
         ],

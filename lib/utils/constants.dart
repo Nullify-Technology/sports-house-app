@@ -147,9 +147,20 @@ const String kProfilePlaceHolderUrl =
     "https://firebasestorage.googleapis.com/v0/b/sports-house-1b0a9.appspot.com/o/user_profiles%2Fprofile_soccer.png?alt=media&token=867c80e2-8391-4b96-9b39-ee6b0e055522";
 
 const String kCropImageTitle = "Crop Profile";
+const String kTimelineNotAvailable = "Timeline not available";
+const String kStartingXI = "Starting XI";
+const String kSubtitutes = "Subtitutes";
+const String kNotStarted = "Not Started";
+const String kSquadDetailsUnavailable = "Squad Unavailable!";
+const String kTimeLineUnavailable = "Timeline Unavailable!";
 
 enum AppState {
   free,
   picked,
   cropped,
+}
+
+enum Position {
+  left,
+  right,
 }
