@@ -1,10 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
+import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
+import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
@@ -29,6 +33,7 @@ class _CreateRoomState extends State<CreateRoom> {
   final roomNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late RoomsBloc roomsBloc;
+  late AuthUser currentUser;
 
   createFixtureRoom() async {
     if (_formKey.currentState!.validate()) {
@@ -36,9 +41,8 @@ class _CreateRoomState extends State<CreateRoom> {
           selectedType.key != 'private') {
         AgoraRoom? room = await roomsBloc.createRoom(
             selectedFixture.key, "0", roomNameController.text);
-        print(room);
         Navigator.popAndPushNamed(context, RoomScreen.pageId,
-            arguments: RoomScreenArguments(room!));
+            arguments: RoomScreenArguments(room!.room));
       } else {
         print('No matches are available!');
         final snackBar = SnackBar(
@@ -86,6 +90,7 @@ class _CreateRoomState extends State<CreateRoom> {
     roomsBloc = RoomsBloc(client: client);
     fixtureBloc = FixtureBloc(client: client);
     fixtureBloc.getFixtures();
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
     super.initState();
   }
 

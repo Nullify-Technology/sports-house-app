@@ -37,27 +37,31 @@ class WebRTCPeerConnection {
 
     Map<String, dynamic> configuration = {
       "iceServers": [
-        {"url": "stun:stun.l.google.com:19302"},
+        {"url": "stun:stun3.l.google.com:19302"},
       ]
     };
 
+    // {"url": "stun:numb.viagenie.ca", "username": 'giranir264@moxkid.com', "credentials": 'appu@025'}
+    // {
+    //   "urls": [
+    //     "turn:13.250.13.83:3478?transport=udp"
+    //   ],
+    //   "username": "YzYNCouZM1mhqhmseWk6",
+    //   "credential": "YzYNCouZM1mhqhmseWk6"
+    // }
     final Map<String, dynamic> offerSdpConstraints = {
       "mandatory": {
         "OfferToReceiveAudio": true,
         "OfferToReceiveVideo": false,
-        "googEchoCancellation" : true,
-        "googDAEchoCancellation" : true,
-        "googAutoGainControl" : true,
-        "googAutoGainControl2" : true,
-        "googNoiseSuppression" : true,
-        "googNoiseSuppression2" : true,
-        "googAudioMirroring" : false,
-        "googHighpassFilter" : true
       },
       "optional": [],
     };
 
-    _peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
+    try{
+      _peerConnection = await createPeerConnection(configuration, offerSdpConstraints);
+    }catch(e){
+      print(e);
+    }
     await _peerConnection.addStream(localStream);
   }
 

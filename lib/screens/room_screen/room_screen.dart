@@ -1,27 +1,22 @@
-import 'dart:convert';
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/lineup.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/team.dart';
-import 'package:sports_house/provider/agora_provider.dart';
-import 'package:sports_house/screens/event_rooms/event_room.dart';
+import 'package:sports_house/models/user.dart';
+import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/utils/classes/event_classes.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/EventsCard.dart';
+import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/error_components.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class RoomScreenArguments {
-  final AgoraRoom agoraRoom;
+  final Room room;
 
-  RoomScreenArguments(this.agoraRoom);
+  RoomScreenArguments(this.room);
 }
 
 class RoomScreen extends StatefulWidget {
@@ -35,55 +30,53 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
-  late DatabaseReference databaseReference =
-      FirebaseDatabase(databaseURL: kRTDBUrl)
-          .reference()
-          .child("fixture")
-          .child("fixture_${widget.arguments.agoraRoom.room.fixture.id}");
+  late DatabaseReference fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("fixture").child("fixture_${widget.arguments.room.fixture.id}");
+  late DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom).child(widget.arguments.room.id);
 
-  Future handleMicroPhonePermission() async {
-    final status = await Permission.microphone.request();
-    if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
-      Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
-          widget.arguments.agoraRoom.token, widget.arguments.agoraRoom);
-    } else {
-      _showPermissionDialog();
-    }
-  }
+  // Future handleMicroPhonePermission() async {
+  //   final status = await Permission.microphone.request();
+  //   if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
+  //     Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
+  //         widget.arguments.agoraRoom.token, widget.arguments.agoraRoom);
+  //   } else {
+  //     _showPermissionDialog();
+  //   }
+  // }
 
-  Future<void> _showPermissionDialog() async {
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: const <Widget>[
-                Text(kPermissionText),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.popUntil(
-                    context, ModalRoute.withName(EventRooms.pageId));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Future<void> _showPermissionDialog() async {
+  //   await showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: const <Widget>[
+  //               Text(kPermissionText),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: const Text('Ok'),
+  //             onPressed: () {
+  //               Navigator.popUntil(
+  //                   context, ModalRoute.withName(EventRooms.pageId));
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   void initState() {
+    Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(widget.arguments.room);
     super.initState();
-    if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
-      handleMicroPhonePermission();
-    }
+    // if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
+    //   handleMicroPhonePermission();
+    // }
   }
 
   @override
@@ -117,7 +110,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   background: Padding(
                     padding:
                         const EdgeInsets.only(top: 70, left: 15, right: 15),
-                    child: buildRoomHeader(widget.arguments.agoraRoom.room),
+                    child: buildRoomHeader(widget.arguments.room),
                   ),
                 ),
                 bottom: TabBar(
@@ -148,9 +141,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               children: [
                 buildParticipantsView(),
                 buildMatchTimeline(
-                  widget.arguments.agoraRoom.room,
+                  widget.arguments.room,
                 ),
-                buildMatchXI(widget.arguments.agoraRoom.room),
+                buildMatchXI(widget.arguments.room),
                 // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
               ],
             ),
@@ -182,9 +175,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           children: [
             TextButton(
               onPressed: () {
-                context
-                    .read<AgoraProvider>()
-                    .leaveRoom(widget.arguments.agoraRoom.room.id);
+                context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -213,13 +204,13 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               ),
             ),
             TextButton(
-              onPressed: context.read<AgoraProvider>().toggleMute,
+              onPressed: () => context.read<RTCProvider>().toggleMute(widget.arguments.room.id),
               style: TextButton.styleFrom(
                 backgroundColor: kMuteButtonBgColor,
                 shape: CircleBorder(),
                 padding: EdgeInsets.all(10),
               ),
-              child: context.watch<AgoraProvider>().muted
+              child: context.watch<RTCProvider>().muted
                   ? Icon(
                       Icons.mic_off_rounded,
                       color: kMutedButtonColor,
@@ -396,7 +387,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                         ),
                       ),
                       StreamBuilder<Event>(
-                        stream: databaseReference.child("status").onValue,
+                        stream: fixtureReference.child("status").onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
                             if (snapShot.data!.snapshot.value != null) {
@@ -466,7 +457,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.all(Radius.circular(40.0)),
                         ),
                         child: StreamBuilder<Event>(
-                          stream: databaseReference
+                          stream: fixtureReference
                               .child("score")
                               .child("current")
                               .onValue,
@@ -752,7 +743,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   StreamBuilder<Event> buildMatchTimeline(Room room) {
     return StreamBuilder<Event>(
-      stream: databaseReference.child("events").onValue,
+      stream: fixtureReference.child("events").onValue,
       builder: (context, snapShot) {
         if (snapShot.hasData) {
           if (snapShot.data!.snapshot.value != null) {
@@ -939,32 +930,36 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             SizedBox(
               height: 10,
             ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              padding: EdgeInsets.zero,
-              itemBuilder: (BuildContext context, int index) {
-                return buildParticipant(
-                  imageUrl: context
-                      .watch<AgoraProvider>()
-                      .roomUsers[index]
-                      .profilePictureUrl,
-                  name: context.watch<AgoraProvider>().roomUsers[index].name!,
-                  isMuted: (context
-                              .watch<AgoraProvider>()
-                              .roomUsers[index]
-                              .muted ==
-                          null ||
-                      context.watch<AgoraProvider>().roomUsers[index].muted!),
-                );
+            StreamBuilder<Event>(
+              stream: roomReference.onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    Map<String, dynamic> userDetails = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (BuildContext context, int index) {
+                        AuthUser user = AuthUser.fromJson(Map<String, dynamic>.from(userDetails.values.toList()[index]));
+                        return buildParticipant(
+                          imageUrl: user.profilePictureUrl,
+                          name: user.name!,
+                          isMuted: user.muted!
+                        );
+                      },
+                      itemCount: userDetails.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisSpacing: 10,
+                        crossAxisCount: 4,
+                        childAspectRatio: 0.5,
+                      ),
+                    );
+                  }
+                }
+                return CenterProgressBar();
               },
-              itemCount: context.watch<AgoraProvider>().roomUsers.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisSpacing: 10,
-                crossAxisCount: 4,
-                childAspectRatio: 0.5,
-              ),
             ),
 
             //Needed for padding bottomNavBar

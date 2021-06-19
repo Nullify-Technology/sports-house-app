@@ -2,21 +2,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/models/agora_room.dart';
+import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class InRoomBottomBar extends StatelessWidget {
-  const InRoomBottomBar({Key? key, required this.agoraRoom}) : super(key: key);
-  final AgoraRoom agoraRoom;
+  const InRoomBottomBar({Key? key, required this.room}) : super(key: key);
+  final Room room;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, RoomScreen.pageId,
-            arguments: RoomScreenArguments(agoraRoom));
+            arguments: RoomScreenArguments(room));
       },
       child: Card(
         margin: EdgeInsets.symmetric(
@@ -42,7 +43,7 @@ class InRoomBottomBar extends StatelessWidget {
                 height: 50,
                 child: Stack(
                   alignment: Alignment.centerRight,
-                  children: buildProfileStack(members: agoraRoom.room.members),
+                  children: buildProfileStack(members: room.members),
                 ),
               ),
               Expanded(
@@ -51,7 +52,7 @@ class InRoomBottomBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      agoraRoom.room.name,
+                      room.name,
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -59,7 +60,7 @@ class InRoomBottomBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '$kHostedBy ${agoraRoom.room.createdBy.name}',
+                      '$kHostedBy ${room.createdBy.name}',
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -71,7 +72,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<AgoraProvider>().leaveRoom(agoraRoom.room.id);
+                  context.read<AgoraProvider>().leaveRoom(room.id);
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),

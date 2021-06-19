@@ -33,11 +33,9 @@ dependencies:
   provider: ^5.0.0
   retrofit: ^2.0.0
   timeline_tile: ^2.0.0
-  firebase_messaging: ^10.0.2
-  firebase_database: ^7.1.1
-  flutter_local_notifications: ^6.0.0
   flutter_webrtc: ^0.6.4
   sdp_transform: ^0.3.0
+  flutter_incall: ^1.0.0
 
 dev_dependencies:
   flutter_test:

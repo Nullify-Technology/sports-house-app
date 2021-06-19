@@ -1,10 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/agora_provider.dart';
+import 'package:sports_house/provider/rtc_provider.dart';
+import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -30,12 +34,13 @@ class EventRooms extends StatefulWidget {
 
 class _EventRoomsState extends State<EventRooms> {
   late RoomsBloc roomsBloc;
-
+  late AuthUser currentUser;
   Future joinRoom(Room room) async {
     try {
-      AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
+      // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
+
       Navigator.pushNamed(context, RoomScreen.pageId,
-          arguments: RoomScreenArguments(agoraRoom));
+          arguments: RoomScreenArguments(room));
     } catch (e) {
       print("failed to join room");
     }
@@ -43,6 +48,7 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   void initState() {
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
     roomsBloc = RoomsBloc(client: RestClient.create());
     roomsBloc.getRooms(widget.arguments.fixtureId);
     super.initState();
@@ -85,9 +91,9 @@ class _EventRoomsState extends State<EventRooms> {
         ),
       ),
       extendBody: true,
-      bottomNavigationBar: context.watch<AgoraProvider>().isJoined
+      bottomNavigationBar: context.watch<RTCProvider>().joined
           ? InRoomBottomBar(
-              agoraRoom: context.watch<AgoraProvider>().room,
+              room: context.watch<RTCProvider>().room,
             )
           : null,
     );

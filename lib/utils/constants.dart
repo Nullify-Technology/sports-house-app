@@ -169,3 +169,4 @@ const String kOffer = "offer";
 const String kAnswer = "answer";
 const String kCandidates = "candidates";
 const String kRTCRoom = "rtc_room";
+const String kMuted = "muted";

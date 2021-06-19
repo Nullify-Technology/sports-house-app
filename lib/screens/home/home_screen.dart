@@ -11,6 +11,7 @@ import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/agora_provider.dart';
+import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
       Navigator.pushNamed(context, RoomScreen.pageId,
-          arguments: RoomScreenArguments(agoraRoom));
+          arguments: RoomScreenArguments(agoraRoom.room));
     } catch (e) {
       print("failed to join room");
     }
@@ -242,9 +243,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       extendBody: true,
-      bottomNavigationBar: context.watch<AgoraProvider>().isJoined
+      bottomNavigationBar: context.watch<RTCProvider>().joined
           ? InRoomBottomBar(
-              agoraRoom: context.watch<AgoraProvider>().room,
+              room: context.watch<RTCProvider>().room,
             )
           : null,
     );

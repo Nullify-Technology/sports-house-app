@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/provider/agora_provider.dart';
+import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
@@ -17,12 +19,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth _auth = FirebaseAuth.instance;
+    // FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("rtc_rooms").onChildRemoved.listen((event) {
+    //   print("removed child ${event.snapshot.key}");
+    // });
+
+    FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("rtc_rooms").onChildAdded.listen((event) {
+      print("added child ${event.snapshot.value}");
+    });
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider(_auth)),
         ChangeNotifierProxyProvider<UserProvider, AgoraProvider>(
           create: (context) => AgoraProvider(),
           update: (context, authProvider, _) => AgoraProvider(currentUser: authProvider.currentUser),
+        ),
+        ChangeNotifierProxyProvider<UserProvider, RTCProvider>(
+          create: (context) => RTCProvider(),
+          update: (context, authProvider, _) => RTCProvider(currentUser: authProvider.currentUser),
         )
       ],
       child: MaterialApp(
