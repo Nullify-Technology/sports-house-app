@@ -74,7 +74,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
       backgroundColor: kColorBlack,
       body: DefaultTabController(
         length: 2,
-        initialIndex: 1,
+        initialIndex: 0,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
