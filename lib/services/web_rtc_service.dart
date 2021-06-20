@@ -15,17 +15,20 @@ class WebRTCPeerConnection {
   static Future getUserMedia() async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': {
-        "echoCancellation" : true,
-        "autoGainControl" : true,
-        "noiseSuppression" : true,
-        "googEchoCancellation" : true,
-        "googDAEchoCancellation" : true,
-        "googAutoGainControl" : true,
-        "googAutoGainControl2" : true,
-        "googNoiseSuppression" : true,
-        "googNoiseSuppression2" : true,
-        "googAudioMirroring" : false,
-        "googHighpassFilter" : true
+        'mandatory': {
+          "echoCancellation": true,
+          "autoGainControl": true,
+          "noiseSuppression": true,
+          "googEchoCancellation": true,
+          "googDAEchoCancellation": true,
+          "googAutoGainControl": true,
+          "googAutoGainControl2": true,
+          "googNoiseSuppression": true,
+          "googNoiseSuppression2": true,
+          "googAudioMirroring": false,
+          "googHighpassFilter": true
+        },
+        'optional' : []
       },
       'video': false,
     };

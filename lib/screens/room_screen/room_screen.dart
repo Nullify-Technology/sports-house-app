@@ -45,8 +45,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   // Future<void> _showPermissionDialog() async {
   //   await showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
+    //     context: context,
+    //     barrierDismissible: false, // user must tap button!
   //     builder: (BuildContext context) {
   //       return AlertDialog(
   //         content: SingleChildScrollView(
@@ -174,8 +174,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
-              onPressed: () {
-                context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
+              onPressed: () async {
+                await context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -958,7 +958,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                     );
                   }
                 }
-                return CenterProgressBar();
+                return Expanded(child: CenterProgressBar());
               },
             ),
 

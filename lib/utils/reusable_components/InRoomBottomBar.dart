@@ -5,6 +5,7 @@ import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/provider/agora_provider.dart';
+import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 
@@ -72,7 +73,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<AgoraProvider>().leaveRoom(room.id);
+                  context.read<RTCProvider>().leaveRoom(room.id);
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),

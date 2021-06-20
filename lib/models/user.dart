@@ -18,6 +18,8 @@ class AuthUser{
  final bool hasAccess;
  @JsonKey(name: "muted" ,includeIfNull: false)
  bool? muted = true;
+ @JsonKey(name: "joined" ,includeIfNull: false)
+ bool? joined = false;
 
  AuthUser({required this.id, required this.phone, this.name, this.profilePictureUrl, required this.hasAccess});
 
