@@ -1,0 +1,226 @@
+import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:sports_house/models/fixture.dart';
+import 'package:sports_house/screens/event_rooms/event_room.dart';
+import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/custom_text.dart';
+
+class FixtureTile extends StatelessWidget {
+  final Fixture fixture;
+
+  const FixtureTile({
+    Key? key,
+    required this.fixture,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    late DatabaseReference databaseReference =
+        FirebaseDatabase(databaseURL: kRTDBUrl)
+            .reference()
+            .child("fixture")
+            .child("fixture_${fixture.id}");
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, EventRooms.pageId,
+            arguments: EventRoomsArguments(fixture.id,
+                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
+      },
+      child: Card(
+        elevation: 5,
+        color: kCardBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomText(
+                    text: DateFormat.jm('en_US').format(
+                      DateTime.parse(fixture.date).toLocal(),
+                    ),
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  StreamBuilder<Event>(
+                    stream: databaseReference.child("status").onValue,
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        if (snapShot.data!.snapshot.value != null) {
+                          Map<String, dynamic> status =
+                              new Map<String, dynamic>.from(
+                                  snapShot.data!.snapshot.value);
+
+                          return buildTimerWidget(status);
+                          // return Center();
+                        }
+                      }
+                      return Container();
+                    },
+                  ),
+                ],
+              ),
+              VerticalDivider(
+                color: Colors.white,
+                thickness: 6,
+              ),
+              Expanded(
+                child: StreamBuilder<Event>(
+                  stream:
+                      databaseReference.child("score").child("current").onValue,
+                  builder: (context, snapShot) {
+                    if (snapShot.hasData) {
+                      if (snapShot.data!.snapshot.value != null) {
+                        Map<String, dynamic> score =
+                            new Map<String, dynamic>.from(
+                                snapShot.data!.snapshot.value);
+
+                        return buildTeamAndScore(score: score);
+                      }
+                    }
+                    return buildTeamAndScore();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTeamAndScore({Map<String, dynamic>? score}) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: CustomText(
+                text: fixture.teams.home.name,
+                fontSize: 16,
+              ),
+            ),
+            if (score != null)
+              CustomText(
+                text: score["home"],
+                fontSize: 16,
+              ),
+          ],
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: CustomText(
+                text: fixture.teams.away.name,
+                fontSize: 16,
+              ),
+            ),
+            if (score != null)
+              CustomText(
+                text: score["away"],
+                fontSize: 16,
+              ),
+          ],
+        ),
+        SizedBox(
+          height: 2,
+        ),
+      ],
+    );
+  }
+
+  Container buildTeamIcon(String url) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: new BoxDecoration(
+        color: kCardBgColor,
+        shape: BoxShape.circle,
+      ),
+      child: CachedNetworkImage(
+        imageUrl: url,
+        //placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.flag),
+        width: 50,
+        height: 50,
+      ),
+    );
+  }
+
+  static Widget buildTimerWidget(Map<String, dynamic> status) {
+    var short = status['short'];
+    var elapsed = status['elapsed'];
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: new BoxDecoration(
+        color:
+            (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.timer,
+            size: 16,
+          ),
+          SizedBox(
+            width: 4,
+          ),
+          Text(
+            (short != null && short == "FT")
+                ? "Full Time"
+                : (short != null && short == "HT"
+                    ? "Half Time"
+                    : (short != null && short == "NS")
+                        ? "Not Started"
+                        : elapsed.toString()),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  showCompletedEventWarning(context) async {
+    return await showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(kCompletedEventText),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}

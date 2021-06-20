@@ -44,6 +44,18 @@ class FixtureBloc{
     }
   }
 
+  Future getLiveTournamentFixtures(tournamentId) async {
+    fixturesSink.add(Response.loading('Getting tournament fixtures'));
+    try {
+      ApiResponse<Fixture> response =
+          await client.getLiveTournamentFixtures(tournamentId);
+      fixturesSink.add(Response.completed(response.results));
+    } catch (e) {
+      fixturesSink.add(Response.error(e.toString()));
+      print(e);
+    }
+  }
+
   dispose() {
     _fixturesController.close();
   }

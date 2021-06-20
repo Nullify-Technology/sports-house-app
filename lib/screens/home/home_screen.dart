@@ -20,7 +20,7 @@ import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/screens/tournament/tournament.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/EventsCard.dart';
+import 'package:sports_house/utils/reusable_components/FixtureCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     fixtureBloc.dispose();
+    tournamentBloc.dispose();
     super.dispose();
   }
 
@@ -275,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   vertical: 10,
                 ),
                 height: 250,
-                child: EventsCard(
+                child: FixtureCard(
                   fixture: fixtures[index],
                 ),
               );
@@ -345,10 +346,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, TournamentScreen.pageId,
-                              arguments: TournamentScreenArguments(
-                                  tournaments[i].id ?? '',
-                                  tournaments[i].name ?? ''));
+                          Navigator.pushNamed(
+                            context,
+                            TournamentScreen.pageId,
+                            arguments: TournamentScreenArguments(
+                              tournamentId: tournaments[i].id ?? '',
+                              tournamentName: tournaments[i].name ?? '',
+                              banner: tournaments[i].banner ?? '',
+                              startDate:
+                                  tournaments[i].currentSeason!.start ?? '',
+                              endDate: tournaments[i].currentSeason!.end ?? '',
+                            ),
+                          );
                         });
                   },
                 );
