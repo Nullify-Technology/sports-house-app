@@ -74,7 +74,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
       backgroundColor: kColorBlack,
       body: DefaultTabController(
         length: 2,
-        initialIndex: 0,
+        initialIndex: 1,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -203,7 +203,10 @@ class _TournamentScreenState extends State<TournamentScreen> {
                 child: Center(child: Text(kUnavailable)),
               );
             } else {
-              return CenterProgressBar();
+              return Container(
+                height: MediaQuery.of(context).size.width,
+                child: CenterProgressBar(),
+              );
             }
           }),
     );

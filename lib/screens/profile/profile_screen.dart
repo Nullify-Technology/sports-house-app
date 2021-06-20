@@ -42,7 +42,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: currentUser == null
-          ? CenterProgressBar()
+          ?  Container(
+                height: MediaQuery.of(context).size.width,
+                child: CenterProgressBar(),
+              )
           : buildProfileScreen(currentUser!),
     );
   }

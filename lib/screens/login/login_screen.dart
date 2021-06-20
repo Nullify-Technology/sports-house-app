@@ -15,7 +15,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late TabController _controller;
   late String _verificationId;
@@ -27,15 +26,17 @@ class _LoginScreenState extends State<LoginScreen>
 
     PhoneVerificationFailed phoneVerificationFailed =
         (FirebaseAuthException authException) {
-          _controller.animateTo(0);
-          final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          print('Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
+      _controller.animateTo(0);
+      final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      print(
+          'Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
     };
 
     PhoneVerificationCompleted phoneVerificationCompleted =
         (PhoneAuthCredential credentials) async {
-      final User user = (await _auth.signInWithCredential(credentials)).user as User;
+      final User user =
+          (await _auth.signInWithCredential(credentials)).user as User;
       print("Successfully signed in UID: ${user.uid}");
       if (user.uid.isNotEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen>
         (String verificationId) {
       this._verificationId = verificationId;
       // _controller.animateTo(0);
-      print( "timeout");
+      print("timeout");
     };
 
     try {
@@ -71,17 +72,16 @@ class _LoginScreenState extends State<LoginScreen>
 
   void verifyOtp(String otp) async {
     _controller.animateTo(1);
-    try{
+    try {
       final AuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: this._verificationId,
-          smsCode: otp
-      );
-      final User user = (await _auth.signInWithCredential(credential)).user as User;
+          verificationId: this._verificationId, smsCode: otp);
+      final User user =
+          (await _auth.signInWithCredential(credential)).user as User;
       print("Successfully signed in UID: ${user.uid}");
       if (user.uid.isNotEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       }
-    } catch(e){
+    } catch (e) {
       final snackBar = SnackBar(content: Text(kInvalidOtp));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       _controller.animateTo(2);

@@ -47,8 +47,8 @@ class StandingsBloc {
 
   Future getStandings(String tournamentId) async {
     try {
-      Future<TournamentStandings> response = client.getStandings(tournamentId);
-      // standingsSink.add(Response.completed(await response));
+      Future<TournamentStandings> response =
+          client.getStandings(tournamentId);
       return response;
     } catch (e) {
       print(e);

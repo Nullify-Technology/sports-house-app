@@ -958,7 +958,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                     );
                   }
                 }
-                return CenterProgressBar();
+                return  Container(
+                height: MediaQuery.of(context).size.width,
+                child: CenterProgressBar(),
+              );
               },
             ),
 
