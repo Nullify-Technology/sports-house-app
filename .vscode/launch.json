@@ -9,7 +9,8 @@
             "name": "development",
             "request": "launch",
             "type": "dart",
-            "program": "${workspaceFolder}/lib/main_dev.dart"
+            "program": "${workspaceFolder}/lib/main_dev.dart",
+            "args": [ "--no-sound-null-safety" ],
         },
         {
             "name": "production",
