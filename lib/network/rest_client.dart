@@ -7,6 +7,7 @@ import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/tournament.dart';
 import 'package:sports_house/utils/constants.dart';
 
 import 'interceptors/logging_interceptor.dart';
@@ -26,6 +27,9 @@ abstract class RestClient {
 
   @GET("/fixture")
   Future<ApiResponse<Fixture>> getFixtures();
+
+  @GET("/tournament")
+  Future<ApiResponse<Tournament>> getTournaments();
 
   @GET("/room/trending/")
   Future<ApiResponse<Room>> getTrendingRooms();
