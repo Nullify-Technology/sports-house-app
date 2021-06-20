@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sports_house/models/tournament.dart';
 import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
@@ -10,6 +11,7 @@ import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/screens/login/login_screen.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
+import 'package:sports_house/screens/tournament/tournament.dart';
 import 'package:sports_house/utils/constants.dart';
 
 import 'config/app_config.dart';
@@ -60,6 +62,10 @@ class MyApp extends StatelessWidget {
           EventRooms.pageId: (context) => EventRooms(
                 arguments: ModalRoute.of(context)!.settings.arguments
                     as EventRoomsArguments,
+              ),
+          TournamentScreen.pageId: (context) => TournamentScreen(
+                arguments: ModalRoute.of(context)!.settings.arguments
+                    as TournamentScreenArguments,
               ),
         },
         initialRoute:

@@ -18,11 +18,13 @@ import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
+import 'package:sports_house/screens/tournament/tournament.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/EventsCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sports_house/utils/reusable_components/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -296,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 15,
         ),
         Container(
-          height: 110,
+          height: 125,
           width: MediaQuery.of(context).size.width,
           alignment: Alignment.center,
           // color: Colors.black,
@@ -307,29 +309,47 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, i) {
                 return Builder(
                   builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      child: GestureDetector(
-                        child: Card(
-                          color: Colors.white,
-                          clipBehavior: Clip.hardEdge,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8))),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 10,
+                    return GestureDetector(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.45,
+                              height: 100,
+                              child: Card(
+                                color: Colors.white,
+                                clipBehavior: Clip.hardEdge,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  child: CachedNetworkImage(
+                                    imageUrl: tournaments[i].banner ??
+                                        kDummyProfileImageUrl,
+                                  ),
+                                ),
+                              ),
                             ),
-                            child: CachedNetworkImage(
-                              imageUrl: tournaments[i].banner ??
-                                  kDummyProfileImageUrl,
+                            SizedBox(
+                              height: 3,
                             ),
-                          ),
+                            CustomText(
+                              text: tournaments[i].name ?? '',
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
                         ),
-                        // onTap: () => joinRoom(room),
-                      ),
-                    );
+                        onTap: () {
+                          Navigator.pushNamed(context, TournamentScreen.pageId,
+                              arguments: TournamentScreenArguments(
+                                  tournaments[i].id ?? '',
+                                  tournaments[i].name ?? ''));
+                        });
                   },
                 );
               }),
