@@ -160,7 +160,7 @@ class _EventRoomsState extends State<EventRooms> {
                     Map<String, dynamic> status = new Map<String, dynamic>.from(
                         snapShot.data!.snapshot.value);
 
-                    return buildTimerWidget(status);
+                    return buildTimerWidget(status, fontSize: 16.0);
                   }
                 }
                 return Container(
