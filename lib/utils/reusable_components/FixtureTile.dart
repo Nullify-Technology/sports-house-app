@@ -113,7 +113,7 @@ class FixtureTile extends StatelessWidget {
             ),
             if (score != null)
               CustomText(
-                text: score["home"],
+                text: score["home"].toString(),
                 fontSize: 16,
               ),
           ],
@@ -131,7 +131,7 @@ class FixtureTile extends StatelessWidget {
             ),
             if (score != null)
               CustomText(
-                text: score["away"],
+                text: score["away"].toString(),
                 fontSize: 16,
               ),
           ],
