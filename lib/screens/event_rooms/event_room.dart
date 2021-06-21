@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
+import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
@@ -35,6 +36,11 @@ class EventRooms extends StatefulWidget {
 class _EventRoomsState extends State<EventRooms> {
   late RoomsBloc roomsBloc;
   late AuthUser currentUser;
+    late DatabaseReference fixtureReference =
+      FirebaseDatabase(databaseURL: kRTDBUrl)
+          .reference()
+          .child("fixture")
+          .child("fixture_${widget.arguments.fixtureId}");
   Future joinRoom(Room room) async {
     try {
       // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
@@ -48,7 +54,8 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   void initState() {
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser =
+        Provider.of<UserProvider>(context, listen: false).currentUser!;
     roomsBloc = RoomsBloc(client: RestClient.create());
     roomsBloc.getRooms(widget.arguments.fixtureId);
     super.initState();
@@ -57,47 +64,153 @@ class _EventRoomsState extends State<EventRooms> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.arguments.eventName,
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       backgroundColor: kColorBlack,
-      body: Card(
-        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-        color: kCardBgColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: kCreateRoomCardRadius,
-            topRight: kCreateRoomCardRadius,
+      extendBody: true,
+      // bottomNavigationBar: buildBottomNavigationBar(context),
+      body: DefaultTabController(
+        length: 3,
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                expandedHeight: 260.0,
+                floating: false,
+                backgroundColor: kHomeAppBarBgColor,
+                pinned: true,
+                title: Text(
+                  kAppName,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                centerTitle: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  // centerTitle: true,
+                  background: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 70, left: 15, right: 15),
+                    child: buildRoomHeader(widget.arguments.room),
+                  ),
+                ),
+                bottom: TabBar(
+                  indicatorColor: Colors.transparent,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicator: BoxDecoration(),
+                  tabs: <Widget>[
+                    Tab(
+                      icon: Icon(Icons.group),
+                    ),
+                    Tab(
+                      icon: Icon(Icons.timeline),
+                    ),
+                    Tab(
+                      icon: Icon(Icons.sports_soccer),
+                    ),
+                    // Tab(icon: Icon(Icons.change_circle)),
+                  ],
+                ),
+              ),
+            ];
+          },
+          body: Padding(
+            padding: const EdgeInsets.only(
+              top: 10,
+            ),
+            child: TabBarView(
+              children: [
+                Container(),
+                buildMatchTimeline(
+                  widget.arguments.,
+                ),
+                buildMatchXI(widget.arguments.room),
+                // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
+              ],
+            ),
           ),
         ),
-        child: StreamBuilder<Response<List<Room>>>(
-          stream: roomsBloc.roomsStream,
-          builder: (context, snapShot) {
-            if (snapShot.hasData) {
-              switch (snapShot.data!.status) {
-                case Status.LOADING:
-                case Status.ERROR:
-                  return Container();
-                case Status.COMPLETED:
-                  return buildRoomList(snapShot.data!.data);
-              }
-            }
-            return Container();
-          },
-        ),
       ),
-      extendBody: true,
-      bottomNavigationBar: context.watch<RTCProvider>().joined
-          ? InRoomBottomBar(
-              room: context.watch<RTCProvider>().room,
-            )
-          : null,
     );
   }
+
+  Column buildRoomHeader(Fixture fixture, DatabaseReference fixtureReference) {
+  return Column(
+    children: [
+      Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  height: 6,
+                ),
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    buildTeamIcon(fixture.teams.home.logoUrl),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 14,
+                      ),
+                      decoration: new BoxDecoration(
+                        color: kCardBgColor,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                      ),
+                      child: StreamBuilder<Event>(
+                        stream: fixtureReference
+                            .child("score")
+                            .child("current")
+                            .onValue,
+                        builder: (context, snapShot) {
+                          if (snapShot.hasData) {
+                            if (snapShot.data!.snapshot.value != null) {
+                              Map<String, dynamic> score =
+                                  new Map<String, dynamic>.from(
+                                      snapShot.data!.snapshot.value);
+                              return Column(
+                                children: [
+                                  Text(
+                                    '${score["home"]} - ${score["away"]}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          }
+                          return Text(
+                            'Vs',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    buildTeamIcon(fixture.teams.away.logoUrl),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
 
   Widget buildRoomList(List<Room> rooms) {
     return Padding(
