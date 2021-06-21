@@ -28,8 +28,7 @@ class FixtureTile extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, EventRooms.pageId,
-            arguments: EventRoomsArguments(fixture.id,
-                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
+            arguments: EventRoomsArguments(fixture));
       },
       child: Card(
         elevation: 5,

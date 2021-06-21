@@ -16,12 +16,12 @@ import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/RoomsTile.dart';
 import 'package:provider/provider.dart';
+import 'package:sports_house/utils/reusable_components/custom_text.dart';
 
 class EventRoomsArguments {
-  final String fixtureId;
-  final String eventName;
+  final Fixture fixture;
 
-  EventRoomsArguments(this.fixtureId, this.eventName);
+  EventRoomsArguments(this.fixture);
 }
 
 class EventRooms extends StatefulWidget {
@@ -36,11 +36,11 @@ class EventRooms extends StatefulWidget {
 class _EventRoomsState extends State<EventRooms> {
   late RoomsBloc roomsBloc;
   late AuthUser currentUser;
-    late DatabaseReference fixtureReference =
+  late DatabaseReference fixtureReference =
       FirebaseDatabase(databaseURL: kRTDBUrl)
           .reference()
           .child("fixture")
-          .child("fixture_${widget.arguments.fixtureId}");
+          .child("fixture_${widget.arguments.fixture.id}");
   Future joinRoom(Room room) async {
     try {
       // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
@@ -57,7 +57,7 @@ class _EventRoomsState extends State<EventRooms> {
     currentUser =
         Provider.of<UserProvider>(context, listen: false).currentUser!;
     roomsBloc = RoomsBloc(client: RestClient.create());
-    roomsBloc.getRooms(widget.arguments.fixtureId);
+    roomsBloc.getRooms(widget.arguments.fixture.id);
     super.initState();
   }
 
@@ -78,7 +78,7 @@ class _EventRoomsState extends State<EventRooms> {
                 backgroundColor: kHomeAppBarBgColor,
                 pinned: true,
                 title: Text(
-                  kAppName,
+                  '${widget.arguments.fixture.teams.home.name} Vs ${widget.arguments.fixture.teams.away.name}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 centerTitle: true,
@@ -87,7 +87,8 @@ class _EventRoomsState extends State<EventRooms> {
                   background: Padding(
                     padding:
                         const EdgeInsets.only(top: 70, left: 15, right: 15),
-                    child: buildRoomHeader(widget.arguments.room),
+                    child: buildRoomHeader(
+                        widget.arguments.fixture, fixtureReference),
                   ),
                 ),
                 bottom: TabBar(
@@ -96,7 +97,7 @@ class _EventRoomsState extends State<EventRooms> {
                   indicator: BoxDecoration(),
                   tabs: <Widget>[
                     Tab(
-                      icon: Icon(Icons.group),
+                      icon: Icon(Icons.groups),
                     ),
                     Tab(
                       icon: Icon(Icons.timeline),
@@ -116,11 +117,23 @@ class _EventRoomsState extends State<EventRooms> {
             ),
             child: TabBarView(
               children: [
-                Container(),
-                buildMatchTimeline(
-                  widget.arguments.,
+                StreamBuilder<Response<List<Room>>>(
+                  stream: roomsBloc.roomsStream,
+                  builder: (context, snapShot) {
+                    if (snapShot.hasData) {
+                      switch (snapShot.data!.status) {
+                        case Status.LOADING:
+                        case Status.ERROR:
+                          return Container();
+                        case Status.COMPLETED:
+                          return buildRoomList(snapShot.data!.data);
+                      }
+                    }
+                    return Container();
+                  },
                 ),
-                buildMatchXI(widget.arguments.room),
+                buildMatchTimeline(widget.arguments.fixture, fixtureReference),
+                buildMatchXI(widget.arguments.fixture, context),
                 // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
               ],
             ),
@@ -131,141 +144,158 @@ class _EventRoomsState extends State<EventRooms> {
   }
 
   Column buildRoomHeader(Fixture fixture, DatabaseReference fixtureReference) {
-  return Column(
-    children: [
-      Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
           children: [
-            Column(
-              children: [
-                SizedBox(
-                  height: 6,
-                ),
-                Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    buildTeamIcon(fixture.teams.home.logoUrl),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
+            Expanded(
+              child: Center(),
+            ),
+            StreamBuilder<Event>(
+              stream: fixtureReference.child("status").onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    Map<String, dynamic> status = new Map<String, dynamic>.from(
+                        snapShot.data!.snapshot.value);
+
+                    return buildTimerWidget(status);
+                  }
+                }
+                return Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 5,
+                    horizontal: 5,
+                  ),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: kCardBgColor,
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      )),
+                  child: Row(
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.timer,
+                        size: 16,
                       ),
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 14,
+                      SizedBox(
+                        width: 4,
                       ),
-                      decoration: new BoxDecoration(
-                        color: kCardBgColor,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                      Text(
+                        kNotStarted,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      child: StreamBuilder<Event>(
-                        stream: fixtureReference
-                            .child("score")
-                            .child("current")
-                            .onValue,
-                        builder: (context, snapShot) {
-                          if (snapShot.hasData) {
-                            if (snapShot.data!.snapshot.value != null) {
-                              Map<String, dynamic> score =
-                                  new Map<String, dynamic>.from(
-                                      snapShot.data!.snapshot.value);
-                              return Column(
-                                children: [
-                                  Text(
-                                    '${score["home"]} - ${score["away"]}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          }
-                          return Text(
-                            'Vs',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    buildTeamIcon(fixture.teams.away.logoUrl),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                );
+              },
+            ),
+            Expanded(
+              child: Center(),
             ),
           ],
         ),
-      ),
-    ],
-  );
-}
-
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            buildTeamIcon(fixture.teams.home.logoUrl, size: 60.0),
+            Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 14,
+                  ),
+                  // decoration: new BoxDecoration(
+                  //   color: kCardBgColor,
+                  //   shape: BoxShape.rectangle,
+                  //   borderRadius: BorderRadius.all(Radius.circular(40.0)),
+                  // ),
+                  child: StreamBuilder<Event>(
+                    stream: fixtureReference
+                        .child("score")
+                        .child("current")
+                        .onValue,
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        if (snapShot.data!.snapshot.value != null) {
+                          Map<String, dynamic> score =
+                              new Map<String, dynamic>.from(
+                                  snapShot.data!.snapshot.value);
+                          return Column(
+                            children: [
+                              CustomText(
+                                text: '${score["home"]} - ${score["away"]}',
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ],
+                          );
+                        }
+                      }
+                      return Text(
+                        'Vs',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            buildTeamIcon(fixture.teams.away.logoUrl, size: 60.0),
+          ],
+        ),
+        SizedBox(height: 5),
+        Divider(
+          thickness: 2,
+          indent: 150,
+          endIndent: 150,
+        ),
+        CustomText(
+          text:
+              '${widget.arguments.fixture.venue.name},${widget.arguments.fixture.venue.city}',
+          fontSize: 12,
+        ),
+        SizedBox(height: 40),
+      ],
+    );
+  }
 
   Widget buildRoomList(List<Room> rooms) {
-    return Padding(
-      padding: const EdgeInsets.all(25),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.podcasts,
+    if (rooms.length > 0)
+      return Padding(
+        padding: const EdgeInsets.all(8),
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: rooms.length,
+          padding: EdgeInsets.only(bottom: 80),
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              child: RoomsTile(
+                title: rooms[index].name,
+                listners: rooms[index].count,
+                participants: rooms[index].members,
+                hostedBy: rooms[index].createdBy.name ?? '',
               ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(
-                kRooms,
-                style: TextStyle(
-                  fontSize: kHeadingFontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          if (rooms.length > 0)
-            ListView.builder(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              itemCount: rooms.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  child: RoomsTile(
-                    title: rooms[index].name,
-                    listners: rooms[index].count,
-                    participants: rooms[index].members,
-                    hostedBy: rooms[index].createdBy.name ?? '',
-                  ),
-                  onTap: () => joinRoom(rooms[index]),
-                );
-              },
-            )
-          else
-            buildNoRoomsAvailableError(),
-          // Needed for keeping list above bottomNavBar
-          SizedBox(
-            height: 80,
-          ),
-        ],
-      ),
-    );
+              onTap: () => joinRoom(rooms[index]),
+            );
+          },
+        ),
+      );
+    else
+      return buildNoRoomsAvailableError();
   }
 
   Expanded buildNoRoomsAvailableError() {

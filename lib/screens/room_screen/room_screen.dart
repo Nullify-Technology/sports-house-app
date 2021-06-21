@@ -379,7 +379,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 }
 
-Container buildTeamIcon(String url) {
+Container buildTeamIcon(String url, {size = 30}) {
   return Container(
     padding: EdgeInsets.all(12),
     decoration: new BoxDecoration(
@@ -390,8 +390,8 @@ Container buildTeamIcon(String url) {
       imageUrl: url,
       //placeholder: (context, url) => CircularProgressIndicator(),
       errorWidget: (context, url, error) => Icon(Icons.flag),
-      width: 30,
-      height: 30,
+      width: size,
+      height: size,
     ),
   );
 }
@@ -671,7 +671,6 @@ Widget buildMatchXI(Fixture fixture, BuildContext context) {
       error: kSquadDetailsUnavailable,
       icon: Icons.sports_soccer,
     );
-  ;
 }
 
 Row buildTeamTitle(Team team) {
@@ -782,11 +781,14 @@ Widget buildStartingXI(Fixture fixture, String team) {
               shape: BoxShape.circle,
               color: kDropdownBgColor,
             ),
-            child: CircleAvatar(
-              foregroundImage: CachedNetworkImageProvider(fixture
-                      .players![lineup.startXI![i].id.toString()]!.photo ??
-                  kDummyProfileImageUrl),
-            ),
+            child: fixture.players != null
+                ? CircleAvatar(
+                    foregroundImage: CachedNetworkImageProvider(fixture
+                            .players![lineup.startXI![i].id.toString()]!
+                            .photo ??
+                        kDummyProfileImageUrl),
+                  )
+                : null,
           ),
         );
       },

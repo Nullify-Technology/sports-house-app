@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
+import 'package:sports_house/utils/reusable_components/custom_text.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({
@@ -22,82 +23,83 @@ class RoomsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: new BorderSide(
-            color: kDropdownBgColor,
-          ),
-        ),
-      ),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+      // decoration: BoxDecoration(
+      //   border: Border(
+      //     bottom: new BorderSide(
+      //       color: kDropdownBgColor,
+      //     ),
+      //   ),
+      // ),
+      child: Card(
+        color: kCardBgColor,
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 6, horizontal: 15),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 6,
-                ),
-                if (isVerified)
-                  Icon(
-                    Icons.verified,
-                    color: kColorGreen,
-                    size: 16,
+                  SizedBox(
+                    width: 6,
                   ),
-              ],
-            ),
-            if (hostedBy != '')
-              Text(
-                '$kHostedBy $hostedBy',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                ),
+                  if (isVerified)
+                    Icon(
+                      Icons.verified,
+                      color: kColorGreen,
+                      size: 16,
+                    ),
+                ],
               ),
-          ],
-        ),
-        // isThreeLine: true,
-        subtitle: Column(
-          children: [
-            SizedBox(
-              height: 6,
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.hearing,
-                  size: 18,
-                  color: Colors.white54,
-                ),
-                SizedBox(
-                  width: 4,
-                ),
+              if (hostedBy != '')
                 Text(
-                  '$listners $kListners',
+                  '$kHostedBy $hostedBy',
                   style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                  ),
+                ),
+            ],
+          ),
+          // isThreeLine: true,
+          subtitle: Column(
+            children: [
+              SizedBox(
+                height: 12,
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.hearing,
+                    size: 12,
                     color: Colors.white54,
                   ),
-                )
-              ],
+                  SizedBox(
+                    width: 4,
+                  ),
+                  CustomText(
+                    text: '$listners $kListners',
+                    fontSize: 12,
+                  )
+                ],
+              ),
+            ],
+          ),
+          trailing: Container(
+            width: 90,
+            height: 40,
+            child: Stack(
+              alignment: Alignment.centerRight,
+              children: buildProfileStack(members: participants),
             ),
-          ],
-        ),
-        trailing: Container(
-          width: 90,
-          height: 40,
-          child: Stack(
-            alignment: Alignment.centerRight,
-            children: buildProfileStack(members: participants),
           ),
         ),
       ),
