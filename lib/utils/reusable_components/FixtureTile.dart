@@ -53,6 +53,9 @@ class FixtureTile extends StatelessWidget {
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
+                  SizedBox(
+                    height: 2,
+                  ),
                   StreamBuilder<Event>(
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
@@ -161,13 +164,15 @@ class FixtureTile extends StatelessWidget {
   }
 
   static Widget buildTimerWidget(Map<String, dynamic> status) {
-    var short = status['short'];
-    var elapsed = status['elapsed'];
+    bool isStatus = status['short'] != null &&
+        (status['short'] != "1H" &&
+            status['short'] != "2H" &&
+            status['short'] != "ET" &&
+            status['short'] != "P");
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: new BoxDecoration(
-        color:
-            (short != null && short == "FT") ? kCardBgColor : Colors.redAccent,
+        color: isStatus ? kDropdownBgColor : Colors.redAccent,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.all(Radius.circular(40.0)),
       ),
@@ -175,22 +180,18 @@ class FixtureTile extends StatelessWidget {
         children: [
           Icon(
             Icons.timer,
-            size: 16,
+            size: 12,
           ),
           SizedBox(
             width: 4,
           ),
           Text(
-            (short != null && short == "FT")
-                ? "Full Time"
-                : (short != null && short == "HT"
-                    ? "Half Time"
-                    : (short != null && short == "NS")
-                        ? "Not Started"
-                        : elapsed.toString()),
+            isStatus && status['short'] != null
+                ? status['short']
+                : status['elapsed'].toString(),
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 10,
+              fontSize: 14,
             ),
           ),
         ],
