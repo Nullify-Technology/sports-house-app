@@ -35,7 +35,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   Future _joinRTCRoom(Room room) async {
     try {
       Room currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
-      print("current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
+      print(
+          "current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
       if (currentRoom == null || currentRoom.id != room.id) {
         print("inside if");
         await Provider.of<RTCProvider>(context, listen: false)
@@ -391,7 +392,8 @@ Container buildTeamIcon(String url, {size = 30.0}) {
   );
 }
 
-Column buildRoomHeader(Room room, DatabaseReference fixtureReference, DatabaseReference roomReference) {
+Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
+    DatabaseReference roomReference) {
   return Column(
     children: [
       Container(
@@ -473,8 +475,8 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference, DatabaseRe
                               if (snapShot.hasData) {
                                 if (snapShot.data.snapshot.value != null) {
                                   Map<String, dynamic> members =
-                                  new Map<String, dynamic>.from(
-                                      snapShot.data.snapshot.value);
+                                      new Map<String, dynamic>.from(
+                                          snapShot.data.snapshot.value);
 
                                   return Text(
                                     '${members.length} $kListners',
@@ -506,8 +508,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference, DatabaseRe
                             Map<String, dynamic> status =
                                 new Map<String, dynamic>.from(
                                     snapShot.data.snapshot.value);
-
-                            return buildTimerWidget(status);
+                            return buildTimerWidget(status, fontSize: 15.0);
                           }
                         }
                         return Container(

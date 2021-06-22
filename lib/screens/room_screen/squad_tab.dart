@@ -8,8 +8,10 @@ import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/error_components.dart';
 
 Widget buildMatchXI(Fixture fixture, BuildContext context) {
-  if (fixture.teams.home.lineups.startXI != null &&
-      fixture.teams.home.lineups.startXI != null) {
+  if (fixture.teams.home.lineups != null &&
+      fixture.teams.away.lineups != null &&
+      fixture.teams.home.lineups.startXI != null &&
+      fixture.teams.away.lineups.startXI != null) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(
@@ -82,8 +84,7 @@ Widget buildStartingXI(Fixture fixture, String team) {
             child: fixture.players != null
                 ? CircleAvatar(
                     foregroundImage: CachedNetworkImageProvider(fixture
-                            .players[lineup.startXI[i].id.toString()]
-                            .photo ??
+                            .players[lineup.startXI[i].id.toString()].photo ??
                         kDummyProfileImageUrl),
                   )
                 : null,

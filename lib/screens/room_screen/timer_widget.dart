@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sports_house/utils/constants.dart';
 
-Widget buildTimerWidget(Map<String, dynamic> status, {fontSize = 10}) {
+Widget buildTimerWidget(Map<String, dynamic> status, {double fontSize = 10.0}) {
   bool isStatus = status['short'] != null &&
       (status['short'] != "1H" &&
           status['short'] != "2H" &&
@@ -29,7 +29,7 @@ Widget buildTimerWidget(Map<String, dynamic> status, {fontSize = 10}) {
               : status['elapsed'].toString(),
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: isStatus && status['long'] != null ? 10 : fontSize,
+            fontSize: isStatus && status['long'] != null ? 10.0 : fontSize,
           ),
         ),
       ],
