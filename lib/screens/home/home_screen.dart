@@ -4,10 +4,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:sports_house/blocs/tournament_bloc.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
+import 'package:sports_house/models/tournament.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/agora_provider.dart';
@@ -16,11 +18,13 @@ import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/profile/profile_screen.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
+import 'package:sports_house/screens/tournament/tournament.dart';
 import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/EventsCard.dart';
+import 'package:sports_house/utils/reusable_components/FixtureCard.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sports_house/utils/reusable_components/custom_text.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -33,6 +37,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late FixtureBloc fixtureBloc;
+  late TournamentBloc tournamentBloc;
   late AuthUser? currentUser;
   late RoomsBloc roomsBloc;
   final RestClient client = RestClient.create();
@@ -53,13 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     fixtureBloc = FixtureBloc(client: client);
+    tournamentBloc = TournamentBloc(client: client);
     roomsBloc = RoomsBloc(client: RestClient.create());
     roomsBloc.getTrendingRooms();
+    tournamentBloc.getTournaments();
   }
 
   @override
   void dispose() {
     fixtureBloc.dispose();
+    tournamentBloc.dispose();
     super.dispose();
   }
 
@@ -199,26 +207,31 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          StreamBuilder<Response<List<Tournament>>>(
+              stream: tournamentBloc.tournamentsStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  switch (snapshot.data!.status) {
+                    case Status.LOADING:
+                    case Status.ERROR:
+                      return SliverToBoxAdapter(child: Container());
+                    case Status.COMPLETED:
+                      return SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(20, 30, 0, 10),
+                          child: Center(
+                            child: buildTournamentList(snapshot.data!.data),
+                          ),
+                        ),
+                      );
+                  }
+                }
+                return SliverToBoxAdapter(child: Container());
+              }),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 30, 0, 10),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.podcasts,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    kUpcomingEvents,
-                    style: TextStyle(
-                      fontSize: kHeadingFontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+              padding: EdgeInsets.fromLTRB(20, 15, 0, 10),
+              child: buildIconTitle(icon: Icons.podcasts, title: kFixtures),
             ),
           ),
           StreamBuilder<Response<List<Fixture>>>(
@@ -263,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   vertical: 10,
                 ),
                 height: 250,
-                child: EventsCard(
+                child: FixtureCard(
                   fixture: fixtures[index],
                 ),
               );
@@ -272,6 +285,108 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         childCount: fixtures.length,
       ),
+    );
+  }
+
+  Widget buildTournamentList(List<Tournament> tournaments) {
+    return Column(
+      children: [
+        buildIconTitle(
+          icon: Icons.sports_soccer,
+          title: kTournaments,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Container(
+          height: 125,
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
+          // color: Colors.black,
+          child: ListView.builder(
+              itemCount: tournaments.length,
+              scrollDirection: Axis.horizontal,
+              // shrinkWrap: true,
+              itemBuilder: (context, i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return GestureDetector(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.45,
+                              height: 100,
+                              child: Card(
+                                color: Colors.white,
+                                clipBehavior: Clip.hardEdge,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  child: CachedNetworkImage(
+                                    imageUrl: tournaments[i].banner ??
+                                        kDummyProfileImageUrl,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 3,
+                            ),
+                            CustomText(
+                              text: tournaments[i].name ?? '',
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            TournamentScreen.pageId,
+                            arguments: TournamentScreenArguments(
+                              tournamentId: tournaments[i].id ?? '',
+                              tournamentName: tournaments[i].name ?? '',
+                              banner: tournaments[i].banner ?? '',
+                              startDate:
+                                  tournaments[i].currentSeason!.start ?? '',
+                              endDate: tournaments[i].currentSeason!.end ?? '',
+                            ),
+                          );
+                        });
+                  },
+                );
+              }),
+        ),
+      ],
+    );
+  }
+
+  Row buildIconTitle({
+    required IconData icon,
+    required String title,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: kHeadingFontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 

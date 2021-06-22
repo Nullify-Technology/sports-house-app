@@ -8,10 +8,10 @@ import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/screens/event_rooms/event_room.dart';
 import 'package:sports_house/utils/constants.dart';
 
-class EventsCard extends StatelessWidget {
+class FixtureCard extends StatelessWidget {
   final Fixture fixture;
 
-  const EventsCard({
+  const FixtureCard({
     Key? key,
     required this.fixture,
   }) : super(key: key);

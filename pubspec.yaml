@@ -22,8 +22,11 @@ dependencies:
   firebase_messaging: ^10.0.2
   firebase_storage: ^8.1.1
   floating_bottom_navigation_bar: ^1.5.1
+  flutter_incall: ^1.0.0
   flutter_local_notifications: ^6.0.0
   flutter_secure_storage: ^4.2.0
+  flutter_webrtc: ^0.6.4
+  grouped_list: ^4.0.0
   image_cropper: ^1.4.0
   image_picker: ^0.8.0+3
   json_annotation: ^4.0.1
@@ -32,10 +35,8 @@ dependencies:
   permission_handler: ^8.0.1
   provider: ^5.0.0
   retrofit: ^2.0.0
-  timeline_tile: ^2.0.0
-  flutter_webrtc: ^0.6.4
   sdp_transform: ^0.3.0
-  flutter_incall: ^1.0.0
+  timeline_tile: ^2.0.0
 
 dev_dependencies:
   flutter_test:
