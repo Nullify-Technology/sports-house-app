@@ -16,10 +16,10 @@ class UserProvider with ChangeNotifier {
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
   final RestClient client = RestClient.create();
-  AuthUser? _authUser;
+  AuthUser _authUser;
   final FirebaseAuth auth;
 
-  AuthUser? get currentUser => _authUser;
+  AuthUser get currentUser => _authUser;
 
   UserProvider(this.auth) {
     authenticateUser();
@@ -27,15 +27,15 @@ class UserProvider with ChangeNotifier {
 
   Future authenticateUser() async {
     if (auth.currentUser != null) {
-      String idToken = await auth.currentUser?.getIdToken(false) as String;
-      String phoneNumber = auth.currentUser?.phoneNumber as String;
+      String idToken = await auth.currentUser?.getIdToken(false);
+      String phoneNumber = auth.currentUser?.phoneNumber;
       _authUser = await getUser(idToken, phoneNumber);
       auth.idTokenChanges().listen((user) async {
         if (user != null &&
             user.refreshToken != null &&
-            user.refreshToken!.isNotEmpty) {
-          String idToken = user.refreshToken as String;
-          String phoneNumber = user.phoneNumber as String;
+            user.refreshToken.isNotEmpty) {
+          String idToken = user.refreshToken;
+          String phoneNumber = user.phoneNumber;
           _authUser = await getUser(idToken, phoneNumber);
         }
       });
@@ -43,7 +43,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<AuthUser?> getUser(idToken, phoneNumber) async {
+  Future<AuthUser> getUser(idToken, phoneNumber) async {
     try {
       Auth response = await client.getUser(phoneNumber, idToken);
       await flutterStorage.write(
@@ -54,7 +54,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateUserName({String? name}) async {
+  Future<void> updateUserName({String name}) async {
     try {
       Auth response = await client.updateUser(name: name);
       _authUser = response.user;
@@ -79,7 +79,7 @@ class UserProvider with ChangeNotifier {
   // Future<void> updateProfilePicture(String userId) async {
   //   try{
   //     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-  //     File image = File(pickedFile!.path);
+  //     File image = File(pickedFile.path);
   //     TaskSnapshot snapshot = await _storage.ref("user_profiles/$userId.png").putFile(image);
   //     String url = (await snapshot.ref.getDownloadURL()).toString();
   //     Auth response = await client.updateUser(profileUrl: url);

@@ -12,13 +12,13 @@ class FixtureCard extends StatelessWidget {
   final Fixture fixture;
 
   const FixtureCard({
-    Key? key,
-    required this.fixture,
+    Key key,
+     this.fixture,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    late DatabaseReference databaseReference =
+     DatabaseReference databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl)
             .reference()
             .child("fixture")
@@ -59,10 +59,10 @@ class FixtureCard extends StatelessWidget {
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data!.snapshot.value != null) {
+                        if (snapShot.data.snapshot.value != null) {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
-                                  snapShot.data!.snapshot.value);
+                                  snapShot.data.snapshot.value);
 
                           return buildTimerWidget(status);
                           // return Center();
@@ -105,10 +105,10 @@ class FixtureCard extends StatelessWidget {
                             .onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            if (snapShot.data!.snapshot.value != null) {
+                            if (snapShot.data.snapshot.value != null) {
                               Map<String, dynamic> score =
                                   new Map<String, dynamic>.from(
-                                      snapShot.data!.snapshot.value);
+                                      snapShot.data.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(

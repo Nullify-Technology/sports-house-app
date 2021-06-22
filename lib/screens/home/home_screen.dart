@@ -12,7 +12,6 @@ import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/tournament.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
@@ -36,17 +35,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late FixtureBloc fixtureBloc;
-  late TournamentBloc tournamentBloc;
-  late AuthUser? currentUser;
-  late RoomsBloc roomsBloc;
+  FixtureBloc fixtureBloc;
+  TournamentBloc tournamentBloc;
+  AuthUser currentUser;
+  RoomsBloc roomsBloc;
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   Future joinRoom(Room room) async {
     try {
-      AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
+      AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id);
       Navigator.pushNamed(context, RoomScreen.pageId,
           arguments: RoomScreenArguments(agoraRoom.room));
     } catch (e) {
@@ -75,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     currentUser = context.watch<UserProvider>().currentUser;
     if (currentUser != null) {
-      if (currentUser!.name == null || currentUser!.name!.isEmpty) {
+      if (currentUser.name == null || currentUser.name.isEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       } else {
         fixtureBloc.getFixtures();
@@ -188,13 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         stream: roomsBloc.roomsStream,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            switch (snapShot.data!.status) {
+                            switch (snapShot.data.status) {
                               case Status.LOADING:
                               case Status.ERROR:
                                 return Container();
                               case Status.COMPLETED:
                                 return buildTrendingCarousel(
-                                  snapShot.data!.data,
+                                  snapShot.data.data,
                                 );
                             }
                           }
@@ -211,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
               stream: tournamentBloc.tournamentsStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  switch (snapshot.data!.status) {
+                  switch (snapshot.data.status) {
                     case Status.LOADING:
                     case Status.ERROR:
                       return SliverToBoxAdapter(child: Container());
@@ -220,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(20, 30, 0, 10),
                           child: Center(
-                            child: buildTournamentList(snapshot.data!.data),
+                            child: buildTournamentList(snapshot.data.data),
                           ),
                         ),
                       );
@@ -238,12 +237,12 @@ class _HomeScreenState extends State<HomeScreen> {
               stream: fixtureBloc.fixturesStream,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
-                  switch (snapShot.data!.status) {
+                  switch (snapShot.data.status) {
                     case Status.LOADING:
                     case Status.ERROR:
                       return SliverToBoxAdapter(child: Container());
                     case Status.COMPLETED:
-                      return buildFixtureList(snapShot.data!.data);
+                      return buildFixtureList(snapShot.data.data);
                   }
                 }
                 return SliverToBoxAdapter(child: Container());
@@ -354,8 +353,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               tournamentName: tournaments[i].name ?? '',
                               banner: tournaments[i].banner ?? '',
                               startDate:
-                                  tournaments[i].currentSeason!.start ?? '',
-                              endDate: tournaments[i].currentSeason!.end ?? '',
+                                  tournaments[i].currentSeason.start ?? '',
+                              endDate: tournaments[i].currentSeason.end ?? '',
                             ),
                           );
                         });
@@ -368,8 +367,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Row buildIconTitle({
-    required IconData icon,
-    required String title,
+    IconData icon,
+    String title,
   }) {
     return Row(
       children: [

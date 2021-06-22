@@ -10,7 +10,7 @@ import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class InRoomBottomBar extends StatelessWidget {
-  const InRoomBottomBar({Key? key, required this.room}) : super(key: key);
+  const InRoomBottomBar({Key key,  this.room}) : super(key: key);
   final Room room;
 
   @override
@@ -73,7 +73,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<RTCProvider>().leaveRoom(room.id);
+                  context.read<RTCProvider>().leaveRoom();
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
@@ -95,21 +95,21 @@ class InRoomBottomBar extends StatelessWidget {
   }
 }
 
-List<Widget> buildProfileStack({required List<AuthUser> members}) {
+List<Widget> buildProfileStack({ List<AuthUser> members}) {
   List<Widget> profileStack = [];
   for (AuthUser user in members) {
     if (profileStack.length == 3) break;
-    if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
+    if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
       Widget avatar = buildCircleAvatar(
           imageUrl: user.profilePictureUrl ?? '',
-          left: profileStack.length * 25);
+          left: profileStack.length * 25.0);
       profileStack.add(avatar);
     }
   }
   return profileStack;
 }
 
-Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
+Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
   return Positioned(
     left: left,
     child: Container(

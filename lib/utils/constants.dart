@@ -174,3 +174,6 @@ const String kTournaments = "Tournaments";
 const String kFixtures = "Fixtures";
 const String kStandings = "Standings";
 const String kUnavailable = "Unavailable";
+
+const String kRoomNetworkAlert = "Unable to join the room now. Please try again later";
+const String kMediaServer = "media.sports-house.in";

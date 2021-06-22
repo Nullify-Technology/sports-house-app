@@ -16,8 +16,8 @@ Fixture _$FixtureFromJson(Map<String, dynamic> json) {
     json['score'] == null
         ? null
         : MatchDetails.fromJson(json['score'] as Map<String, dynamic>),
-    json['status'] as String?,
-    (json['players'] as Map<String, dynamic>?)?.map(
+    json['status'] as String,
+    (json['players'] as Map<String, dynamic>)?.map(
       (k, e) => MapEntry(k, PlayerData.fromJson(e as Map<String, dynamic>)),
     ),
   );

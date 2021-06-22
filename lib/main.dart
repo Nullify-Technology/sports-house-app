@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        title: AppConfig.of(context)!.appTitle,
+        title: AppConfig.of(context).appTitle,
         theme: ThemeData(
           fontFamily: 'Product Sans',
           colorScheme: ColorScheme.dark().copyWith(
@@ -49,22 +49,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
         debugShowCheckedModeBanner:
-            AppConfig.of(context)!.buildFlavour == kDevelopment,
+            AppConfig.of(context).buildFlavour == kDevelopment,
         routes: {
           LoginScreen.pageId: (context) => LoginScreen(),
           HomeScreen.pageId: (context) => HomeScreen(),
           ProfileScreen.pageId: (context) => ProfileScreen(),
           CreateRoom.pageId: (context) => CreateRoom(),
           RoomScreen.pageId: (context) => RoomScreen(
-                arguments: ModalRoute.of(context)!.settings.arguments
+                arguments: ModalRoute.of(context).settings.arguments
                     as RoomScreenArguments,
               ),
           EventRooms.pageId: (context) => EventRooms(
-                arguments: ModalRoute.of(context)!.settings.arguments
+                arguments: ModalRoute.of(context).settings.arguments
                     as EventRoomsArguments,
               ),
           TournamentScreen.pageId: (context) => TournamentScreen(
-                arguments: ModalRoute.of(context)!.settings.arguments
+                arguments: ModalRoute.of(context).settings.arguments
                     as TournamentScreenArguments,
               ),
         },

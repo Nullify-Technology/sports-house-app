@@ -6,27 +6,27 @@ part 'team_standing.g.dart';
 @JsonSerializable()
 class TeamStanding {
   @JsonKey(name: "away")
-  final GameHistory? away;
+  final GameHistory away;
   @JsonKey(name: "all")
-  final GameHistory? all;
+  final GameHistory all;
   @JsonKey(name: "home")
-  final GameHistory? home;
+  final GameHistory home;
   @JsonKey(name: "rank")
-  final int? rank;
+  final int rank;
   @JsonKey(name: "status")
-  final String? status;
+  final String status;
   @JsonKey(name: "name")
-  final String? name;
+  final String name;
   @JsonKey(name: "logo")
-  final String? logo;
+  final String logo;
   @JsonKey(name: "form")
-  final String? form;
+  final String form;
   @JsonKey(name: "points")
-  final int? points;
+  final int points;
   @JsonKey(name: "goalsDiff")
-  final int? goalsDiff;
+  final int goalsDiff;
   @JsonKey(name: "update")
-  final String? update;
+  final String update;
 
   factory TeamStanding.fromJson(Map<String, dynamic> json) =>
       _$TeamStandingFromJson(json);

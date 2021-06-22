@@ -23,11 +23,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
-  String profileUrl = "";
-  late AuthUser? currentUser;
+  String profileUrl;
+   AuthUser currentUser;
   final ImagePicker picker = ImagePicker();
-  late AppState state;
-  File? imageFile;
+   AppState state;
+  File imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +42,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
       ),
       body: currentUser == null
-          ?  Container(
-                height: MediaQuery.of(context).size.width,
-                child: CenterProgressBar(),
-              )
-          : buildProfileScreen(currentUser!),
+          ? CenterProgressBar()
+          : buildProfileScreen(currentUser),
     );
   }
 
@@ -126,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fillColor: kTextFieldBgColor,
                     ),
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (value.isEmpty) {
                         return kNameCannotBeEmpty;
                       }
                       return null;
@@ -148,10 +145,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: kProfileScreenButtonText,
                     textColor: kColorBlack,
                     onClick: () {
-                      if (!_profileNameForm.currentState!.validate()) {
+                      if (!_profileNameForm.currentState.validate()) {
                         return;
                       }
-                      _profileNameForm.currentState!.save();
+                      _profileNameForm.currentState.save();
                     },
                   ),
                 ],
@@ -177,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> updateProfilePicture(String userId) async {
     try {
       final pickedFile = await picker.getImage(source: ImageSource.gallery);
-      File image = File(pickedFile!.path);
+      File image = File(pickedFile.path);
     } catch (e) {
       print(e);
     }
@@ -196,8 +193,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<Null> _cropImage(AuthUser user) async {
-    File? croppedFile = await ImageCropper.cropImage(
-        sourcePath: imageFile!.path,
+    File croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFile.path,
         maxHeight: 400,
         maxWidth: 400,
         compressQuality: 70,
@@ -233,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       await context
           .read<UserProvider>()
-          .updateProfilePicture(user.id, imageFile!);
+          .updateProfilePicture(user.id, imageFile);
       _clearImage();
     }
   }

@@ -8,10 +8,10 @@ part 'auth.g.dart';
 @JsonSerializable()
 class Auth{
   @JsonKey(name: "user")
-  final AuthUser? user;
+  final AuthUser user;
 
   @JsonKey(name: "token")
-  final String? accessToken;
+  final String accessToken;
 
   Auth({this.user, this.accessToken});
 

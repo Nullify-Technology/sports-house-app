@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_(VERSION 3.15)
 project(runner LANGUAGES CXX)
 
 add_executable(${BINARY_NAME} WIN32

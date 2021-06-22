@@ -17,14 +17,14 @@ TeamStanding _$TeamStandingFromJson(Map<String, dynamic> json) {
     json['home'] == null
         ? null
         : GameHistory.fromJson(json['home'] as Map<String, dynamic>),
-    json['rank'] as int?,
-    json['status'] as String?,
-    json['name'] as String?,
-    json['logo'] as String?,
-    json['form'] as String?,
-    json['points'] as int?,
-    json['goalsDiff'] as int?,
-    json['update'] as String?,
+    json['rank'] as int,
+    json['status'] as String,
+    json['name'] as String,
+    json['logo'] as String,
+    json['form'] as String,
+    json['points'] as int,
+    json['goalsDiff'] as int,
+    json['update'] as String,
   );
 }
 

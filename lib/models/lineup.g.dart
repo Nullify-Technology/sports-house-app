@@ -8,13 +8,13 @@ part of 'lineup.dart';
 
 Lineup _$LineupFromJson(Map<String, dynamic> json) {
   return Lineup(
-    json['formation'] as String?,
-    (json['startXI'] as List<dynamic>?)
+    json['formation'] as String,
+    (json['startXI'] as List<dynamic>)
         ?.map((e) => Player.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    (json['substitutes'] as List<dynamic>?)
+        ?.toList(),
+    (json['substitutes'] as List<dynamic>)
         ?.map((e) => Player.fromJson(e as Map<String, dynamic>))
-        .toList(),
+        ?.toList(),
     json['coach'] == null
         ? null
         : Coach.fromJson(json['coach'] as Map<String, dynamic>),

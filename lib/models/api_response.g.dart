@@ -8,7 +8,7 @@ part of 'api_response.dart';
 
 ApiResponse<T> _$ApiResponseFromJson<T>(
   Map<String, dynamic> json,
-  T Function(Object? json) fromJsonT,
+  T Function(Object json) fromJsonT,
 ) {
   return ApiResponse<T>(
     (json['results'] as List<dynamic>).map(fromJsonT).toList(),
@@ -17,7 +17,7 @@ ApiResponse<T> _$ApiResponseFromJson<T>(
 
 Map<String, dynamic> _$ApiResponseToJson<T>(
   ApiResponse<T> instance,
-  Object? Function(T value) toJsonT,
+  Object Function(T value) toJsonT,
 ) =>
     <String, dynamic>{
       'results': instance.results.map(toJsonT).toList(),

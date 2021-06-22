@@ -6,11 +6,11 @@ part 'season.g.dart';
 class Season{
 
   @JsonKey(name: "year")
-  final int? year;
+  final int year;
   @JsonKey(name: "start")
-  final String? start;
+  final String start;
   @JsonKey(name: "end")
-  final String? end;
+  final String end;
 
   Season(this.year, this.start, this.end,);
 

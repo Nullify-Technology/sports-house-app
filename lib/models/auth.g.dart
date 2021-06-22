@@ -11,7 +11,7 @@ Auth _$AuthFromJson(Map<String, dynamic> json) {
     user: json['user'] == null
         ? null
         : AuthUser.fromJson(json['user'] as Map<String, dynamic>),
-    accessToken: json['token'] as String?,
+    accessToken: json['token'] as String,
   );
 }
 

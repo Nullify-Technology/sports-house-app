@@ -7,12 +7,12 @@ import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/team.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/provider/rtc_provider.dart';
+import 'package:sports_house/screens/home/home_screen.dart';
 import 'package:sports_house/utils/classes/event_classes.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/error_components.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-
 class RoomScreenArguments {
   final Room room;
 
@@ -22,7 +22,7 @@ class RoomScreenArguments {
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
 
-  RoomScreen({Key? key, required this.arguments}) : super(key: key);
+  RoomScreen({Key key,  this.arguments}) : super(key: key);
   static String pageId = 'RoomScreen';
 
   @override
@@ -30,53 +30,50 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
-  late DatabaseReference fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("fixture").child("fixture_${widget.arguments.room.fixture.id}");
-  late DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom).child(widget.arguments.room.id);
+   DatabaseReference fixtureReference;
+   DatabaseReference roomReference;
 
-  // Future handleMicroPhonePermission() async {
-  //   final status = await Permission.microphone.request();
-  //   if (!status.isDenied & !status.isPermanentlyDenied & !status.isRestricted) {
-  //     Provider.of<AgoraProvider>(context, listen: false).joinAgoraRoom(
-  //         widget.arguments.agoraRoom.token, widget.arguments.agoraRoom);
-  //   } else {
-  //     _showPermissionDialog();
-  //   }
-  // }
+   Future _joinRTCRoom(Room room) async {
+     try{
+       if(!Provider.of<RTCProvider>(context, listen: false).joined){
+         await Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(room);
+       }
+     }catch(e){
+        showAlertDialog(context);
+     }
+   }
 
-  // Future<void> _showPermissionDialog() async {
-  //   await showDialog<void>(
-    //     context: context,
-    //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SingleChildScrollView(
-  //           child: ListBody(
-  //             children: const <Widget>[
-  //               Text(kPermissionText),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: const Text('Ok'),
-  //             onPressed: () {
-  //               Navigator.popUntil(
-  //                   context, ModalRoute.withName(EventRooms.pageId));
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+   showAlertDialog(BuildContext context) {
+     Widget cancelButton = TextButton(
+       child: Text("Ok"),
+       onPressed:  () {
+         Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
+       },
+     );
+
+     // set up the AlertDialog
+     AlertDialog alert = AlertDialog(
+       content: Text(kRoomNetworkAlert),
+       actions: [
+         cancelButton,
+       ],
+     );
+
+     // show the dialog
+     showDialog(
+       context: context,
+       builder: (BuildContext context) {
+         return alert;
+       },
+     );
+   }
 
   @override
   void initState() {
-    Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(widget.arguments.room);
+    fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("fixture").child("fixture_${widget.arguments.room.fixture.id}");
+    roomReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom).child(widget.arguments.room.id);
+    _joinRTCRoom(widget.arguments.room);
     super.initState();
-    // if (!Provider.of<AgoraProvider>(context, listen: false).isJoined) {
-    //   handleMicroPhonePermission();
-    // }
   }
 
   @override
@@ -175,7 +172,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           children: [
             TextButton(
               onPressed: () async {
-                await context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
+                context.read<RTCProvider>().leaveRoom();
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -204,7 +201,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               ),
             ),
             TextButton(
-              onPressed: () => context.read<RTCProvider>().toggleMute(widget.arguments.room.id),
+              onPressed: () => context.read<RTCProvider>().toggleMute(),
               style: TextButton.styleFrom(
                 backgroundColor: kMuteButtonBgColor,
                 shape: CircleBorder(),
@@ -244,8 +241,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Container buildParticipant({
-    required String? imageUrl,
-    required String name,
+     String imageUrl,
+     String name,
     bool isMuted = true,
   }) {
     return Container(
@@ -390,10 +387,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                         stream: fixtureReference.child("status").onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            if (snapShot.data!.snapshot.value != null) {
+                            if (snapShot.data.snapshot.value != null) {
                               Map<String, dynamic> status =
                                   new Map<String, dynamic>.from(
-                                      snapShot.data!.snapshot.value);
+                                      snapShot.data.snapshot.value);
 
                               return buildTimerWidget(status);
                             }
@@ -463,10 +460,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                               .onValue,
                           builder: (context, snapShot) {
                             if (snapShot.hasData) {
-                              if (snapShot.data!.snapshot.value != null) {
+                              if (snapShot.data.snapshot.value != null) {
                                 Map<String, dynamic> score =
                                     new Map<String, dynamic>.from(
-                                        snapShot.data!.snapshot.value);
+                                        snapShot.data.snapshot.value);
                                 return Column(
                                   children: [
                                     Text(
@@ -664,15 +661,15 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         padding: EdgeInsets.zero,
         physics: NeverScrollableScrollPhysics(),
         itemCount: team == 'home'
-            ? room.fixture.teams.home.lineups.startXI!.length
-            : room.fixture.teams.away.lineups.startXI!.length,
+            ? room.fixture.teams.home.lineups.startXI.length
+            : room.fixture.teams.away.lineups.startXI.length,
         itemBuilder: (context, i) {
           Lineup lineup = team == 'home'
               ? room.fixture.teams.home.lineups
               : room.fixture.teams.away.lineups;
           return ListTile(
             title: Text(
-              '${lineup.startXI![i].name} ( ${lineup.startXI![i].number} )',
+              '${lineup.startXI[i].name} ( ${lineup.startXI[i].number} )',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -689,7 +686,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               ),
               child: CircleAvatar(
                 foregroundImage: CachedNetworkImageProvider(room.fixture
-                        .players![lineup.startXI![i].id.toString()]!.photo ??
+                        .players[lineup.startXI[i].id.toString()].photo ??
                     kDummyProfileImageUrl),
               ),
             ),
@@ -704,15 +701,15 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemCount: team == 'home'
-          ? room.fixture.teams.home.lineups.substitutes!.length
-          : room.fixture.teams.away.lineups.substitutes!.length,
+          ? room.fixture.teams.home.lineups.substitutes.length
+          : room.fixture.teams.away.lineups.substitutes.length,
       itemBuilder: (context, i) {
         Lineup lineup = team == 'home'
             ? room.fixture.teams.home.lineups
             : room.fixture.teams.away.lineups;
         return ListTile(
           title: Text(
-            '${lineup.substitutes![i].name}',
+            '${lineup.substitutes[i].name}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -728,7 +725,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               color: kDropdownBgColor,
             ),
             child: Text(
-              '${lineup.substitutes![i].pos}',
+              '${lineup.substitutes[i].pos}',
               style: TextStyle(
                 color: kColorGreen,
                 fontWeight: FontWeight.bold,
@@ -746,8 +743,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       stream: fixtureReference.child("events").onValue,
       builder: (context, snapShot) {
         if (snapShot.hasData) {
-          if (snapShot.data!.snapshot.value != null) {
-            var events = snapShot.data!.snapshot.value;
+          if (snapShot.data.snapshot.value != null) {
+            var events = snapShot.data.snapshot.value;
             List<dynamic> matchEvents = events
                 .map((event) => MatchEvent.fromDb(event))
                 .toList() as List<dynamic>;
@@ -934,8 +931,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               stream: roomReference.onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
-                  if (snapShot.data!.snapshot.value != null) {
-                    Map<String, dynamic> userDetails = new Map<String, dynamic>.from(snapShot.data!.snapshot.value);
+                  if (snapShot.data.snapshot.value != null) {
+                    Map<String, dynamic> userDetails = new Map<String, dynamic>.from(snapShot.data.snapshot.value);
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: ClampingScrollPhysics(),
@@ -945,8 +942,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                         AuthUser user = AuthUser.fromJson(Map<String, dynamic>.from(userDetails.values.toList()[index]));
                         return buildParticipant(
                           imageUrl: user.profilePictureUrl,
-                          name: user.name!,
-                          isMuted: user.muted!
+                          name: user.name,
+                          isMuted: user.muted
                         );
                       },
                       itemCount: userDetails.length,

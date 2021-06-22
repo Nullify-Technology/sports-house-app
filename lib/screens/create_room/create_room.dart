@@ -16,7 +16,7 @@ import 'package:sports_house/utils/reusable_components/drop_down_list.dart';
 import 'package:intl/intl.dart';
 
 class CreateRoom extends StatefulWidget {
-  CreateRoom({Key? key}) : super(key: key);
+  CreateRoom({Key key}) : super(key: key);
   static String pageId = 'CreateRoom';
 
   @override
@@ -25,24 +25,24 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> {
   final RestClient client = RestClient.create();
-  late FixtureBloc fixtureBloc;
+   FixtureBloc fixtureBloc;
   List<DropDown> fixtureDropDown = [];
   List<DropDown> roomTypes = [];
-  late DropDown selectedFixture;
-  late DropDown selectedType;
+   DropDown selectedFixture;
+   DropDown selectedType;
   final roomNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late RoomsBloc roomsBloc;
-  late AuthUser currentUser;
+   RoomsBloc roomsBloc;
+   AuthUser currentUser;
 
   createFixtureRoom() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState.validate()) {
       if (selectedFixture.key != 'no_matches' &&
           selectedType.key != 'private') {
-        AgoraRoom? room = await roomsBloc.createRoom(
+        AgoraRoom room = await roomsBloc.createRoom(
             selectedFixture.key, "0", roomNameController.text);
         Navigator.popAndPushNamed(context, RoomScreen.pageId,
-            arguments: RoomScreenArguments(room!.room));
+            arguments: RoomScreenArguments(room.room));
       } else {
         print('No matches are available!');
         final snackBar = SnackBar(
@@ -90,7 +90,7 @@ class _CreateRoomState extends State<CreateRoom> {
     roomsBloc = RoomsBloc(client: client);
     fixtureBloc = FixtureBloc(client: client);
     fixtureBloc.getFixtures();
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
     super.initState();
   }
 
@@ -126,12 +126,12 @@ class _CreateRoomState extends State<CreateRoom> {
             stream: fixtureBloc.fixturesStream,
             builder: (context, snapShot) {
               if (snapShot.hasData) {
-                switch (snapShot.data!.status) {
+                switch (snapShot.data.status) {
                   case Status.LOADING:
                   case Status.ERROR:
                     return Container();
                   case Status.COMPLETED:
-                    populateFixturesDropDown(snapShot.data!.data);
+                    populateFixturesDropDown(snapShot.data.data);
                     return buildUI();
                 }
               }
@@ -170,7 +170,7 @@ class _CreateRoomState extends State<CreateRoom> {
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) =>
-                      value!.isEmpty ? "Room name can not be empty" : null,
+                      value.isEmpty ? "Room name can not be empty" : null,
                 ),
                 SizedBox(
                   height: 15,

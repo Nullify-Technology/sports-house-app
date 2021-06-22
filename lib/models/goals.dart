@@ -5,9 +5,9 @@ part 'goals.g.dart';
 @JsonSerializable()
 class Goals {
   @JsonKey(name: "for", includeIfNull: true)
-  final int? forTeam;
+  final int forTeam;
   @JsonKey(name: "against", includeIfNull: true)
-  final int? against;
+  final int against;
   Goals({
     this.forTeam,
     this.against,

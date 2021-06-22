@@ -9,7 +9,7 @@ class HttpLoggingInterceptor extends InterceptorsWrapper{
   @override
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
 
-      String? token = await storage.read(key: kAccessToken);
+      String token = await storage.read(key: kAccessToken);
       if(token!=null){
         options.headers["Authorization"] = "Bearer " + token;
       }

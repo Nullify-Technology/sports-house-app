@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
 import 'package:sports_house/blocs/standings_bloc.dart';
-import 'package:sports_house/blocs/tournament_bloc.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/standings.dart';
@@ -12,7 +11,6 @@ import 'package:sports_house/models/tournament_standings.dart';
 import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/FixtureCard.dart';
 import 'package:sports_house/utils/reusable_components/FixtureTile.dart';
 import 'package:sports_house/utils/reusable_components/custom_text.dart';
 import 'package:intl/intl.dart';
@@ -25,15 +23,16 @@ class TournamentScreenArguments {
   final String banner;
 
   TournamentScreenArguments(
-      {required this.banner,
-      required this.tournamentId,
-      required this.tournamentName,
-      required this.startDate,
-      required this.endDate});
+      {
+        this.banner,
+        this.tournamentId,
+       this.tournamentName,
+       this.startDate,
+       this.endDate});
 }
 
 class TournamentScreen extends StatefulWidget {
-  TournamentScreen({Key? key, required this.arguments}) : super(key: key);
+  TournamentScreen({Key key,  this.arguments}) : super(key: key);
   static String pageId = 'TournamentScreen';
   final TournamentScreenArguments arguments;
 
@@ -42,10 +41,10 @@ class TournamentScreen extends StatefulWidget {
 }
 
 class _TournamentScreenState extends State<TournamentScreen> {
-  late FixtureBloc fixtureBloc;
-  late StandingsBloc standingsBloc;
+   FixtureBloc fixtureBloc;
+   StandingsBloc standingsBloc;
   final RestClient client = RestClient.create();
-  // late TournamentStandings _tournamentStandings;
+  //  TournamentStandings _tournamentStandings;
 
   Future<TournamentStandings> fetchStandings() async {
     return await standingsBloc.getStandings(widget.arguments.tournamentId);
@@ -178,12 +177,12 @@ class _TournamentScreenState extends State<TournamentScreen> {
           stream: fixtureBloc.fixturesStream,
           builder: (context, snapShot) {
             if (snapShot.hasData) {
-              switch (snapShot.data!.status) {
+              switch (snapShot.data.status) {
                 case Status.LOADING:
                 case Status.ERROR:
                   return SliverToBoxAdapter(child: Container());
                 case Status.COMPLETED:
-                  return buildFixtureList(snapShot.data!.data);
+                  return buildFixtureList(snapShot.data.data);
               }
             }
             return Container();
@@ -197,7 +196,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
           future: fetchStandings(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return buildStandingsList(snapshot.data!.standings);
+              return buildStandingsList(snapshot.data.standings);
             } else if (snapshot.hasError) {
               return Container(
                 child: Center(child: Text(kUnavailable)),
@@ -262,7 +261,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
     );
   }
 
-  Widget buildStandingsList(List<Standings>? standings) {
+  Widget buildStandingsList(List<Standings> standings) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 7,
@@ -270,7 +269,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
       child: GroupedListView<Standings, String>(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
-        elements: standings!,
+        elements: standings,
         padding: EdgeInsets.only(bottom: 50),
         groupBy: (standing) {
           return standing.name ?? '';
@@ -296,7 +295,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: buildTable(standing.teams!),
+                  child: buildTable(standing.teams),
                 ),
               );
             },
@@ -312,12 +311,12 @@ class _TournamentScreenState extends State<TournamentScreen> {
     tableRowList.add(buildTableHeader());
     for (var team in teamStanding) {
       tableRowList.add(buildTableRow(
-        team.name!,
-        team.all!.played!,
-        team.all!.win!,
-        team.all!.draw!,
-        team.all!.lose!,
-        '${team.all!.goals!.forTeam} : ${team.all!.goals!.against}',
+        team.name,
+        team.all.played,
+        team.all.win,
+        team.all.draw,
+        team.all.lose,
+        '${team.all.goals.forTeam} : ${team.all.goals.against}',
         team.points.toString(),
       ));
     }

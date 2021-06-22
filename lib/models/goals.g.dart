@@ -8,8 +8,8 @@ part of 'goals.dart';
 
 Goals _$GoalsFromJson(Map<String, dynamic> json) {
   return Goals(
-    forTeam: json['for'] as int?,
-    against: json['against'] as int?,
+    forTeam: json['for'] as int,
+    against: json['against'] as int,
   );
 }
 

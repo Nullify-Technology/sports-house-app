@@ -11,16 +11,16 @@ class DesignRoom {
   final String listners;
   final List<String> participants;
   DesignRoom({
-    required this.eventName,
-    // required this.minutes,
-    required this.score,
-    required this.talkingCount,
-    required this.team1Url,
-    required this.team2Url,
-    required this.roomName,
+     this.eventName,
+    //  this.minutes,
+     this.score,
+     this.talkingCount,
+     this.team1Url,
+     this.team2Url,
+     this.roomName,
     this.isVerified = false,
     this.hostedBy = '',
-    required this.listners,
-    required this.participants,
+     this.listners,
+     this.participants,
   });
 }

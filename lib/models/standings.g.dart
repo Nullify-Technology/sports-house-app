@@ -8,11 +8,11 @@ part of 'standings.dart';
 
 Standings _$StandingsFromJson(Map<String, dynamic> json) {
   return Standings(
-    json['description'] as String?,
-    json['name'] as String?,
-    (json['teams'] as List<dynamic>?)
+    json['description'] as String,
+    json['name'] as String,
+    (json['teams'] as List<dynamic>)
         ?.map((e) => TeamStanding.fromJson(e as Map<String, dynamic>))
-        .toList(),
+        ?.toList(),
   );
 }
 

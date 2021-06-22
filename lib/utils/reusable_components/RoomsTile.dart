@@ -6,12 +6,12 @@ import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({
-    Key? key,
-    required this.title,
+    Key key,
+     this.title,
     this.isVerified = false,
     this.hostedBy = '',
-    required this.listners,
-    required this.participants,
+     this.listners,
+     this.participants,
   }) : super(key: key);
   final String title;
   final bool isVerified;
@@ -104,22 +104,22 @@ class RoomsTile extends StatelessWidget {
     );
   }
 
-  List<Widget> buildProfileStack({required List<AuthUser> members}) {
+  List<Widget> buildProfileStack({ List<AuthUser> members}) {
     List<Widget> profileStack = [];
     for (AuthUser user in members) {
       if (profileStack.length == 3) break;
       if (user.profilePictureUrl != null &&
-          user.profilePictureUrl!.isNotEmpty) {
+          user.profilePictureUrl.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
-            left: profileStack.length * 25);
+            left: profileStack.length * 25.0);
         profileStack.add(avatar);
       }
     }
     return profileStack;
   }
 
-  Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

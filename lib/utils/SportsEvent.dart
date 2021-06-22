@@ -6,11 +6,11 @@ class SportsEvent {
   String team1Url;
   String team2Url;
   SportsEvent({
-    required this.title,
-    required this.minutes,
-    required this.score,
+     this.title,
+     this.minutes,
+     this.score,
     this.talkingCount = '',
-    required this.team1Url,
-    required this.team2Url,
+     this.team1Url,
+     this.team2Url,
   });
 }

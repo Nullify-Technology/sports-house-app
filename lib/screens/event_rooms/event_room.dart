@@ -1,12 +1,9 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/provider/agora_provider.dart';
 import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
@@ -25,7 +22,7 @@ class EventRoomsArguments {
 
 class EventRooms extends StatefulWidget {
   final EventRoomsArguments arguments;
-  EventRooms({Key? key, required this.arguments}) : super(key: key);
+  EventRooms({Key key,  this.arguments}) : super(key: key);
   static String pageId = 'EventRooms';
 
   @override
@@ -33,8 +30,8 @@ class EventRooms extends StatefulWidget {
 }
 
 class _EventRoomsState extends State<EventRooms> {
-  late RoomsBloc roomsBloc;
-  late AuthUser currentUser;
+   RoomsBloc roomsBloc;
+   AuthUser currentUser;
   Future joinRoom(Room room) async {
     try {
       // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
@@ -48,7 +45,7 @@ class _EventRoomsState extends State<EventRooms> {
 
   @override
   void initState() {
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
     roomsBloc = RoomsBloc(client: RestClient.create());
     roomsBloc.getRooms(widget.arguments.fixtureId);
     super.initState();
@@ -78,12 +75,12 @@ class _EventRoomsState extends State<EventRooms> {
           stream: roomsBloc.roomsStream,
           builder: (context, snapShot) {
             if (snapShot.hasData) {
-              switch (snapShot.data!.status) {
+              switch (snapShot.data.status) {
                 case Status.LOADING:
                 case Status.ERROR:
                   return Container();
                 case Status.COMPLETED:
-                  return buildRoomList(snapShot.data!.data);
+                  return buildRoomList(snapShot.data.data);
               }
             }
             return Container();

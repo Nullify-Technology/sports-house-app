@@ -5,7 +5,6 @@ import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/auth.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/standings.dart';
 import 'package:sports_house/models/tournament.dart';
 import 'package:sports_house/models/tournament_standings.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -24,8 +23,8 @@ abstract class RestClient {
   @PATCH("/user")
   @FormUrlEncoded()
   Future<Auth> updateUser(
-      {@Field("name") String? name,
-      @Field("profile_picture_url") String? profileUrl});
+      {@Field("name") String name,
+        @Field("profile_picture_url") String profileUrl});
 
   @GET("/fixture")
   Future<ApiResponse<Fixture>> getFixtures();
@@ -45,8 +44,8 @@ abstract class RestClient {
 
   @GET("/fixture/{fixtureId}/rooms")
   Future<ApiResponse<Room>> getRooms(
-    @Path() String fixtureId,
-  );
+      @Path() String fixtureId,
+      );
 
   @POST("/room")
   @FormUrlEncoded()

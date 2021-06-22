@@ -1,23 +1,20 @@
 import 'dart:async';
 
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:sports_house/models/agora_room.dart';
 import 'package:sports_house/models/api_response.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
 
 class RoomsBloc {
   final RestClient client;
-  late StreamController<Response<List<Room>>> _roomsController;
-  late List<Room> rooms;
+   StreamController<Response<List<Room>>> _roomsController;
+   List<Room> rooms;
   StreamSink<Response<List<Room>>> get roomsSink => _roomsController.sink;
 
   Stream<Response<List<Room>>> get roomsStream => _roomsController.stream;
 
-  RoomsBloc({required this.client}) {
+  RoomsBloc({ this.client}) {
     this._roomsController = StreamController<Response<List<Room>>>.broadcast();
   }
 
@@ -45,7 +42,7 @@ class RoomsBloc {
     }
   }
 
-  Future<AgoraRoom?> createRoom(fixtureId, userId, name) async {
+  Future<AgoraRoom> createRoom(fixtureId, userId, name) async {
     try {
       AgoraRoom response = await client.createRoom(fixtureId, "0", name);
       return response;
@@ -54,7 +51,7 @@ class RoomsBloc {
     }
   }
 
-  Future<AgoraRoom?> joinRoom(String roomId) async {
+  Future<AgoraRoom> joinRoom(String roomId) async {
     try {
       AgoraRoom response = await client.joinRoom(roomId);
       return response;

@@ -16,7 +16,7 @@ import 'package:sports_house/utils/constants.dart';
 
 class TournamentBloc {
   final RestClient client;
-  late StreamController<Response<List<Tournament>>> _tournamentsController;
+  StreamController<Response<List<Tournament>>> _tournamentsController;
   final flutterStorage = FlutterSecureStorage();
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
@@ -27,7 +27,7 @@ class TournamentBloc {
   Stream<Response<List<Tournament>>> get tournamentsStream =>
       _tournamentsController.stream;
 
-  TournamentBloc({required this.client}) {
+  TournamentBloc({this.client}) {
     this._tournamentsController =
         StreamController<Response<List<Tournament>>>.broadcast();
     tournamentsSink.add(Response.loading('Initialising tournaments Details'));

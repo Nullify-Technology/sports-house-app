@@ -10,10 +10,12 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) {
   return AuthUser(
     id: json['id'] as String,
     phone: json['phone'] as String,
-    name: json['name'] as String?,
-    profilePictureUrl: json['profile_picture_url'] as String?,
+    name: json['name'] as String,
+    profilePictureUrl: json['profile_picture_url'] as String,
     hasAccess: json['has_access'] as bool,
-  )..muted = json['muted'] as bool?;
+  )
+    ..muted = json['muted'] as bool
+    ..joined = json['joined'] as bool;
 }
 
 Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
@@ -32,5 +34,6 @@ Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
   }
 
   writeNotNull('muted', instance.muted);
+  writeNotNull('joined', instance.joined);
   return val;
 }

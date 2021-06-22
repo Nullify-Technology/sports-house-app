@@ -13,13 +13,13 @@ class FixtureTile extends StatelessWidget {
   final Fixture fixture;
 
   const FixtureTile({
-    Key? key,
-    required this.fixture,
+    Key key,
+    this.fixture,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    late DatabaseReference databaseReference =
+    DatabaseReference databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl)
             .reference()
             .child("fixture")
@@ -60,10 +60,10 @@ class FixtureTile extends StatelessWidget {
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data!.snapshot.value != null) {
+                        if (snapShot.data.snapshot.value != null) {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
-                                  snapShot.data!.snapshot.value);
+                                  snapShot.data.snapshot.value);
 
                           return buildTimerWidget(status);
                           // return Center();
@@ -84,10 +84,10 @@ class FixtureTile extends StatelessWidget {
                       databaseReference.child("score").child("current").onValue,
                   builder: (context, snapShot) {
                     if (snapShot.hasData) {
-                      if (snapShot.data!.snapshot.value != null) {
+                      if (snapShot.data.snapshot.value != null) {
                         Map<String, dynamic> score =
                             new Map<String, dynamic>.from(
-                                snapShot.data!.snapshot.value);
+                                snapShot.data.snapshot.value);
 
                         return buildTeamAndScore(score: score);
                       }
@@ -103,7 +103,7 @@ class FixtureTile extends StatelessWidget {
     );
   }
 
-  Widget buildTeamAndScore({Map<String, dynamic>? score}) {
+  Widget buildTeamAndScore({Map<String, dynamic> score}) {
     return Column(
       children: [
         Row(

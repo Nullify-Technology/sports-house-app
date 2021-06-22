@@ -16,8 +16,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late TabController _controller;
-  late String _verificationId;
+   TabController _controller;
+   String _verificationId;
   final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
   final GlobalKey<FormState> _otpFormKey = GlobalKey();
 
@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen>
     };
 
     PhoneCodeSent codeSent =
-        (String verificationId, [int? forceResendingToken]) async {
+        (String verificationId, [int forceResendingToken]) async {
       this._verificationId = verificationId;
       _controller.animateTo(2);
     };
@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen>
                 fillColor: kTextFieldBgColor,
               ),
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -218,10 +218,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_phoneNumberFormKey.currentState!.validate()) {
+                if (!_phoneNumberFormKey.currentState.validate()) {
                   return;
                 }
-                _phoneNumberFormKey.currentState!.save();
+                _phoneNumberFormKey.currentState.save();
               },
             ),
           ],
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               textAlign: TextAlign.center,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -304,10 +304,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_otpFormKey.currentState!.validate()) {
+                if (!_otpFormKey.currentState.validate()) {
                   return;
                 }
-                _otpFormKey.currentState!.save();
+                _otpFormKey.currentState.save();
               },
             ),
           ],

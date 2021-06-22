@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class RoundedRectangleButton extends StatelessWidget {
   const RoundedRectangleButton({
-    Key? key,
-    required this.background,
+    Key key,
+     this.background,
     this.fontSize = 18,
-    required this.textColor,
+     this.textColor,
     this.borderRadius = 4.0,
-    required this.text,
+     this.text,
     this.fontWeight = FontWeight.bold,
-    required this.onClick,
+     this.onClick,
   }) : super(key: key);
   final Color background;
   final Color textColor;

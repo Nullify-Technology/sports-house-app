@@ -6,12 +6,12 @@ class AppConfig extends InheritedWidget {
   final Widget child;
 
   AppConfig({
-    required this.appTitle,
-    required this.buildFlavour,
-    required this.child,
+    this.appTitle,
+    this.buildFlavour,
+    this.child,
   }) : super(child: child);
 
-  static AppConfig? of(BuildContext context) {
+  static AppConfig of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<AppConfig>();
   }
 
