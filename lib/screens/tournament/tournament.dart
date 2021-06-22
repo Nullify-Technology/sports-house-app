@@ -14,6 +14,7 @@ import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/FixtureCard.dart';
 import 'package:sports_house/utils/reusable_components/FixtureTile.dart';
+import 'package:sports_house/utils/reusable_components/KeepAliveTab.dart';
 import 'package:sports_house/utils/reusable_components/custom_text.dart';
 import 'package:intl/intl.dart';
 
@@ -162,8 +163,8 @@ class _TournamentScreenState extends State<TournamentScreen> {
             ),
             child: TabBarView(
               children: [
-                buildFixturesTab(),
-                buildStandingsTab(),
+                KeepAliveTab(child: buildFixturesTab()),
+                KeepAliveTab(child: buildStandingsTab()),
               ],
             ),
           ),
@@ -180,13 +181,20 @@ class _TournamentScreenState extends State<TournamentScreen> {
             if (snapShot.hasData) {
               switch (snapShot.data!.status) {
                 case Status.LOADING:
+                  return Container(
+                    height: MediaQuery.of(context).size.width,
+                    child: CenterProgressBar(),
+                  );
                 case Status.ERROR:
                   return SliverToBoxAdapter(child: Container());
                 case Status.COMPLETED:
                   return buildFixtureList(snapShot.data!.data);
               }
             }
-            return Container();
+            return Container(
+              height: MediaQuery.of(context).size.width,
+              child: CenterProgressBar(),
+            );
           }),
     );
   }

@@ -12,8 +12,13 @@ import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/create_room/create_room.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
+import 'package:sports_house/screens/room_screen/squad_tab.dart';
+import 'package:sports_house/screens/room_screen/timeline_tab.dart';
+import 'package:sports_house/screens/room_screen/timer_widget.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
+import 'package:sports_house/utils/reusable_components/KeepAliveTab.dart';
 import 'package:sports_house/utils/reusable_components/RoomsTile.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_house/utils/reusable_components/custom_text.dart';
@@ -41,6 +46,7 @@ class _EventRoomsState extends State<EventRooms> {
           .reference()
           .child("fixture")
           .child("fixture_${widget.arguments.fixture.id}");
+
   Future joinRoom(Room room) async {
     try {
       // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
@@ -66,7 +72,11 @@ class _EventRoomsState extends State<EventRooms> {
     return Scaffold(
       backgroundColor: kColorBlack,
       extendBody: true,
-      // bottomNavigationBar: buildBottomNavigationBar(context),
+      bottomNavigationBar: context.watch<RTCProvider>().joined
+          ? InRoomBottomBar(
+              room: context.watch<RTCProvider>().room,
+            )
+          : null,
       body: DefaultTabController(
         length: 3,
         child: NestedScrollView(
@@ -117,23 +127,35 @@ class _EventRoomsState extends State<EventRooms> {
             ),
             child: TabBarView(
               children: [
-                StreamBuilder<Response<List<Room>>>(
-                  stream: roomsBloc.roomsStream,
-                  builder: (context, snapShot) {
-                    if (snapShot.hasData) {
-                      switch (snapShot.data!.status) {
-                        case Status.LOADING:
-                        case Status.ERROR:
-                          return Container();
-                        case Status.COMPLETED:
-                          return buildRoomList(snapShot.data!.data);
+                KeepAliveTab(
+                  child: StreamBuilder<Response<List<Room>>>(
+                    stream: roomsBloc.roomsStream,
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        switch (snapShot.data!.status) {
+                          case Status.LOADING:
+                            return Container(
+                              height: MediaQuery.of(context).size.width,
+                              child: CenterProgressBar(),
+                            );
+                          case Status.ERROR:
+                            return Container();
+                          case Status.COMPLETED:
+                            return buildRoomList(snapShot.data!.data);
+                        }
                       }
-                    }
-                    return Container();
-                  },
+                      return Container(
+                        height: MediaQuery.of(context).size.width,
+                        child: CenterProgressBar(),
+                      );
+                    },
+                  ),
                 ),
-                buildMatchTimeline(widget.arguments.fixture, fixtureReference),
-                buildMatchXI(widget.arguments.fixture, context),
+                KeepAliveTab(
+                    child: buildMatchTimeline(
+                        widget.arguments.fixture, fixtureReference)),
+                KeepAliveTab(
+                    child: buildMatchXI(widget.arguments.fixture, context)),
                 // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
               ],
             ),
@@ -160,7 +182,7 @@ class _EventRoomsState extends State<EventRooms> {
                     Map<String, dynamic> status = new Map<String, dynamic>.from(
                         snapShot.data!.snapshot.value);
 
-                    return buildTimerWidget(status, fontSize: 16.0);
+                    return buildTimerWidget(status, fontSize: 15.0);
                   }
                 }
                 return Container(
