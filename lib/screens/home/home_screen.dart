@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:sports_house/utils/reusable_components/TrendingRoomCard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:sports_house/utils/reusable_components/custom_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen();
@@ -42,6 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  RemoteConfig remoteConfig = RemoteConfig.instance;
+  double _appLatestVersion;
 
   Future joinRoom(Room room) async {
     try {
@@ -53,14 +57,37 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void fetchConfig() async {
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: Duration(seconds: 10),
+      minimumFetchInterval: Duration(hours: 1),
+    ));
+    bool updated = await remoteConfig.fetchAndActivate();
+    if (updated) {
+      // the config has been updated, new parameter values are available.
+      _appLatestVersion = remoteConfig.getDouble('app_version');
+      print('Version Data : $kAppVersion | $_appLatestVersion');
+    } else {
+      // the config values were previously updated.
+      print('Not updated');
+      print('Version Data : $kAppVersion | $_appLatestVersion');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    remoteConfig.setDefaults(<String, dynamic>{
+      'app_version': kAppVersion,
+    });
+    _appLatestVersion = kAppVersion;
     fixtureBloc = FixtureBloc(client: client);
     tournamentBloc = TournamentBloc(client: client);
     roomsBloc = RoomsBloc(client: RestClient.create());
     roomsBloc.getTrendingRooms();
     tournamentBloc.getTournaments();
+    fetchConfig();
   }
 
   @override
@@ -69,6 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
     tournamentBloc.dispose();
     super.dispose();
   }
+
+  void _launchURL() async => await canLaunch(kWebSiteUrl)
+      ? await launch(kWebSiteUrl)
+      : throw 'Could not launch $kWebSiteUrl';
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +237,45 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          if (kAppVersion < _appLatestVersion)
+            SliverToBoxAdapter(
+              child: GestureDetector(
+                onTap: () => _launchURL(),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 10,
+                  ),
+                  // margin: EdgeInsets.fromLTRB(50, 10, 50, 0),
+                  decoration: BoxDecoration(
+                    color: kColorGreen,
+                    // borderRadius: BorderRadius.all(
+                    //   Radius.circular(50),
+                    // ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Icon(
+                      //   Icons.new_releases,
+                      //   size: 18,
+                      //   color: kColorBlack,
+                      // ),
+                      CustomText(
+                        text: kNewUpdateAvailable,
+                        fontSize: 16,
+                        color: kColorBlack,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(height: 2),
+                      CustomText(
+                        text: kClickHereToInstall,
+                        fontSize: 12,
+                        color: kColorBlack,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           StreamBuilder<Response<List<Tournament>>>(
               stream: tournamentBloc.tournamentsStream,
               builder: (context, snapshot) {
@@ -217,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     case Status.COMPLETED:
                       return SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(20, 30, 0, 10),
+                          padding: EdgeInsets.fromLTRB(20, 20, 0, 10),
                           child: Center(
                             child: buildTournamentList(snapshot.data.data),
                           ),

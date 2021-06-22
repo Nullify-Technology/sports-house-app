@@ -23,6 +23,7 @@ const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
 const String kAppName = 'Sports House';
+const double kAppVersion = 0.1;
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
 const String kSendOtp = 'Send OTP';
@@ -175,5 +176,9 @@ const String kFixtures = "Fixtures";
 const String kStandings = "Standings";
 const String kUnavailable = "Unavailable";
 
-const String kRoomNetworkAlert = "Unable to join the room now. Please try again later";
+const String kRoomNetworkAlert =
+    "Unable to join the room now. Please try again later";
 const String kMediaServer = "media.sports-house.in";
+const String kNewUpdateAvailable = "New update available!";
+const String kClickHereToInstall = "Click here to install";
+const String kWebSiteUrl = "https://sportshouse.web.app/";
