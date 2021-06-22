@@ -6,16 +6,11 @@ import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
 import 'package:sports_house/provider/rtc_provider.dart';
 import 'package:sports_house/screens/home/home_screen.dart';
-import 'package:sports_house/utils/classes/event_classes.dart';
 import 'package:sports_house/utils/constants.dart';
 import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/error_components.dart';
-import 'package:timeline_tile/timeline_tile.dart';
 import 'package:sports_house/screens/room_screen/squad_tab.dart';
 import 'package:sports_house/screens/room_screen/timeline_tab.dart';
 import 'package:sports_house/screens/room_screen/timer_widget.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 
 class RoomScreenArguments {
   final Room room;
@@ -39,7 +34,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   Future _joinRTCRoom(Room room) async {
     try {
-      if (!Provider.of<RTCProvider>(context, listen: false).joined) {
+      Room currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
+      print("current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
+      if (currentRoom == null || currentRoom.id != room.id) {
+        print("inside if");
         await Provider.of<RTCProvider>(context, listen: false)
             .joinRTCRoom(room);
       }
@@ -119,7 +117,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                     padding:
                         const EdgeInsets.only(top: 70, left: 15, right: 15),
                     child: buildRoomHeader(
-                        widget.arguments.room, fixtureReference),
+                        widget.arguments.room, fixtureReference, roomReference),
                   ),
                 ),
                 bottom: TabBar(
@@ -393,7 +391,7 @@ Container buildTeamIcon(String url, {size = 30.0}) {
   );
 }
 
-Column buildRoomHeader(Room room, DatabaseReference fixtureReference) {
+Column buildRoomHeader(Room room, DatabaseReference fixtureReference, DatabaseReference roomReference) {
   return Column(
     children: [
       Container(
@@ -469,13 +467,34 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference) {
                           SizedBox(
                             width: 4,
                           ),
-                          Text(
-                            '${room.count} $kListners',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 17,
-                            ),
-                          )
+                          StreamBuilder<Event>(
+                            stream: roomReference.onValue,
+                            builder: (context, snapShot) {
+                              if (snapShot.hasData) {
+                                if (snapShot.data.snapshot.value != null) {
+                                  Map<String, dynamic> members =
+                                  new Map<String, dynamic>.from(
+                                      snapShot.data.snapshot.value);
+
+                                  return Text(
+                                    '${members.length} $kListners',
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 17,
+                                    ),
+                                  );
+                                }
+                              }
+
+                              return Text(
+                                '${room.count} $kListners',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 17,
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),

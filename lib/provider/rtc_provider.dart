@@ -41,6 +41,9 @@ class RTCProvider with ChangeNotifier {
   }
 
   Future joinRTCRoom(Room room) async {
+    if(_room != null){
+      await this.leaveRoom();
+    }
     if (!(await internetConnectivity())) {
       throw Response.error("No network");
     }
@@ -93,6 +96,7 @@ class RTCProvider with ChangeNotifier {
   }
 
   Future leaveRoom() async {
+    _room = null;
     if(_signaling != null) {
       _signaling.bye();
       _signaling.close();
