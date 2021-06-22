@@ -14,7 +14,7 @@ class RoomsBloc {
 
   Stream<Response<List<Room>>> get roomsStream => _roomsController.stream;
 
-  RoomsBloc({ this.client}) {
+  RoomsBloc({this.client}) {
     this._roomsController = StreamController<Response<List<Room>>>.broadcast();
   }
 

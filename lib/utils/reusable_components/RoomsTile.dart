@@ -18,7 +18,7 @@ class RoomsTile extends StatelessWidget {
   final bool isVerified;
   final String hostedBy;
   final int listners;
-  final List<AuthUser> participants;
+  final List<dynamic> participants;
 
   @override
   Widget build(BuildContext context) {
@@ -93,22 +93,27 @@ class RoomsTile extends StatelessWidget {
               ),
             ],
           ),
-          trailing: Container(
+          trailing: participants.isNotEmpty ? Container(
             width: 90,
             height: 40,
             child: Stack(
               alignment: Alignment.centerRight,
               children: buildProfileStack(members: participants),
             ),
+          ) :  Container(
+            width: 90,
+            height: 40,
           ),
         ),
       ),
     );
   }
 
-  List<Widget> buildProfileStack({ List<AuthUser> members}) {
+  List<Widget> buildProfileStack({ List<dynamic> members}) {
     List<Widget> profileStack = [];
-    for (AuthUser user in members) {
+    for (var member in members) {
+      AuthUser user = AuthUser.fromJson(
+          Map<String, dynamic>.from(member));
       if (profileStack.length == 3) break;
       if (user.profilePictureUrl != null &&
           user.profilePictureUrl.isNotEmpty) {

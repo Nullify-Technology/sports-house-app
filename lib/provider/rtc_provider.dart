@@ -2,17 +2,19 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sports_house/blocs/rooms_bloc.dart';
 import 'package:sports_house/config/mediasoup/websocket/signaling.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/user.dart';
+import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/utils/constants.dart';
 
 class RTCProvider with ChangeNotifier {
   AuthUser currentUser;
   DatabaseReference _databaseReference;
   Room _room;
-
+  RoomsBloc _roomBloc;
   Room get room => _room;
   Signaling _signaling;
 
@@ -24,6 +26,7 @@ class RTCProvider with ChangeNotifier {
   setMuted(muted) => currentUser.muted = muted;
 
   RTCProvider({this.currentUser}) {
+    _roomBloc = RoomsBloc(client: RestClient.create());
     _databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom);
   }
@@ -47,6 +50,7 @@ class RTCProvider with ChangeNotifier {
     if (!(await internetConnectivity())) {
       throw Response.error("No network");
     }
+      await _roomBloc.joinRoom(room.id);
       _signaling = new Signaling(kMediaServer)..connect(room.id);
       _databaseReference = _databaseReference.child(room.id);
       _signaling.onStateChange = (SignalingState state) {
@@ -96,6 +100,7 @@ class RTCProvider with ChangeNotifier {
   }
 
   Future leaveRoom() async {
+    _roomBloc.leaveRoom(room.id);
     _room = null;
     if(_signaling != null) {
       _signaling.bye();
@@ -126,6 +131,10 @@ class RTCProvider with ChangeNotifier {
     }
     if(currentUser != null){
       _databaseReference.child(currentUser.id).remove();
+    }
+
+    if(_room != null){
+      _roomBloc.leaveRoom(room.id);
     }
     _databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom);

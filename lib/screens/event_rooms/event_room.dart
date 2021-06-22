@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/blocs/rooms_bloc.dart';
+import 'package:sports_house/helper/life_cycle_event_handler.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/response.dart';
 import 'package:sports_house/models/room.dart';
@@ -41,17 +42,6 @@ class _EventRoomsState extends State<EventRooms> {
   AuthUser currentUser;
   DatabaseReference fixtureReference;
 
-  Future joinRoom(Room room) async {
-    try {
-      // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id) as AgoraRoom;
-
-      Navigator.pushNamed(context, RoomScreen.pageId,
-          arguments: RoomScreenArguments(room));
-    } catch (e) {
-      print("failed to join room");
-    }
-  }
-
   @override
   void initState() {
     currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
@@ -60,6 +50,9 @@ class _EventRoomsState extends State<EventRooms> {
         .child("fixture")
         .child("fixture_${widget.arguments.fixture.id}");
     roomsBloc = RoomsBloc(client: RestClient.create());
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+      resumeCallBack: () => roomsBloc.getRooms(widget.arguments.fixture.id)
+    ));
     roomsBloc.getRooms(widget.arguments.fixture.id);
     super.initState();
   }
@@ -293,6 +286,7 @@ class _EventRoomsState extends State<EventRooms> {
 
   Widget buildRoomList(List<Room> rooms) {
     if (rooms.length > 0)
+
       return Padding(
         padding: const EdgeInsets.all(8),
         child: ListView.builder(
@@ -301,15 +295,44 @@ class _EventRoomsState extends State<EventRooms> {
           itemCount: rooms.length,
           padding: EdgeInsets.only(bottom: 80),
           itemBuilder: (context, index) {
-            return GestureDetector(
-              child: RoomsTile(
-                title: rooms[index].name,
-                listners: rooms[index].count,
-                participants: rooms[index].members,
-                hostedBy: rooms[index].createdBy.name ?? '',
-              ),
-              onTap: () => joinRoom(rooms[index]),
+            DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+                .reference()
+                .child(kRTCRoom)
+                .child(rooms[index].id);
+
+            return StreamBuilder<Event>(
+              stream: roomReference.onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data.snapshot.value != null) {
+                    Map<String, dynamic> userDetails =
+                    new Map<String, dynamic>.from(
+                        snapShot.data.snapshot.value);
+                    return GestureDetector(
+                        child: RoomsTile(
+                          title: rooms[index].name,
+                          listners: userDetails.length,
+                          participants: userDetails.values.toList(),
+                          hostedBy: rooms[index].createdBy.name ?? '',
+                        ),
+                        onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
+                            arguments: RoomScreenArguments(rooms[index])) //joinRoom(rooms[index]),
+                    );
+                  }
+                }
+                return GestureDetector(
+                    child: RoomsTile(
+                      title: rooms[index].name,
+                      listners: 0,
+                      participants: [],
+                      hostedBy: rooms[index].createdBy.name ?? '',
+                    ),
+                    onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
+                        arguments: RoomScreenArguments(rooms[index])) //joinRoom(rooms[index]),
+                );
+              },
             );
+
           },
         ),
       );
