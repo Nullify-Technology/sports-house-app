@@ -340,52 +340,50 @@ class _EventRoomsState extends State<EventRooms> {
       return buildNoRoomsAvailableError();
   }
 
-  Expanded buildNoRoomsAvailableError() {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Image.asset(
-            'assets/images/no_rooms_found.png',
-            width: MediaQuery.of(context).size.width * 0.6,
+  Column buildNoRoomsAvailableError() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Image.asset(
+          'assets/images/no_rooms_found.png',
+          width: MediaQuery.of(context).size.width * 0.6,
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        Text(
+          kNoRoomsFound,
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            // fontWeight: FontWeight.bold,
           ),
-          SizedBox(
-            height: 5,
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, CreateRoom.pageId);
+          },
+          style: ElevatedButton.styleFrom(
+            shape: StadiumBorder(),
+            primary: kColorGreen,
           ),
-          Text(
-            kNoRoomsFound,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              // fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, CreateRoom.pageId);
-            },
-            style: ElevatedButton.styleFrom(
-              shape: StadiumBorder(),
-              primary: kColorGreen,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                kCreateRoom,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: kCardBgColor,
-                ),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              kCreateRoom,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: kCardBgColor,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
