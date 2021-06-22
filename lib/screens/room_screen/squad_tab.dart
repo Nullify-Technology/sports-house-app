@@ -56,15 +56,15 @@ Widget buildStartingXI(Fixture fixture, String team) {
       padding: EdgeInsets.zero,
       physics: NeverScrollableScrollPhysics(),
       itemCount: team == 'home'
-          ? fixture.teams.home.lineups.startXI!.length
-          : fixture.teams.away.lineups.startXI!.length,
+          ? fixture.teams.home.lineups.startXI.length
+          : fixture.teams.away.lineups.startXI.length,
       itemBuilder: (context, i) {
         Lineup lineup = team == 'home'
             ? fixture.teams.home.lineups
             : fixture.teams.away.lineups;
         return ListTile(
           title: Text(
-            '${lineup.startXI![i].name} ( ${lineup.startXI![i].number} )',
+            '${lineup.startXI[i].name} ( ${lineup.startXI[i].number} )',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -82,7 +82,7 @@ Widget buildStartingXI(Fixture fixture, String team) {
             child: fixture.players != null
                 ? CircleAvatar(
                     foregroundImage: CachedNetworkImageProvider(fixture
-                            .players![lineup.startXI![i].id.toString()]!
+                            .players[lineup.startXI[i].id.toString()]
                             .photo ??
                         kDummyProfileImageUrl),
                   )
@@ -176,15 +176,15 @@ ListView buildSubstitutes(Room room, String team) {
     shrinkWrap: true,
     physics: NeverScrollableScrollPhysics(),
     itemCount: team == 'home'
-        ? room.fixture.teams.home.lineups.substitutes!.length
-        : room.fixture.teams.away.lineups.substitutes!.length,
+        ? room.fixture.teams.home.lineups.substitutes.length
+        : room.fixture.teams.away.lineups.substitutes.length,
     itemBuilder: (context, i) {
       Lineup lineup = team == 'home'
           ? room.fixture.teams.home.lineups
           : room.fixture.teams.away.lineups;
       return ListTile(
         title: Text(
-          '${lineup.substitutes![i].name}',
+          '${lineup.substitutes[i].name}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -200,7 +200,7 @@ ListView buildSubstitutes(Room room, String team) {
             color: kDropdownBgColor,
           ),
           child: Text(
-            '${lineup.substitutes![i].pos}',
+            '${lineup.substitutes[i].pos}',
             style: TextStyle(
               color: kColorGreen,
               fontWeight: FontWeight.bold,

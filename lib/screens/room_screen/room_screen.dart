@@ -26,7 +26,7 @@ class RoomScreenArguments {
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
 
-  RoomScreen({Key key,  this.arguments}) : super(key: key);
+  RoomScreen({Key key, this.arguments}) : super(key: key);
   static String pageId = 'RoomScreen';
 
   @override
@@ -34,48 +34,55 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
-   DatabaseReference fixtureReference;
-   DatabaseReference roomReference;
+  DatabaseReference fixtureReference;
+  DatabaseReference roomReference;
 
-   Future _joinRTCRoom(Room room) async {
-     try{
-       if(!Provider.of<RTCProvider>(context, listen: false).joined){
-         await Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(room);
-       }
-     }catch(e){
-        showAlertDialog(context);
-     }
-   }
+  Future _joinRTCRoom(Room room) async {
+    try {
+      if (!Provider.of<RTCProvider>(context, listen: false).joined) {
+        await Provider.of<RTCProvider>(context, listen: false)
+            .joinRTCRoom(room);
+      }
+    } catch (e) {
+      showAlertDialog(context);
+    }
+  }
 
-   showAlertDialog(BuildContext context) {
-     Widget cancelButton = TextButton(
-       child: Text("Ok"),
-       onPressed:  () {
-         Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
-       },
-     );
+  showAlertDialog(BuildContext context) {
+    Widget cancelButton = TextButton(
+      child: Text("Ok"),
+      onPressed: () {
+        Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
+      },
+    );
 
-     // set up the AlertDialog
-     AlertDialog alert = AlertDialog(
-       content: Text(kRoomNetworkAlert),
-       actions: [
-         cancelButton,
-       ],
-     );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      content: Text(kRoomNetworkAlert),
+      actions: [
+        cancelButton,
+      ],
+    );
 
-     // show the dialog
-     showDialog(
-       context: context,
-       builder: (BuildContext context) {
-         return alert;
-       },
-     );
-   }
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 
   @override
   void initState() {
-    fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child("fixture").child("fixture_${widget.arguments.room.fixture.id}");
-    roomReference = FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom).child(widget.arguments.room.id);
+    fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+        .reference()
+        .child("fixture")
+        .child("fixture_${widget.arguments.room.fixture.id}");
+    roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+        .reference()
+        .child(kRTCRoom)
+        .child(widget.arguments.room.id);
     _joinRTCRoom(widget.arguments.room);
     super.initState();
   }
@@ -295,7 +302,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   }
                 }
                 return Container(
-                  height: MediaQuery.of(context).size.width,
+                  // height: MediaQuery.of(context).size.height - 600,
                   child: CenterProgressBar(),
                 );
               },
@@ -312,8 +319,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Container buildParticipant({
-     String imageUrl,
-     String name,
+    String imageUrl,
+    String name,
     bool isMuted = true,
   }) {
     return Container(
@@ -369,7 +376,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 }
 
-Container buildTeamIcon(String url, {size = 30}) {
+Container buildTeamIcon(String url, {size = 30.0}) {
   return Container(
     padding: EdgeInsets.all(12),
     decoration: new BoxDecoration(

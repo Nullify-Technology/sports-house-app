@@ -14,8 +14,8 @@ StreamBuilder<Event> buildMatchTimeline(
     stream: fixtureReference.child("events").onValue,
     builder: (context, snapShot) {
       if (snapShot.hasData) {
-        if (snapShot.data!.snapshot.value != null) {
-          var events = snapShot.data!.snapshot.value;
+        if (snapShot.data.snapshot.value != null) {
+          var events = snapShot.data.snapshot.value;
           List<dynamic> matchEvents = events
               .map((event) => MatchEvent.fromDb(event))
               .toList() as List<dynamic>;
