@@ -22,7 +22,7 @@ const Color kMuteButtonBgColor = Color(0x33000000);
 const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
-const String kAppName = 'Sports House';
+const String kAppName = 'Match Cafe';
 const double kAppVersion = 0.1;
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
