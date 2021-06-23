@@ -11,6 +11,7 @@ import 'package:sports_house/network/rest_client.dart';
 import 'package:sports_house/provider/user_provider.dart';
 import 'package:sports_house/screens/room_screen/room_screen.dart';
 import 'package:sports_house/utils/constants.dart';
+import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
 import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
 import 'package:sports_house/utils/reusable_components/drop_down_list.dart';
 import 'package:intl/intl.dart';
@@ -25,15 +26,16 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> {
   final RestClient client = RestClient.create();
-   FixtureBloc fixtureBloc;
+  FixtureBloc fixtureBloc;
   List<DropDown> fixtureDropDown = [];
   List<DropDown> roomTypes = [];
-   DropDown selectedFixture;
-   DropDown selectedType;
+  DropDown selectedFixture;
+  DropDown selectedType;
   final roomNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-   RoomsBloc roomsBloc;
-   AuthUser currentUser;
+  RoomsBloc roomsBloc;
+  AuthUser currentUser;
+  bool _isLoading = false;
 
   createFixtureRoom() async {
     if (_formKey.currentState.validate()) {
@@ -132,6 +134,10 @@ class _CreateRoomState extends State<CreateRoom> {
                     return Container();
                   case Status.COMPLETED:
                     populateFixturesDropDown(snapShot.data.data);
+                    if (_isLoading)
+                      return Container(
+                        child: CenterProgressBar(),
+                      );
                     return buildUI();
                 }
               }

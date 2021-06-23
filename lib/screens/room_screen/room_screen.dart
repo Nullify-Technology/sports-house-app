@@ -322,6 +322,11 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     String name,
     bool isMuted = true,
   }) {
+    if (imageUrl == null && name == null && isMuted == null) {
+      print(imageUrl.toString() + name.toString() + isMuted.toString());
+      return null;
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 5,
@@ -355,7 +360,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   ),
                   child: Icon(
                     isMuted ? Icons.mic_off_rounded : Icons.mic,
-                    color: isMuted ? kMutedButtonColor : kUnmutedButtonColor,
+                    color: isMuted == null || isMuted
+                        ? kMutedButtonColor
+                        : kUnmutedButtonColor,
                     size: 17,
                   ),
                 )
@@ -366,7 +373,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             height: 10,
           ),
           Text(
-            name,
+            name ?? '',
             textAlign: TextAlign.center,
           ),
         ],
