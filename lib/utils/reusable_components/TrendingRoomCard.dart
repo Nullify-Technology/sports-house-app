@@ -70,7 +70,7 @@ class TrendingRoomCard extends StatelessWidget {
                       width: 4,
                     ),
                     Text(
-                      '${room.count} $kListners',
+                      '${room.count} $kListeners',
                       style: TextStyle(
                         color: Colors.white54,
                       ),

@@ -68,7 +68,7 @@ const String kProduction = "prod";
 const String kAccessToken = "AccessToken";
 const String kUser = "UserProfile";
 
-const String kListners = 'Listners';
+const String kListeners = 'Listeners';
 const String kHostedBy = 'Hosted By:';
 const String kRooms = 'Rooms';
 

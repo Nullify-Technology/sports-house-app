@@ -479,7 +479,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                                           snapShot.data.snapshot.value);
 
                                   return Text(
-                                    '${members.length} $kListners',
+                                    '${members.length} $kListeners',
                                     style: TextStyle(
                                       color: Colors.white54,
                                       fontSize: 17,
@@ -489,7 +489,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                               }
 
                               return Text(
-                                '${room.count} $kListners',
+                                '${room.count} $kListeners',
                                 style: TextStyle(
                                   color: Colors.white54,
                                   fontSize: 17,

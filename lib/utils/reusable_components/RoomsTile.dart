@@ -86,7 +86,7 @@ class RoomsTile extends StatelessWidget {
                     width: 4,
                   ),
                   CustomText(
-                    text: '$listners $kListners',
+                    text: '$listners $kListeners',
                     fontSize: 12,
                   )
                 ],
