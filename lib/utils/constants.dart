@@ -23,7 +23,7 @@ const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
 const String kAppName = 'Match Cafe';
-const double kAppVersion = 0.1;
+const double kAppVersion = 0.2;
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
 const String kSendOtp = 'Send OTP';
@@ -182,3 +182,7 @@ const String kMediaServer = "media.sports-house.in";
 const String kNewUpdateAvailable = "New update available!";
 const String kClickHereToInstall = "Click here to install";
 const String kWebSiteUrl = "https://matchcafe.app/";
+const String kNoMatchesAvailable =
+    "No matches are available for creating room!";
+const String kPrivateRoomsUnavailable =
+    "Private rooms are unavailable right now!";

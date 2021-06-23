@@ -38,6 +38,9 @@ class _CreateRoomState extends State<CreateRoom> {
   bool _isLoading = false;
 
   createFixtureRoom() async {
+    setState(() {
+      _isLoading = true;
+    });
     if (_formKey.currentState.validate()) {
       if (selectedFixture.key != 'no_matches' &&
           selectedType.key != 'private') {
@@ -50,8 +53,8 @@ class _CreateRoomState extends State<CreateRoom> {
         final snackBar = SnackBar(
           content: Text(
             selectedFixture.key == 'no_matches'
-                ? 'No matches are available for creating room!'
-                : 'Private rooms are unavailable right now!',
+                ? kNoMatchesAvailable
+                : kPrivateRoomsUnavailable,
           ),
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -124,25 +127,27 @@ class _CreateRoomState extends State<CreateRoom> {
             topRight: kCreateRoomCardRadius,
           ),
         ),
-        child: StreamBuilder<Response<List<Fixture>>>(
-            stream: fixtureBloc.fixturesStream,
-            builder: (context, snapShot) {
-              if (snapShot.hasData) {
-                switch (snapShot.data.status) {
-                  case Status.LOADING:
-                  case Status.ERROR:
-                    return Container();
-                  case Status.COMPLETED:
-                    populateFixturesDropDown(snapShot.data.data);
-                    if (_isLoading)
-                      return Container(
-                        child: CenterProgressBar(),
-                      );
-                    return buildUI();
-                }
-              }
-              return Container();
-            }),
+        child: _isLoading
+            ? Container(
+                child: CenterProgressBar(),
+              )
+            : StreamBuilder<Response<List<Fixture>>>(
+                stream: fixtureBloc.fixturesStream,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    switch (snapShot.data.status) {
+                      case Status.LOADING:
+                      case Status.ERROR:
+                        return Container();
+                      case Status.COMPLETED:
+                        populateFixturesDropDown(snapShot.data.data);
+                        return buildUI();
+                    }
+                  }
+                  return Container(
+                    child: CenterProgressBar(),
+                  );
+                }),
       ),
     );
   }
