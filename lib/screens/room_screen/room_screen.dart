@@ -182,7 +182,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           children: [
             TextButton(
               onPressed: () async {
-                context.read<RTCProvider>().leaveRoom();
+                context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -211,7 +211,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               ),
             ),
             TextButton(
-              onPressed: () => context.read<RTCProvider>().toggleMute(),
+              onPressed: () => context.read<RTCProvider>().toggleMute(widget.arguments.room.id),
               style: TextButton.styleFrom(
                 backgroundColor: kMuteButtonBgColor,
                 shape: CircleBorder(),
