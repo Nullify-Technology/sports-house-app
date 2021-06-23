@@ -181,4 +181,4 @@ const String kRoomNetworkAlert =
 const String kMediaServer = "media.sports-house.in";
 const String kNewUpdateAvailable = "New update available!";
 const String kClickHereToInstall = "Click here to install";
-const String kWebSiteUrl = "https://sportshouse.web.app/";
+const String kWebSiteUrl = "https://matchcafe.app/";
