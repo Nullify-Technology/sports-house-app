@@ -121,15 +121,20 @@ class _HomeScreenState extends State<HomeScreen> {
             pinned: true,
             snap: false,
             floating: false,
-            expandedHeight: 360.0,
+            expandedHeight: 390.0,
             backgroundColor: kHomeAppBarBgColor,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.sports,
-                  size: 30,
-                  color: Colors.white,
+                // Image.asset(
+                //   'assets/images/logo.png',
+                //   width: 30,
+                //   height: 30,
+                // ),
+                CustomText(
+                  text: kAppName,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.0,
                 ),
                 Row(
                   children: [
@@ -188,14 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
               collapseMode: CollapseMode.pin,
               background: Padding(
                 padding: const EdgeInsets.only(
-                  top: 90,
+                  top: 105,
                 ),
                 child: Column(
                   children: [
                     Row(
                       children: [
                         SizedBox(
-                          width: 20,
+                          width: 30,
                         ),
                         Icon(
                           Icons.whatshot,
@@ -287,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     case Status.COMPLETED:
                       return SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(20, 20, 0, 10),
+                          padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
                           child: Center(
                             child: buildTournamentList(snapshot.data.data),
                           ),
@@ -299,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 15, 0, 10),
+              padding: EdgeInsets.fromLTRB(30, 15, 0, 10),
               child: buildIconTitle(icon: Icons.podcasts, title: kFixtures),
             ),
           ),
@@ -341,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (BuildContext context) {
               return Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 25,
+                  horizontal: 30,
                   vertical: 10,
                 ),
                 height: 250,
@@ -384,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              width: MediaQuery.of(context).size.width * 0.45,
+                              width: MediaQuery.of(context).size.width * 0.42,
                               height: 100,
                               child: Card(
                                 color: Colors.white,
@@ -462,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget buildTrendingCarousel(List<Room> rooms) {
     return CarouselSlider(
       options: CarouselOptions(
-        viewportFraction: 0.83,
+        viewportFraction: 0.85,
         height: 240.0,
         enlargeStrategy: CenterPageEnlargeStrategy.scale,
         enableInfiniteScroll: false,
