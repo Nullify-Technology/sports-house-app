@@ -81,7 +81,8 @@ Widget buildStartingXI(Fixture fixture, String team) {
               shape: BoxShape.circle,
               color: kDropdownBgColor,
             ),
-            child: fixture.players != null
+            child: fixture.players != null &&
+                    fixture.players[lineup.startXI[i].id.toString()] != null
                 ? CircleAvatar(
                     foregroundImage: CachedNetworkImageProvider(fixture
                             .players[lineup.startXI[i].id.toString()].photo ??
