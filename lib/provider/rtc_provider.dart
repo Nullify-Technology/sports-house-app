@@ -52,7 +52,7 @@ class RTCProvider with ChangeNotifier {
     }
       await _roomBloc.joinRoom(room.id);
       _signaling = new Signaling(kMediaServer)..connect(room.id);
-      _databaseReference = _databaseReference.child(room.id);
+      DatabaseReference roomRef = _databaseReference.child(room.id);
       _signaling.onStateChange = (SignalingState state) {
         switch (state) {
           case SignalingState.CallStateNew:
@@ -79,7 +79,7 @@ class RTCProvider with ChangeNotifier {
             currentUser.muted = false;
             currentUser.joined = true;
             notifyListeners();
-            _databaseReference.child(currentUser.id).set(currentUser.toJson());
+            roomRef.child(currentUser.id).set(currentUser.toJson());
             break;
         }
       };
@@ -99,7 +99,8 @@ class RTCProvider with ChangeNotifier {
       _signaling.invite();
   }
 
-  Future leaveRoom() async {
+  Future leaveRoom(String roomId) async {
+    DatabaseReference roomRef = _databaseReference.child(room.id);
     _roomBloc.leaveRoom(room.id);
     _room = null;
     if(_signaling != null) {
@@ -107,15 +108,14 @@ class RTCProvider with ChangeNotifier {
       _signaling.close();
     }
     currentUser.joined = false;
-    await _databaseReference.child(currentUser.id).remove();
-    _databaseReference =
-        FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom);
+    await roomRef.child(currentUser.id).remove();
     notifyListeners();
   }
 
-  Future toggleMute() async {
+  Future toggleMute(String roomId) async {
+    DatabaseReference roomRef = _databaseReference.child(room.id);
     setMuted(!muted);
-    _databaseReference
+    roomRef
         .child(currentUser.id)
         .update(currentUser.toJson());
     _signaling.mute(muted);
@@ -125,19 +125,18 @@ class RTCProvider with ChangeNotifier {
 
   @override
   void dispose() {
+    DatabaseReference roomRef = _databaseReference.child(room.id);
     if(_signaling != null) {
       _signaling.bye();
       _signaling.close();
     }
     if(currentUser != null){
-      _databaseReference.child(currentUser.id).remove();
+      roomRef.child(currentUser.id).remove();
     }
 
     if(_room != null){
       _roomBloc.leaveRoom(room.id);
     }
-    _databaseReference =
-        FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom);
     super.dispose();
   }
 }
