@@ -91,7 +91,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<RTCProvider>().leaveRoom();
+                  context.read<RTCProvider>().leaveRoom(room.id);
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
