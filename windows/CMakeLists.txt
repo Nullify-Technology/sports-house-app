@@ -1,7 +1,7 @@
 cmake_minimum_(VERSION 3.15)
-project(sports_house LANGUAGES CXX)
+project(match_cafe LANGUAGES CXX)
 
-set(BINARY_NAME "sports_house")
+set(BINARY_NAME "match_cafe")
 
 cmake_policy(SET CMP0063 NEW)
 

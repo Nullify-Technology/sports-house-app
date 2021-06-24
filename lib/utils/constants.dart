@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/SportsEvent.dart';
-import 'package:sports_house/utils/Room.dart';
+import 'package:match_cafe/utils/SportsEvent.dart';
+import 'package:match_cafe/utils/Room.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);

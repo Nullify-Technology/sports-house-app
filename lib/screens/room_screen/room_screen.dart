@@ -2,15 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/provider/rtc_provider.dart';
-import 'package:sports_house/screens/home/home_screen.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/screens/room_screen/squad_tab.dart';
-import 'package:sports_house/screens/room_screen/timeline_tab.dart';
-import 'package:sports_house/screens/room_screen/timer_widget.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/provider/rtc_provider.dart';
+import 'package:match_cafe/screens/home/home_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/screens/room_screen/squad_tab.dart';
+import 'package:match_cafe/screens/room_screen/timeline_tab.dart';
+import 'package:match_cafe/screens/room_screen/timer_widget.dart';
 
 class RoomScreenArguments {
   final Room room;

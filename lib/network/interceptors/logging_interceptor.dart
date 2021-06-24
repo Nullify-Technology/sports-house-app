@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class HttpLoggingInterceptor extends InterceptorsWrapper{
   final log = Logger('HttpLoggingInterceptor');

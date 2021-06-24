@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sdp_transform/sdp_transform.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/transport.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/transport.dart';
 import 'ortc.dart';
 import 'sdp_utils.dart';
 

@@ -1,5 +1,5 @@
 import 'package:sdp_transform/sdp_transform.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/dtls_parameters.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/dtls_parameters.dart';
 
 extractDtlsParameters(dynamic sdp) {
     Map mediaObject = (sdp["media"].toList() ?? [])

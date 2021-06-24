@@ -4,9 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/screens/event_rooms/event_room.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/screens/event_rooms/event_room.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class FixtureCard extends StatelessWidget {
   final Fixture fixture;

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/api_response.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/network/rest_client.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/api_response.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/network/rest_client.dart';
 
 class RoomsBloc {
   final RestClient client;

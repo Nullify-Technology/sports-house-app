@@ -1,6 +1,6 @@
 {
-    "name": "sports_house",
-    "short_name": "sports_house",
+    "name": "match_cafe",
+    "short_name": "match_cafe",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
-import 'package:sports_house/utils/reusable_components/custom_text.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
+import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({

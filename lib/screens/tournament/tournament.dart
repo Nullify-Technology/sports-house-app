@@ -1,19 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:sports_house/blocs/fixtures_bloc.dart';
-import 'package:sports_house/blocs/standings_bloc.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/standings.dart';
-import 'package:sports_house/models/team_standing.dart';
-import 'package:sports_house/models/tournament_standings.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/FixtureTile.dart';
-import 'package:sports_house/utils/reusable_components/KeepAliveTab.dart';
-import 'package:sports_house/utils/reusable_components/custom_text.dart';
+import 'package:match_cafe/blocs/fixtures_bloc.dart';
+import 'package:match_cafe/blocs/standings_bloc.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/standings.dart';
+import 'package:match_cafe/models/team_standing.dart';
+import 'package:match_cafe/models/tournament_standings.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/FixtureTile.dart';
+import 'package:match_cafe/utils/reusable_components/KeepAliveTab.dart';
+import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:intl/intl.dart';
 
 class TournamentScreenArguments {

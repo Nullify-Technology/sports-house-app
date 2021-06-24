@@ -1,5 +1,5 @@
-name: sports_house
-description: Sports House mobile application
+name: match_cafe
+description: Match Cafe mobile application
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

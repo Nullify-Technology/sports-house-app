@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/match_details.dart';
-import 'package:sports_house/models/teams.dart';
-import 'package:sports_house/models/venue.dart';
+import 'package:match_cafe/models/match_details.dart';
+import 'package:match_cafe/models/teams.dart';
+import 'package:match_cafe/models/venue.dart';
 
 import 'player_data.dart';
 

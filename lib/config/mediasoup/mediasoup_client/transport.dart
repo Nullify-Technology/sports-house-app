@@ -6,10 +6,10 @@ import 'package:executor/executor.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:serializable/serializable.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/producer.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/remote_sdp.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/sdp_unified_plan.dart';
-import 'package:sports_house/config/mediasoup/mediasoup_client/sdp_utils.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/producer.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/remote_sdp.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/sdp_unified_plan.dart';
+import 'package:match_cafe/config/mediasoup/mediasoup_client/sdp_utils.dart';
 import 'dtls_parameters.dart';
 import 'ice_candidate.dart';
 

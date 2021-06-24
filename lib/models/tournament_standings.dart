@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/season.dart';
-import 'package:sports_house/models/standings.dart';
+import 'package:match_cafe/models/season.dart';
+import 'package:match_cafe/models/standings.dart';
 
 part 'tournament_standings.g.dart';
 

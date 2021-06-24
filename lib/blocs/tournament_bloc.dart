@@ -5,14 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sports_house/models/auth.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/tournament.dart';
-import 'package:sports_house/models/api_response.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/auth.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/tournament.dart';
+import 'package:match_cafe/models/api_response.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class TournamentBloc {
   final RestClient client;

@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/config/mediasoup/websocket/signaling.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/blocs/rooms_bloc.dart';
+import 'package:match_cafe/config/mediasoup/websocket/signaling.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class RTCProvider with ChangeNotifier {
   AuthUser currentUser;

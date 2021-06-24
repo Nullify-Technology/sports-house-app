@@ -2,8 +2,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/user.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/user.dart';
 
 part 'room.g.dart';
 
