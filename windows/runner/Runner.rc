@@ -90,7 +90,7 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.sportshouse" "\0"
-            VALUE "FileDescription", "Sports House mobile application" "\0"
+            VALUE "FileDescription", "Match Cafe mobile application" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "match_cafe" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2021 com.sportshouse. All rights reserved." "\0"
