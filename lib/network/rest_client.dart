@@ -50,7 +50,7 @@ abstract class RestClient {
   @POST("/room")
   @FormUrlEncoded()
   Future<AgoraRoom> createRoom(@Field("fixture_id") String fixtureId,
-      @Field("user_id") String userId, @Field("name") String name);
+      @Field("user_id") String userId, @Field("name") String name,@Field("type") String type);
 
   @POST("/room/{roomId}/join")
   Future<AgoraRoom> joinRoom(@Path() String roomId);
