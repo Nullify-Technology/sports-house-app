@@ -42,10 +42,9 @@ class _CreateRoomState extends State<CreateRoom> {
       _isLoading = true;
     });
     if (_formKey.currentState.validate()) {
-      if (selectedFixture.key != 'no_matches' &&
-          selectedType.key != 'private') {
-        AgoraRoom room = await roomsBloc.createRoom(
-            selectedFixture.key, "0", roomNameController.text,selectedType.key);
+      if (selectedFixture.key != 'no_matches') {
+        AgoraRoom room = await roomsBloc.createRoom(selectedFixture.key, "0",
+            roomNameController.text, selectedType.key);
         Navigator.popAndPushNamed(context, RoomScreen.pageId,
             arguments: RoomScreenArguments(room.room));
       } else {
