@@ -68,8 +68,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final Uri deepLink = dynamicLink?.link;
       print('Deeplink : ' + deepLink.toString());
       if (deepLink != null) {
+        List<String> segments = deepLink.pathSegments;
         print('Deeplink : ' + deepLink.toString());
-        joinRoomWithId(context, deepLink.pathSegments.last);
+        if (segments.length > 2 && segments[segments.length - 2] == 'room')
+          joinRoomWithId(context, segments.last);
       }
     }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
@@ -81,8 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final Uri deepLink = data?.link;
 
     if (deepLink != null) {
+      List<String> segments = deepLink.pathSegments;
       print('Deeplink : ' + deepLink.toString());
-      joinRoomWithId(context, deepLink.pathSegments.last);
+      if (segments.length > 2 && segments[segments.length - 2] == 'room')
+        joinRoomWithId(context, segments.last);
     }
   }
 
