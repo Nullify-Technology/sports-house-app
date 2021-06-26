@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:sports_house/blocs/fixtures_bloc.dart';
@@ -242,12 +243,14 @@ class _TournamentScreenState extends State<TournamentScreen> {
         bottom: 50,
       ),
       groupBy: (fixture) {
-        return formatter.format(DateTime.parse(fixture.date).toLocal());
+        var dateTime = DateTime.parse(fixture.date).toLocal();
+        var date = new DateTime(dateTime.year, dateTime.month, dateTime.day);
+        return date.toIso8601String();
       },
       groupSeparatorBuilder: (String value) => Padding(
         padding: const EdgeInsets.fromLTRB(12, 18, 10, 10),
         child: Text(
-          value,
+          formatter.format(DateTime.parse(value)),
           style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
         ),
       ),
