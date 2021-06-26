@@ -98,7 +98,7 @@ class _RestClient implements RestClient {
         _setStreamType<ApiResponse<Fixture>>(Options(
                 method: 'GET', headers: <String, dynamic>{}, extra: _extra)
             .compose(
-                _dio.options, '/tournament/$tournamentId/fixtures?from_date=2021-06-21',
+                _dio.options, '/tournament/$tournamentId/fixtures?live=true',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Fixture>.fromJson(
