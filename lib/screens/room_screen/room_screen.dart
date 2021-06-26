@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:match_cafe/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/models/room.dart';
 import 'package:match_cafe/models/user.dart';
@@ -32,6 +33,7 @@ class RoomScreen extends StatefulWidget {
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   DatabaseReference fixtureReference;
   DatabaseReference roomReference;
+  AuthUser _currentUser;
 
   Future _joinRTCRoom(Room room) async {
     try {
@@ -85,6 +87,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         .child(kRTCRoom)
         .child(widget.arguments.room.id);
     _joinRTCRoom(widget.arguments.room);
+
     super.initState();
   }
 
@@ -95,6 +98,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    _currentUser = context.watch<UserProvider>().currentUser;
     return Scaffold(
       backgroundColor: kColorBlack,
       extendBody: true,
@@ -119,8 +123,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   background: Padding(
                     padding:
                         const EdgeInsets.only(top: 70, left: 15, right: 15),
-                    child: buildRoomHeader(
-                        widget.arguments.room, fixtureReference, roomReference),
+                    child: buildRoomHeader(widget.arguments.room,
+                        fixtureReference, roomReference, _currentUser),
                   ),
                 ),
                 bottom: TabBar(
@@ -404,7 +408,7 @@ Container buildTeamIcon(String url, {size = 30.0}) {
 }
 
 Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
-    DatabaseReference roomReference) {
+    DatabaseReference roomReference, AuthUser user) {
   return Column(
     children: [
       Container(
@@ -464,7 +468,8 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                     TextButton(
                       onPressed: () {
                         //TODO : Add option for sharing room link
-                        Share.share(room.dynamicLink);
+                        Share.share(
+                            '${user.name} is inviting you to virtually watch together ${room.fixture.teams.home.name} Vs ${room.fixture.teams.away.name} match on Match Cafe app.\nJoin Here : ${room.dynamicLink}');
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: kMuteButtonBgColor,
