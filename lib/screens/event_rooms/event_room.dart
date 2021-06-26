@@ -275,7 +275,7 @@ class _EventRoomsState extends State<EventRooms> {
         ),
         CustomText(
           text:
-              '${widget.arguments.fixture.venue.name},${widget.arguments.fixture.venue.city}',
+              "${widget.arguments.fixture.venue.name ?? ''} - ${widget.arguments.fixture.venue.city ?? ''}",
           fontSize: 12,
         ),
         SizedBox(height: 40),
@@ -313,7 +313,7 @@ class _EventRoomsState extends State<EventRooms> {
                           listners: userDetails.length,
                           participants: userDetails.values.toList(),
                           hostedBy: rooms[index].createdBy.name ?? '',
-                          type: 'private',
+                          type: rooms[index].type,
                         ),
                         onTap: () => Navigator.pushNamed(
                             context, RoomScreen.pageId,
