@@ -464,12 +464,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                     TextButton(
                       onPressed: () {
                         //TODO : Add option for sharing room link
-                        if (room.dynamicLink != null && room.dynamicLink != '')
-                          Share.share(room.dynamicLink);
-                        else {
-                          // final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
-                          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
+                        Share.share(room.dynamicLink);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: kMuteButtonBgColor,
