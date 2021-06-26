@@ -25,16 +25,15 @@ class TournamentScreenArguments {
   final String banner;
 
   TournamentScreenArguments(
-      {
-        this.banner,
-        this.tournamentId,
-       this.tournamentName,
-       this.startDate,
-       this.endDate});
+      {this.banner,
+      this.tournamentId,
+      this.tournamentName,
+      this.startDate,
+      this.endDate});
 }
 
 class TournamentScreen extends StatefulWidget {
-  TournamentScreen({Key key,  this.arguments}) : super(key: key);
+  TournamentScreen({Key key, this.arguments}) : super(key: key);
   static String pageId = 'TournamentScreen';
   final TournamentScreenArguments arguments;
 
@@ -43,9 +42,10 @@ class TournamentScreen extends StatefulWidget {
 }
 
 class _TournamentScreenState extends State<TournamentScreen> {
-   FixtureBloc fixtureBloc;
-   StandingsBloc standingsBloc;
+  FixtureBloc fixtureBloc;
+  StandingsBloc standingsBloc;
   final RestClient client = RestClient.create();
+
   //  TournamentStandings _tournamentStandings;
 
   Future<TournamentStandings> fetchStandings() async {
@@ -245,13 +245,23 @@ class _TournamentScreenState extends State<TournamentScreen> {
       groupBy: (fixture) {
         var dateTime = DateTime.parse(fixture.date).toLocal();
         var date = new DateTime(dateTime.year, dateTime.month, dateTime.day);
-        return date.toIso8601String();
+        return "${date.toIso8601String()}__${fixture.round}";
       },
       groupSeparatorBuilder: (String value) => Padding(
         padding: const EdgeInsets.fromLTRB(12, 18, 10, 10),
-        child: Text(
-          formatter.format(DateTime.parse(value)),
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (value.split("__")[1] != "null")
+              Text(
+                value.split("__")[1],
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            Text(
+              formatter.format(DateTime.parse(value.split("__")[0])),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
       itemBuilder: (context, fixture) {

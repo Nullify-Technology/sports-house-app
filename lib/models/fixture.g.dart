@@ -13,6 +13,7 @@ Fixture _$FixtureFromJson(Map<String, dynamic> json) {
     json['date'] as String,
     Teams.fromJson(json['teams'] as Map<String, dynamic>),
     json['externalId'] as int,
+    json['round'] == null ? "Group" : json['round'] as String,
     json['score'] == null
         ? null
         : MatchDetails.fromJson(json['score'] as Map<String, dynamic>),
