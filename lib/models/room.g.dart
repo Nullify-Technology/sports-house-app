@@ -18,6 +18,9 @@ Room _$RoomFromJson(Map<String, dynamic> json) {
         .map((e) => AuthUser.fromJson(e as Map<String, dynamic>))
         .toList(),
     json['created_by_id'] as String,
+    json['dynamicLink'] as String,
+    json['type'] as String,
+    json['is_closed'] as bool,
   );
 }
 
@@ -30,4 +33,7 @@ Map<String, dynamic> _$RoomToJson(Room instance) => <String, dynamic>{
       'name': instance.name,
       'members': instance.members,
       'created_by_id': instance.createdById,
+      'dynamicLink': instance.dynamicLink,
+      'type': instance.type,
+      'is_closed': instance.isClosed,
     };

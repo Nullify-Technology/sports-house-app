@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 Widget buildTimerWidget(Map<String, dynamic> status, {double fontSize = 10.0}) {
   bool isStatus = status['short'] != null &&

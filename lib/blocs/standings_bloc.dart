@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/tournament_standings.dart';
-import 'package:sports_house/network/rest_client.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/tournament_standings.dart';
+import 'package:match_cafe/network/rest_client.dart';
 
 class StandingsBloc {
   final RestClient client;

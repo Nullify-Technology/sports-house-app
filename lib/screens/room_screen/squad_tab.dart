@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/lineup.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/lineup.dart';
 import 'package:sports_house/models/player.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/team.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/error_components.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/team.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/error_components.dart';
 
 Widget buildMatchXI(Fixture fixture, BuildContext context) {
   if (fixture.teams.home.lineups != null &&

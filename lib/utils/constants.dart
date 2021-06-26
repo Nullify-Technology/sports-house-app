@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/SportsEvent.dart';
-import 'package:sports_house/utils/Room.dart';
+import 'package:match_cafe/utils/SportsEvent.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);
@@ -96,23 +95,6 @@ SportsEvent kDummyEvent = new SportsEvent(
   team2Url:
       'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
 );
-DesignRoom kDummyRoom = new DesignRoom(
-  eventName: 'MUN Vs BAR',
-  score: '2 - 1',
-  talkingCount: '2k',
-  team1Url:
-      'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
-  team2Url:
-      'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
-  roomName: 'MUN Fans Club - Kozhikode',
-  hostedBy: 'Aswin Divakar',
-  listners: '2k',
-  participants: [
-    kDummyProfileImageUrl,
-    kDummyProfileImageUrl,
-    kDummyProfileImageUrl,
-  ],
-);
 
 const List<String> kDummyParticipants = [
   kDummyProfileImageUrl,
@@ -130,13 +112,7 @@ List<SportsEvent> eventList = [
   kDummyEvent,
   kDummyEvent
 ];
-List<DesignRoom> roomList = [
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom
-];
+
 
 const String kPermissionText =
     "Inorder to join a room, you must allow $kAppName to access your microphone!";
@@ -188,3 +164,5 @@ const String kNoMatchesAvailable =
     "No matches are available for creating room!";
 const String kPrivateRoomsUnavailable =
     "Private rooms are unavailable right now!";
+const String kShareMessage =
+    "Hi,\nWe are talking about #GAME in this Match Cafe room, you can join our chat by clicking the following link.";

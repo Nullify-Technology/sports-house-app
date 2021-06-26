@@ -1,19 +1,19 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_house/blocs/fixtures_bloc.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/provider/user_provider.dart';
-import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
-import 'package:sports_house/utils/reusable_components/drop_down_list.dart';
+import 'package:match_cafe/blocs/fixtures_bloc.dart';
+import 'package:match_cafe/blocs/rooms_bloc.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/provider/user_provider.dart';
+import 'package:match_cafe/screens/room_screen/room_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:match_cafe/utils/reusable_components/drop_down_list.dart';
 import 'package:intl/intl.dart';
 
 class CreateRoom extends StatefulWidget {
@@ -42,10 +42,9 @@ class _CreateRoomState extends State<CreateRoom> {
       _isLoading = true;
     });
     if (_formKey.currentState.validate()) {
-      if (selectedFixture.key != 'no_matches' &&
-          selectedType.key != 'private') {
-        AgoraRoom room = await roomsBloc.createRoom(
-            selectedFixture.key, "0", roomNameController.text);
+      if (selectedFixture.key != 'no_matches') {
+        AgoraRoom room = await roomsBloc.createRoom(selectedFixture.key,
+            roomNameController.text, selectedType.key);
         Navigator.popAndPushNamed(context, RoomScreen.pageId,
             arguments: RoomScreenArguments(room.room));
       } else {

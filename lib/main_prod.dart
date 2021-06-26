@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/utils/constants.dart';
 import 'config/app_config.dart';
 import 'main.dart';
 

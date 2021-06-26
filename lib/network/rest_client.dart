@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/api_response.dart';
-import 'package:sports_house/models/auth.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/tournament.dart';
-import 'package:sports_house/models/tournament_standings.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/api_response.dart';
+import 'package:match_cafe/models/auth.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/tournament.dart';
+import 'package:match_cafe/models/tournament_standings.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 import 'interceptors/logging_interceptor.dart';
 
@@ -50,7 +50,7 @@ abstract class RestClient {
   @POST("/room")
   @FormUrlEncoded()
   Future<AgoraRoom> createRoom(@Field("fixture_id") String fixtureId,
-      @Field("user_id") String userId, @Field("name") String name);
+       @Field("name") String name,@Field("type") String type);
 
   @POST("/room/{roomId}/join")
   Future<AgoraRoom> joinRoom(@Path() String roomId);
