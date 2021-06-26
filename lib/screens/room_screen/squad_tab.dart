@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_house/models/fixture.dart';
 import 'package:sports_house/models/lineup.dart';
+import 'package:sports_house/models/player.dart';
 import 'package:sports_house/models/room.dart';
 import 'package:sports_house/models/team.dart';
 import 'package:sports_house/utils/constants.dart';
@@ -17,26 +18,39 @@ Widget buildMatchXI(Fixture fixture, BuildContext context) {
         padding: const EdgeInsets.only(
           top: 30,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTeamTitle(fixture.teams.home),
-            SizedBox(
-              height: 20,
-            ),
-            buildStartingXI(fixture, 'home'),
-            SizedBox(
-              height: 40,
-            ),
-            buildTeamTitle(fixture.teams.away),
-            SizedBox(
-              height: 20,
-            ),
-            buildStartingXI(fixture, 'away'),
-            SizedBox(
-              height: 90,
-            ),
-          ],
+        child: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildTeamTitle(fixture.teams.home),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                height: 720,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage(kFootballPitchBackground),
+                        fit: BoxFit.cover)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    buildStartingXI(context, fixture, 'home'),
+                    buildStartingXI(context, fixture, 'away')
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              buildTeamTitle(fixture.teams.away),
+              SizedBox(
+                height: 90,
+              ),
+              buildSubstitutesHomeAndAway(fixture, context)
+            ],
+          ),
         ),
       ),
     );
@@ -48,84 +62,115 @@ Widget buildMatchXI(Fixture fixture, BuildContext context) {
     );
 }
 
-Widget buildStartingXI(Fixture fixture, String team) {
-  return Padding(
-    padding: const EdgeInsets.only(
-      left: 15,
-    ),
-    child: ListView.builder(
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: team == 'home'
-          ? fixture.teams.home.lineups.startXI.length
-          : fixture.teams.away.lineups.startXI.length,
-      itemBuilder: (context, i) {
-        Lineup lineup = team == 'home'
-            ? fixture.teams.home.lineups
-            : fixture.teams.away.lineups;
-        return ListTile(
-          title: Text(
-            '${lineup.startXI[i].name} ( ${lineup.startXI[i].number} )',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          leading: Container(
-            height: 40,
-            width: 40,
-            // padding: EdgeInsets.all(15),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: kDropdownBgColor,
-            ),
-            child: fixture.players != null &&
-                    fixture.players[lineup.startXI[i].id.toString()] != null
-                ? CircleAvatar(
-                    foregroundImage: CachedNetworkImageProvider(fixture
-                            .players[lineup.startXI[i].id.toString()].photo ??
-                        kDummyProfileImageUrl),
-                  )
-                : null,
-          ),
-        );
-      },
+Widget buildStartingXI(BuildContext context, Fixture fixture, String team) {
+  var lineUp = team == "home"
+      ? fixture.teams.home.lineups.startXI
+      : fixture.teams.away.lineups.startXI;
+  var numbering = [1, 2, 3, 4, 5, 6];
+
+  var lines = new Map<int, List<Player>>();
+  numbering.forEach((element) {
+    var elements = lineUp
+        .where((player) => int.parse(player.grid.split(":")[0]) == element)
+        .toList(growable: false);
+    if (elements.length > 0) {
+      lines[element] = elements;
+    }
+  });
+
+  List<Widget> rows = [
+    SizedBox(
+      height: 30,
+    )
+  ];
+
+  rows.addAll(lines.values.map((listOfPlayers) => Container(
+        width: MediaQuery.of(context).size.width,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: listOfPlayers
+              .map((player) => Column(
+                    children: [
+                      CircleAvatar(
+                        foregroundImage: CachedNetworkImageProvider(
+                            fixture.players[player.id.toString()].photo ??
+                                kDummyProfileImageUrl),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(6, 3, 6, 3),
+                        width: MediaQuery.of(context).size.width / 5,
+                        decoration: BoxDecoration(
+                            color: kCardBgColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: Text(
+                          player.name,
+                          softWrap: false,
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.fade,
+                          style: TextStyle(fontSize: 10, color: kColorGreen),
+                        ),
+                      ),
+                    ],
+                  ))
+              .toList(growable: false),
+        ),
+      )));
+
+  return Container(
+    height: 320,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: team == "home" ? rows : rows.reversed.toList(growable: false),
     ),
   );
 }
 
 Row buildTeamTitle(Team team) {
   return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      SizedBox(
-        width: 20,
+      Row(
+        children: [
+          SizedBox(
+            width: 20,
+          ),
+          CachedNetworkImage(
+            width: 40,
+            imageUrl: team.logoUrl,
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Text(
+            team.name,
+            style: TextStyle(
+              // color: kColorGreen,
+              fontSize: kHeadingFontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
-      CachedNetworkImage(
-        width: 40,
-        imageUrl: team.logoUrl,
-      ),
-      SizedBox(
-        width: 15,
-      ),
-      Text(
-        team.name,
-        style: TextStyle(
-          // color: kColorGreen,
-          fontSize: kHeadingFontSize,
-          fontWeight: FontWeight.bold,
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+        child: Text(
+          team.lineups.formation,
+          style: TextStyle(
+            fontSize: kHeadingFontSize,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
+      )
     ],
   );
 }
 
 //Substitutes
 
-Widget buildSubstitutesHomeAndAway(Room room, BuildContext context) {
-  if (room.fixture.teams.home.lineups.substitutes != null &&
-      room.fixture.teams.home.lineups.substitutes != null) {
+Widget buildSubstitutesHomeAndAway(Fixture fixture, BuildContext context) {
+  if (fixture.teams.home.lineups.substitutes != null &&
+      fixture.teams.home.lineups.substitutes != null) {
     return SingleChildScrollView(
       child: Card(
         color: kCardBgColor,
@@ -150,16 +195,8 @@ Widget buildSubstitutesHomeAndAway(Room room, BuildContext context) {
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: buildSubstitutes(room, 'home'),
-                  ),
-                  Expanded(
-                    child: buildSubstitutes(room, 'away'),
-                  ),
-                ],
-              ),
+              buildSubstitutes(fixture, 'home'),
+              buildSubstitutes(fixture, 'away'),
             ],
           ),
         ),
@@ -173,44 +210,77 @@ Widget buildSubstitutesHomeAndAway(Room room, BuildContext context) {
     );
 }
 
-ListView buildSubstitutes(Room room, String team) {
-  return ListView.builder(
+ListView buildSubstitutes(Fixture fixture, String teamStr) {
+  Team team = teamStr == "home" ? fixture.teams.home : fixture.teams.away;
+
+  List<Widget> rows = [];
+  rows.add(Divider());
+  rows.add(ListTile(
+    leading: CircleAvatar(
+      backgroundImage: CachedNetworkImageProvider(team.logoUrl),
+    ),
+    title: Text(
+      team.name,
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: kHeadingFontSize),
+    ),
+  ));
+  rows.add(Divider());
+  // Add Coach
+  rows.add(ListTile(
+    leading: CircleAvatar(
+      backgroundImage: CachedNetworkImageProvider(
+          team.lineups.coach.photo ?? kDummyProfileImageUrl),
+    ),
+    title: Text(team.lineups.coach.name),
+    subtitle: Text(kCoach),
+  ));
+  // Add players
+  rows.addAll(team.lineups.substitutes.map((p) => ListTile(
+        leading: CircleAvatar(
+          backgroundImage: CachedNetworkImageProvider(
+              fixture.players[p.id.toString()].photo ?? kDummyProfileImageUrl),
+        ),
+        title: Text(p.name),
+      )));
+
+  return ListView(
     shrinkWrap: true,
     physics: NeverScrollableScrollPhysics(),
-    itemCount: team == 'home'
-        ? room.fixture.teams.home.lineups.substitutes.length
-        : room.fixture.teams.away.lineups.substitutes.length,
-    itemBuilder: (context, i) {
-      Lineup lineup = team == 'home'
-          ? room.fixture.teams.home.lineups
-          : room.fixture.teams.away.lineups;
-      return ListTile(
-        title: Text(
-          '${lineup.substitutes[i].name}',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        leading: Container(
-          height: 40,
-          width: 40,
-          // padding: EdgeInsets.all(15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: kDropdownBgColor,
-          ),
-          child: Text(
-            '${lineup.substitutes[i].pos}',
-            style: TextStyle(
-              color: kColorGreen,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-        ),
-      );
-    },
+    children: rows,
+    // itemCount: team == 'home'
+    //     ? fixture.teams.home.lineups.substitutes.length
+    //     : fixture.teams.away.lineups.substitutes.length,
+    // itemBuilder: (context, i) {
+    //   Lineup lineup = team == 'home'
+    //       ? fixture.teams.home.lineups
+    //       : fixture.teams.away.lineups;
+    //   return ListTile(
+    //     title: Text(
+    //       '${lineup.substitutes[i].name}',
+    //       style: TextStyle(
+    //         fontWeight: FontWeight.bold,
+    //         fontSize: 16,
+    //       ),
+    //     ),
+    //     leading: Container(
+    //       height: 40,
+    //       width: 40,
+    //       // padding: EdgeInsets.all(15),
+    //       alignment: Alignment.center,
+    //       decoration: BoxDecoration(
+    //         shape: BoxShape.circle,
+    //         color: kDropdownBgColor,
+    //       ),
+    //       child: Text(
+    //         '${lineup.substitutes[i].pos}',
+    //         style: TextStyle(
+    //           color: kColorGreen,
+    //           fontWeight: FontWeight.bold,
+    //           fontSize: 20,
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // },
   );
 }

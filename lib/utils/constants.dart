@@ -80,6 +80,7 @@ const String kAgoraAppId = "6396fd53ea49412ba6fe4d4134f19400";
 
 const String kNoRoomsFound = 'No rooms found!';
 const String kProfilePlaceHolder = 'assets/images/profile_soccer.png';
+const String kFootballPitchBackground = 'assets/images/football_pitch.jpg';
 
 //TODO : Dummy Constants - To be deleted in the end
 const String kDummyProfileImageUrl =
@@ -151,6 +152,7 @@ const String kCropImageTitle = "Crop Profile";
 const String kTimelineNotAvailable = "Timeline not available";
 const String kStartingXI = "Starting XI";
 const String kSubtitutes = "Subtitutes";
+const String kCoach = "Coach";
 const String kNotStarted = "Not Started";
 const String kSquadDetailsUnavailable = "Squad Unavailable!";
 const String kTimeLineUnavailable = "Timeline Unavailable!";
