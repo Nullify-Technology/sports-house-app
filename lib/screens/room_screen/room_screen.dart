@@ -11,6 +11,7 @@ import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
 import 'package:match_cafe/screens/room_screen/squad_tab.dart';
 import 'package:match_cafe/screens/room_screen/timeline_tab.dart';
 import 'package:match_cafe/screens/room_screen/timer_widget.dart';
+import 'package:share/share.dart';
 
 class RoomScreenArguments {
   final Room room;
@@ -37,7 +38,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
       Room currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
       print(
           "current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
-      if (currentRoom == null || currentRoom.id != room.id) {
+      if ((currentRoom == null || currentRoom.id != room.id) &&
+          !room.isClosed) {
         print("inside if");
         await Provider.of<RTCProvider>(context, listen: false)
             .joinRTCRoom(room);
@@ -211,7 +213,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               ),
             ),
             TextButton(
-              onPressed: () => context.read<RTCProvider>().toggleMute(widget.arguments.room.id),
+              onPressed: () => context
+                  .read<RTCProvider>()
+                  .toggleMute(widget.arguments.room.id),
               style: TextButton.styleFrom(
                 backgroundColor: kMuteButtonBgColor,
                 shape: CircleBorder(),
@@ -422,12 +426,26 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            room.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 19,
-                            ),
+                          Row(
+                            children: [
+                              if (room.type == 'private')
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 2, 6, 4),
+                                  child: Icon(
+                                    Icons.lock,
+                                    color: Colors.white54,
+                                    size: 16,
+                                  ),
+                                ),
+                              Text(
+                                room.name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 19,
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(
                             height: 2,
@@ -446,6 +464,12 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                     TextButton(
                       onPressed: () {
                         //TODO : Add option for sharing room link
+                        if (room.dynamicLink != null && room.dynamicLink != '')
+                          Share.share(room.dynamicLink);
+                        else {
+                          // final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
+                          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: kMuteButtonBgColor,

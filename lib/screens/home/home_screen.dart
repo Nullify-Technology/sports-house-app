@@ -66,11 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData dynamicLink) async {
       final Uri deepLink = dynamicLink?.link;
-      print('Deeplink : ' + deepLink.toString());
+      print('Deeplink 1: ' + deepLink.toString());
       if (deepLink != null) {
         List<String> segments = deepLink.pathSegments;
-        print('Deeplink : ' + deepLink.toString());
-        if (segments.length > 2 && segments[segments.length - 2] == 'room')
+        print('Deeplink : ${segments.length} ${segments[segments.length - 2]}');
+        if (segments.length >= 2 && segments[segments.length - 2] == 'room')
           joinRoomWithId(context, segments.last);
       }
     }, onError: (OnLinkErrorException e) async {
@@ -84,8 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (deepLink != null) {
       List<String> segments = deepLink.pathSegments;
-      print('Deeplink : ' + deepLink.toString());
-      if (segments.length > 2 && segments[segments.length - 2] == 'room')
+      print('Deeplink L: ' + deepLink.toString());
+      print(
+          'Deeplink M: ${segments.length} ${segments[segments.length - 2]} ${segments.last}');
+      if (segments.length >= 2 && segments[segments.length - 2] == 'room')
         joinRoomWithId(context, segments.last);
     }
   }

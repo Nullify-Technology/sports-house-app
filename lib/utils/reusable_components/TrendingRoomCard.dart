@@ -5,7 +5,6 @@ import 'package:match_cafe/models/room.dart';
 import 'package:match_cafe/models/user.dart';
 import 'package:match_cafe/screens/event_rooms/event_room.dart';
 import 'package:match_cafe/screens/room_screen/room_screen.dart';
-import 'package:match_cafe/utils/Room.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {
