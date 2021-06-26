@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/screens/profile/profile_screen.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:match_cafe/screens/profile/profile_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/RoundedRectangleButton.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen();

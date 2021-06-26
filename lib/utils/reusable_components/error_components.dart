@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 Column buildSquadDetailsUnavilable({
    BuildContext context,

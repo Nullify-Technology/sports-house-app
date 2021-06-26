@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/screens/event_rooms/event_room.dart';
-import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/utils/Room.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/screens/event_rooms/event_room.dart';
+import 'package:match_cafe/screens/room_screen/room_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {
   const TrendingRoomCard({

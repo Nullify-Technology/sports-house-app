@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/team_standing.dart';
+import 'package:match_cafe/models/team_standing.dart';
 
 part 'standings.g.dart';
 

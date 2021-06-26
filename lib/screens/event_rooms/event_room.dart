@@ -1,26 +1,26 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/helper/life_cycle_event_handler.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/provider/rtc_provider.dart';
-import 'package:sports_house/provider/user_provider.dart';
-import 'package:sports_house/screens/create_room/create_room.dart';
-import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/screens/room_screen/squad_tab.dart';
-import 'package:sports_house/screens/room_screen/timeline_tab.dart';
-import 'package:sports_house/screens/room_screen/timer_widget.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
-import 'package:sports_house/utils/reusable_components/KeepAliveTab.dart';
-import 'package:sports_house/utils/reusable_components/RoomsTile.dart';
+import 'package:match_cafe/blocs/rooms_bloc.dart';
+import 'package:match_cafe/helper/life_cycle_event_handler.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/provider/rtc_provider.dart';
+import 'package:match_cafe/provider/user_provider.dart';
+import 'package:match_cafe/screens/create_room/create_room.dart';
+import 'package:match_cafe/screens/room_screen/room_screen.dart';
+import 'package:match_cafe/screens/room_screen/squad_tab.dart';
+import 'package:match_cafe/screens/room_screen/timeline_tab.dart';
+import 'package:match_cafe/screens/room_screen/timer_widget.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
+import 'package:match_cafe/utils/reusable_components/KeepAliveTab.dart';
+import 'package:match_cafe/utils/reusable_components/RoomsTile.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_house/utils/reusable_components/custom_text.dart';
+import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 
 class EventRoomsArguments {
   final Fixture fixture;
@@ -51,8 +51,7 @@ class _EventRoomsState extends State<EventRooms> {
         .child("fixture_${widget.arguments.fixture.id}");
     roomsBloc = RoomsBloc(client: RestClient.create());
     WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-      resumeCallBack: () => roomsBloc.getRooms(widget.arguments.fixture.id)
-    ));
+        resumeCallBack: () => roomsBloc.getRooms(widget.arguments.fixture.id)));
     roomsBloc.getRooms(widget.arguments.fixture.id);
     super.initState();
   }
@@ -276,7 +275,7 @@ class _EventRoomsState extends State<EventRooms> {
         ),
         CustomText(
           text:
-              '${widget.arguments.fixture.venue.name},${widget.arguments.fixture.venue.city}',
+              "${widget.arguments.fixture.venue.name ?? ''} - ${widget.arguments.fixture.venue.city ?? ''}",
           fontSize: 12,
         ),
         SizedBox(height: 40),
@@ -286,7 +285,6 @@ class _EventRoomsState extends State<EventRooms> {
 
   Widget buildRoomList(List<Room> rooms) {
     if (rooms.length > 0)
-
       return Padding(
         padding: const EdgeInsets.all(8),
         child: ListView.builder(
@@ -295,10 +293,11 @@ class _EventRoomsState extends State<EventRooms> {
           itemCount: rooms.length,
           padding: EdgeInsets.only(bottom: 80),
           itemBuilder: (context, index) {
-            DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
-                .reference()
-                .child(kRTCRoom)
-                .child(rooms[index].id);
+            DatabaseReference roomReference =
+                FirebaseDatabase(databaseURL: kRTDBUrl)
+                    .reference()
+                    .child(kRTCRoom)
+                    .child(rooms[index].id);
 
             return StreamBuilder<Event>(
               stream: roomReference.onValue,
@@ -306,18 +305,21 @@ class _EventRoomsState extends State<EventRooms> {
                 if (snapShot.hasData) {
                   if (snapShot.data.snapshot.value != null) {
                     Map<String, dynamic> userDetails =
-                    new Map<String, dynamic>.from(
-                        snapShot.data.snapshot.value);
+                        new Map<String, dynamic>.from(
+                            snapShot.data.snapshot.value);
                     return GestureDetector(
                         child: RoomsTile(
                           title: rooms[index].name,
                           listners: userDetails.length,
                           participants: userDetails.values.toList(),
                           hostedBy: rooms[index].createdBy.name ?? '',
+                          type: rooms[index].type,
                         ),
-                        onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
-                            arguments: RoomScreenArguments(rooms[index])) //joinRoom(rooms[index]),
-                    );
+                        onTap: () => Navigator.pushNamed(
+                            context, RoomScreen.pageId,
+                            arguments: RoomScreenArguments(
+                                rooms[index])) //joinRoom(rooms[index]),
+                        );
                   }
                 }
                 return GestureDetector(
@@ -328,11 +330,11 @@ class _EventRoomsState extends State<EventRooms> {
                       hostedBy: rooms[index].createdBy.name ?? '',
                     ),
                     onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
-                        arguments: RoomScreenArguments(rooms[index])) //joinRoom(rooms[index]),
-                );
+                        arguments: RoomScreenArguments(
+                            rooms[index])) //joinRoom(rooms[index]),
+                    );
               },
             );
-
           },
         ),
       );

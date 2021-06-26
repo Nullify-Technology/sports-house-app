@@ -1,8 +1,8 @@
 
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/models/room.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/models/room.dart';
 
 part 'agora_room.g.dart';
 

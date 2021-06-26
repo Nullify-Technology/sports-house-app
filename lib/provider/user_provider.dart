@@ -6,10 +6,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sports_house/models/auth.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/auth.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class UserProvider with ChangeNotifier {
   final flutterStorage = FlutterSecureStorage();

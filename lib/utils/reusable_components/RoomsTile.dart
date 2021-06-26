@@ -1,35 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/InRoomBottomBar.dart';
-import 'package:sports_house/utils/reusable_components/custom_text.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
+import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({
     Key key,
-     this.title,
+    this.title,
     this.isVerified = false,
     this.hostedBy = '',
-     this.listners,
-     this.participants,
+    this.listners,
+    this.participants,
+    this.type,
   }) : super(key: key);
   final String title;
   final bool isVerified;
   final String hostedBy;
   final int listners;
   final List<dynamic> participants;
+  final String type;
 
   @override
   Widget build(BuildContext context) {
+    print('type : $type');
     return Container(
-      // decoration: BoxDecoration(
-      //   border: Border(
-      //     bottom: new BorderSide(
-      //       color: kDropdownBgColor,
-      //     ),
-      //   ),
-      // ),
       child: Card(
         color: kCardBgColor,
         child: ListTile(
@@ -38,7 +34,17 @@ class RoomsTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                // crossAxisAlignment: CrossAxisAlignment.baseline,
                 children: [
+                  if (type == 'private')
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 2, 6, 5),
+                      child: Icon(
+                        Icons.lock,
+                        color: Colors.white54,
+                        size: 16,
+                      ),
+                    ),
                   Expanded(
                     child: Text(
                       title,
@@ -48,15 +54,6 @@ class RoomsTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                  if (isVerified)
-                    Icon(
-                      Icons.verified,
-                      color: kColorGreen,
-                      size: 16,
-                    ),
                 ],
               ),
               if (hostedBy != '')
@@ -93,30 +90,30 @@ class RoomsTile extends StatelessWidget {
               ),
             ],
           ),
-          trailing: participants.isNotEmpty ? Container(
-            width: 90,
-            height: 40,
-            child: Stack(
-              alignment: Alignment.centerRight,
-              children: buildProfileStack(members: participants),
-            ),
-          ) :  Container(
-            width: 90,
-            height: 40,
-          ),
+          trailing: participants.isNotEmpty
+              ? Container(
+                  width: 90,
+                  height: 40,
+                  child: Stack(
+                    alignment: Alignment.centerRight,
+                    children: buildProfileStack(members: participants),
+                  ),
+                )
+              : Container(
+                  width: 90,
+                  height: 40,
+                ),
         ),
       ),
     );
   }
 
-  List<Widget> buildProfileStack({ List<dynamic> members}) {
+  List<Widget> buildProfileStack({List<dynamic> members}) {
     List<Widget> profileStack = [];
     for (var member in members) {
-      AuthUser user = AuthUser.fromJson(
-          Map<String, dynamic>.from(member));
+      AuthUser user = AuthUser.fromJson(Map<String, dynamic>.from(member));
       if (profileStack.length == 3) break;
-      if (user.profilePictureUrl != null &&
-          user.profilePictureUrl.isNotEmpty) {
+      if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
             left: profileStack.length * 25.0);
@@ -126,7 +123,7 @@ class RoomsTile extends StatelessWidget {
     return profileStack;
   }
 
-  Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

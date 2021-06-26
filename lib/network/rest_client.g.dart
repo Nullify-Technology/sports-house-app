@@ -160,10 +160,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<AgoraRoom> createRoom(fixtureId, userId, name) async {
+  Future<AgoraRoom> createRoom(fixtureId, name, type) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _data = {'fixture_id': fixtureId, 'user_id': userId, 'name': name};
+    final _data = {'fixture_id': fixtureId, 'name': name};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<AgoraRoom>(Options(
                 method: 'POST',

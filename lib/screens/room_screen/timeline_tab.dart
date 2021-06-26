@@ -2,10 +2,10 @@
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/utils/classes/event_classes.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/error_components.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/utils/classes/event_classes.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/error_components.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 StreamBuilder<Event> buildMatchTimeline(

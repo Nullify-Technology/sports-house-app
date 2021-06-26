@@ -1,11 +1,11 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/blocs/rooms_bloc.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class AgoraProvider with ChangeNotifier {
   RtcEngine _engine;
