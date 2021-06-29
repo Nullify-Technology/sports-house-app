@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:match_cafe/models/fixture.dart';
 import 'package:match_cafe/screens/event_rooms/event_room.dart';
+import 'package:match_cafe/screens/room_screen/timer_widget.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 class FixtureCard extends StatelessWidget {
@@ -85,7 +86,7 @@ class FixtureCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      '${fixture.venue.name}, ${fixture.venue.city}',
+                      '${fixture.venue.name} - ${fixture.venue.city}',
                       style: TextStyle(fontSize: 11),
                     ),
                   ],
@@ -181,7 +182,7 @@ class FixtureCard extends StatelessWidget {
     );
   }
 
-  static Widget buildTimerWidget(Map<String, dynamic> status) {
+  static Widget buildTimerWidgetOld(Map<String, dynamic> status) {
     var short = status['short'];
     var elapsed = status['elapsed'];
     return Container(
