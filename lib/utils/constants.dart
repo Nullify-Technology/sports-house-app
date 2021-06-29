@@ -46,7 +46,7 @@ const String kInvalidPhoneNumber = "Invalid Phone Number";
 const String kOtpFailed = "Failed to send OTP! Try again later";
 const String kInvalidOtp = "Invalid OTP";
 
-const String kTrending = 'Trending';
+const String kTrending = 'Recommended';
 const String kPeopleTalkingText = 'people are talking about this';
 
 const String kCreate = 'Create';
@@ -111,7 +111,6 @@ List<SportsEvent> eventList = [
   kDummyEvent,
   kDummyEvent
 ];
-
 
 const String kPermissionText =
     "Inorder to join a room, you must allow $kAppName to access your microphone!";

@@ -67,41 +67,36 @@ class TrendingRoomCard extends StatelessWidget {
                 SizedBox(
                   height: 2,
                 ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.hearing,
-                      size: 18,
-                      color: Colors.white54,
-                    ),
-                    SizedBox(
-                      width: 4,
-                    ),
-                    StreamBuilder<Event>(
-                      stream: roomReference.onValue,
-                      builder: (context, snapShot) {
-                        if (snapShot.hasData) {
-                          if (snapShot.data.snapshot.value != null) {
-                            Map<String, dynamic> userDetails =
-                                new Map<String, dynamic>.from(
-                                    snapShot.data.snapshot.value);
-                            return Text(
+                StreamBuilder<Event>(
+                  stream: roomReference.onValue,
+                  builder: (context, snapShot) {
+                    if (snapShot.hasData) {
+                      if (snapShot.data.snapshot.value != null) {
+                        Map<String, dynamic> userDetails =
+                            new Map<String, dynamic>.from(
+                                snapShot.data.snapshot.value);
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.hearing,
+                              size: 18,
+                              color: Colors.white54,
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Text(
                               '${userDetails.length} $kListeners',
                               style: TextStyle(
                                 color: Colors.white54,
                               ),
-                            );
-                          }
-                        }
-                        return Text(
-                          '0 $kListeners',
-                          style: TextStyle(
-                            color: Colors.white54,
-                          ),
+                            ),
+                          ],
                         );
-                      },
-                    ),
-                  ],
+                      }
+                    }
+                    return Container();
+                  },
                 ),
               ],
             ),
