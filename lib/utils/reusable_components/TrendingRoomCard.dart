@@ -10,7 +10,7 @@ import 'package:match_cafe/utils/constants.dart';
 class TrendingRoomCard extends StatelessWidget {
   const TrendingRoomCard({
     Key key,
-     this.room,
+    this.room,
   }) : super(key: key);
   final Room room;
 
@@ -147,12 +147,11 @@ class TrendingRoomCard extends StatelessWidget {
     );
   }
 
-  List<Widget> buildProfileStack({ List<AuthUser> members}) {
+  List<Widget> buildProfileStack({List<AuthUser> members}) {
     List<Widget> profileStack = [];
     for (AuthUser user in members) {
       if (profileStack.length == 3) break;
-      if (user.profilePictureUrl != null &&
-          user.profilePictureUrl.isNotEmpty) {
+      if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
             left: profileStack.length * 25.0);
@@ -162,7 +161,7 @@ class TrendingRoomCard extends StatelessWidget {
     return profileStack;
   }
 
-  Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

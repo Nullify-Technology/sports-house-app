@@ -44,6 +44,7 @@ class RoomsBloc {
 
   Future<AgoraRoom> createRoom(fixtureId, name, type) async {
     try {
+      print('Test : createRoom : $type');
       AgoraRoom response = await client.createRoom(fixtureId, name, type);
       return response;
     } catch (e) {

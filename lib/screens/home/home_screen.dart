@@ -94,9 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future joinRoom(Room room) async {
     try {
-      AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id);
+      // AgoraRoom agoraRoom = await roomsBloc.joinRoom(room.id);
       Navigator.pushNamed(context, RoomScreen.pageId,
-          arguments: RoomScreenArguments(agoraRoom.room));
+          arguments: RoomScreenArguments(room));
     } catch (e) {
       print("failed to join room");
     }
