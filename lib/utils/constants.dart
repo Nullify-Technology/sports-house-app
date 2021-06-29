@@ -51,7 +51,7 @@ const String kPeopleTalkingText = 'people are talking about this';
 
 const String kCreate = 'Create';
 const String kUpcomingEvents = "Upcoming Events";
-const double kHeadingFontSize = 23;
+const double kHeadingFontSize = 18;
 
 const String kRoomName = "Room Name";
 const String kEnterRoomName = "Enter Room Name";

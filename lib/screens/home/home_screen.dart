@@ -162,6 +162,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: kCardBgColor,
       resizeToAvoidBottomInset: true,
+      floatingActionButton: !context.watch<RTCProvider>().joined
+          ? FloatingActionButton(
+              child: Icon(Icons.add),
+              backgroundColor: kColorGreen,
+              onPressed: () {
+                Navigator.pushNamed(context, CreateRoom.pageId);
+              },
+            )
+          : null,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
@@ -169,52 +178,63 @@ class _HomeScreenState extends State<HomeScreen> {
             snap: false,
             floating: false,
             expandedHeight: 390.0,
+            toolbarHeight: 60,
             backgroundColor: kHomeAppBarBgColor,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Image.asset(
-                //   'assets/images/logo.png',
-                //   width: 30,
-                //   height: 30,
-                // ),
-                CustomText(
-                  text: kAppName,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
                 Row(
                   children: [
-                    OutlinedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, CreateRoom.pageId);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            kCreate,
-                            style: TextStyle(
-                              fontSize: 17,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                        ],
-                      ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 30,
+                      height: 30,
                     ),
                     SizedBox(
                       width: 10,
                     ),
+                    CustomText(
+                      text: kAppName,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    // OutlinedButton(
+                    //   onPressed: () {
+                    //     Navigator.pushNamed(context, CreateRoom.pageId);
+                    //   },
+                    //   style: OutlinedButton.styleFrom(
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.all(Radius.circular(50)),
+                    //     ),
+                    //   ),
+                    //   child: Row(
+                    //     children: [
+                    //       Icon(Icons.add),
+                    //       SizedBox(
+                    //         width: 5,
+                    //       ),
+                    //       Text(
+                    //         kCreate,
+                    //         style: TextStyle(
+                    //           fontSize: 17,
+                    //         ),
+                    //       ),
+                    //       SizedBox(
+                    //         width: 10,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   width: 10,
+                    // ),
                     TextButton(
                       child: CircleAvatar(
                         radius: 20,
@@ -244,25 +264,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 30,
-                        ),
-                        Icon(
-                          Icons.recommend,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          kTrending,
-                          style: TextStyle(
-                            fontSize: kHeadingFontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    buildIconTitle(
+                      icon: Icons.recommend,
+                      title: kTrending,
+                      padding: EdgeInsets.only(left: 30),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
@@ -385,6 +390,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Row buildSectionHeading({IconData icon, String heading}) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 30,
+        ),
+        Icon(
+          icon,
+          size: kHeadingFontSize + 3,
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Text(
+          heading,
+          style: TextStyle(
+            fontSize: kHeadingFontSize,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildFixtureList(List<Fixture> fixtures) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -488,26 +517,31 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Row buildIconTitle({
+  Widget buildIconTitle({
     IconData icon,
     String title,
+    EdgeInsets padding = const EdgeInsets.all(0),
   }) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: kHeadingFontSize,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: padding,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: kHeadingFontSize + 3,
           ),
-        ),
-      ],
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: kHeadingFontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
