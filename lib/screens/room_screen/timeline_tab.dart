@@ -136,7 +136,7 @@ Container buildEventCard(MatchEvent event, Position position) {
   ));
 }
 
-Padding buildEventTypeIcon(IconData icon, Color color) {
+Padding buildEventTypeIcon(IconData icon, Color color,{double iconSize = 24.0}) {
   return Padding(
     padding: const EdgeInsets.only(
       right: 3,
@@ -145,6 +145,7 @@ Padding buildEventTypeIcon(IconData icon, Color color) {
         ? Icon(
             icon,
             color: color,
+            size: iconSize,
           )
         : Container(
             width: 12,

@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:match_cafe/provider/user_provider.dart';
+import 'package:match_cafe/utils/classes/event_classes.dart';
+import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/models/room.dart';
 import 'package:match_cafe/models/user.dart';
@@ -109,7 +111,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 260.0,
+                expandedHeight: 310.0,
                 floating: false,
                 backgroundColor: kHomeAppBarBgColor,
                 pinned: true,
@@ -637,6 +639,32 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                     buildTeamIcon(room.fixture.teams.away.logoUrl),
                   ],
                 ),
+                SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    StreamBuilder<Event>(
+                      stream: fixtureReference.child("events").onValue,
+                      builder: (context, snapShot) {
+                        if (snapShot.hasData) {
+                          if (snapShot.data.snapshot.value != null) {
+                            var events = snapShot.data.snapshot.value;
+                            List<dynamic> matchEvents = events
+                                .map((event) => MatchEvent.fromDb(event))
+                                .toList() as List<dynamic>;
+                            MatchEvent event = matchEvents.last;
+                            return buildTimelineEvent(event);
+                          }
+                        }
+                        return Container(
+                          child: Text(''),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ],
@@ -644,4 +672,91 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
       ),
     ],
   );
+}
+
+buildTimelineEvent(MatchEvent event) {
+  IconData icon = Icons.sports;
+  Color color = kColorGreen;
+
+  switch (event.type) {
+    case 'Goal':
+      // color = Colors.white;
+      icon = Icons.sports_soccer;
+      break;
+    case 'subst':
+      icon = Icons.change_circle_outlined;
+      color = Colors.white54;
+      break;
+    case 'Card':
+      icon = Icons.crop_portrait;
+      if (event.detail == 'Yellow Card')
+        color = Colors.yellowAccent;
+      else if (event.detail == 'Red Card') color = Colors.redAccent;
+      break;
+  }
+  return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 7,
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: 14,
+      ),
+      decoration: new BoxDecoration(
+        color: kCardBgColor,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.all(Radius.circular(40.0)),
+      ),
+      child: Row(
+        children: [
+          // Icon( == 'Goal'?),
+          Container(
+//            decoration: BoxDecoration(
+//              shape: BoxShape.circle,
+//              color: kCardBgColor,
+//            ),
+//            padding: EdgeInsets.all(10),
+            child: CustomText(
+              text: '${event.time.elapsed}\'',
+              fontWeight: FontWeight.bold,
+              color: kColorGreen,
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Text(event.detail),
+              Text(
+                '${event.player.name}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              if (event.type != 'Card' &&
+                  event.assist.id != -1 &&
+                  event.assist.name != '')
+                Text(
+                  event.type == 'subst'
+                      ? '( Sub: ${event.assist.name} )'
+                      : '( Assist: ${event.assist.name} )',
+                )
+              else if (event.type == 'Card')
+                Text(
+                  '( For: ${event.comments} )',
+                ),
+            ],
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          buildEventTypeIcon(icon, color,iconSize: 18),
+        ],
+      ));
 }
