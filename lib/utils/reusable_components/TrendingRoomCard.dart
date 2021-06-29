@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:match_cafe/models/agora_room.dart';
 import 'package:match_cafe/models/room.dart';
@@ -16,6 +17,11 @@ class TrendingRoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+        .reference()
+        .child(kRTCRoom)
+        .child(room.id);
+
     return Card(
       color: kTrendingCardBgColor,
       elevation: 5,
@@ -71,12 +77,30 @@ class TrendingRoomCard extends StatelessWidget {
                     SizedBox(
                       width: 4,
                     ),
-                    Text(
-                      '${room.count} $kListeners',
-                      style: TextStyle(
-                        color: Colors.white54,
-                      ),
-                    )
+                    StreamBuilder<Event>(
+                      stream: roomReference.onValue,
+                      builder: (context, snapShot) {
+                        if (snapShot.hasData) {
+                          if (snapShot.data.snapshot.value != null) {
+                            Map<String, dynamic> userDetails =
+                                new Map<String, dynamic>.from(
+                                    snapShot.data.snapshot.value);
+                            return Text(
+                              '${userDetails.length} $kListeners',
+                              style: TextStyle(
+                                color: Colors.white54,
+                              ),
+                            );
+                          }
+                        }
+                        return Text(
+                          '0 $kListeners',
+                          style: TextStyle(
+                            color: Colors.white54,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ],
