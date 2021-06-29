@@ -250,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 30,
                         ),
                         Icon(
-                          Icons.whatshot,
+                          Icons.recommend,
                         ),
                         SizedBox(
                           width: 10,
