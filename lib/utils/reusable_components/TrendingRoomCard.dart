@@ -35,6 +35,15 @@ class TrendingRoomCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    if (room.type == 'private')
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 2, 6, 5),
+                        child: Icon(
+                          Icons.lock,
+                          color: Colors.white54,
+                          size: 16,
+                        ),
+                      ),
                     Expanded(
                       child: Text(
                         room.name,
@@ -47,12 +56,6 @@ class TrendingRoomCard extends StatelessWidget {
                     SizedBox(
                       width: 6,
                     ),
-                    if (false)
-                      Icon(
-                        Icons.verified,
-                        color: kColorGreen,
-                        size: 18,
-                      ),
                   ],
                 ),
                 SizedBox(
