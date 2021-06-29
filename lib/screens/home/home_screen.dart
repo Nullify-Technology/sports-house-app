@@ -166,11 +166,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ? FloatingActionButton(
               child: Icon(Icons.add),
               backgroundColor: kColorGreen,
+              foregroundColor: kColorBlack,
               onPressed: () {
                 Navigator.pushNamed(context, CreateRoom.pageId);
               },
             )
           : null,
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
