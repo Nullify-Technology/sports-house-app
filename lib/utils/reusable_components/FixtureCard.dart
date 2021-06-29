@@ -13,12 +13,12 @@ class FixtureCard extends StatelessWidget {
 
   const FixtureCard({
     Key key,
-     this.fixture,
+    this.fixture,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-     DatabaseReference databaseReference =
+    DatabaseReference databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl)
             .reference()
             .child("fixture")
@@ -78,15 +78,18 @@ class FixtureCard extends StatelessWidget {
               SizedBox(
                 height: 2,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    '${fixture.venue.name}, ${fixture.venue.city}',
-                    style: TextStyle(fontSize: 11),
-                  ),
-                ],
-              ),
+              if (fixture.venue != null &&
+                  fixture.venue.name != null &&
+                  fixture.venue.city != null)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${fixture.venue.name}, ${fixture.venue.city}',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
