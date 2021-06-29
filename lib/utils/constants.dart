@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/utils/SportsEvent.dart';
-import 'package:sports_house/utils/Room.dart';
+import 'package:match_cafe/utils/SportsEvent.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);
@@ -22,7 +21,8 @@ const Color kMuteButtonBgColor = Color(0x33000000);
 const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
-const String kAppName = 'Sports House';
+const String kAppName = 'Match Cafe';
+const double kAppVersion = 0.2;
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
 const String kSendOtp = 'Send OTP';
@@ -46,12 +46,12 @@ const String kInvalidPhoneNumber = "Invalid Phone Number";
 const String kOtpFailed = "Failed to send OTP! Try again later";
 const String kInvalidOtp = "Invalid OTP";
 
-const String kTrending = 'Trending';
+const String kTrending = 'Recommended';
 const String kPeopleTalkingText = 'people are talking about this';
 
 const String kCreate = 'Create';
 const String kUpcomingEvents = "Upcoming Events";
-const double kHeadingFontSize = 23;
+const double kHeadingFontSize = 18;
 
 const String kRoomName = "Room Name";
 const String kEnterRoomName = "Enter Room Name";
@@ -67,7 +67,7 @@ const String kProduction = "prod";
 const String kAccessToken = "AccessToken";
 const String kUser = "UserProfile";
 
-const String kListners = 'Listners';
+const String kListeners = 'Listeners';
 const String kHostedBy = 'Hosted By:';
 const String kRooms = 'Rooms';
 
@@ -94,23 +94,6 @@ SportsEvent kDummyEvent = new SportsEvent(
   team2Url:
       'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
 );
-DesignRoom kDummyRoom = new DesignRoom(
-  eventName: 'MUN Vs BAR',
-  score: '2 - 1',
-  talkingCount: '2k',
-  team1Url:
-      'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
-  team2Url:
-      'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
-  roomName: 'MUN Fans Club - Kozhikode',
-  hostedBy: 'Aswin Divakar',
-  listners: '2k',
-  participants: [
-    kDummyProfileImageUrl,
-    kDummyProfileImageUrl,
-    kDummyProfileImageUrl,
-  ],
-);
 
 const List<String> kDummyParticipants = [
   kDummyProfileImageUrl,
@@ -127,13 +110,6 @@ List<SportsEvent> eventList = [
   kDummyEvent,
   kDummyEvent,
   kDummyEvent
-];
-List<DesignRoom> roomList = [
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom,
-  kDummyRoom
 ];
 
 const String kPermissionText =
@@ -164,3 +140,26 @@ enum Position {
   left,
   right,
 }
+
+const String kOffer = "offer";
+const String kAnswer = "answer";
+const String kCandidates = "candidates";
+const String kRTCRoom = "rtc_room";
+const String kMuted = "muted";
+const String kTournaments = "Tournaments";
+const String kFixtures = "Fixtures";
+const String kStandings = "Standings";
+const String kUnavailable = "Unavailable";
+
+const String kRoomNetworkAlert =
+    "Unable to join the room now. Please try again later";
+const String kMediaServer = "media.sports-house.in";
+const String kNewUpdateAvailable = "New update available!";
+const String kClickHereToInstall = "Click here to install";
+const String kWebSiteUrl = "https://matchcafe.app/";
+const String kNoMatchesAvailable =
+    "No matches are available for creating room!";
+const String kPrivateRoomsUnavailable =
+    "Private rooms are unavailable right now!";
+const String kShareMessage =
+    "Hi,\nWe are talking about #GAME in this Match Cafe room, you can join our chat by clicking the following link.";

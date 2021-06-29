@@ -1,22 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/provider/agora_provider.dart';
-import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/provider/rtc_provider.dart';
+import 'package:match_cafe/screens/room_screen/room_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class InRoomBottomBar extends StatelessWidget {
-  const InRoomBottomBar({Key? key, required this.agoraRoom}) : super(key: key);
-  final AgoraRoom agoraRoom;
+  const InRoomBottomBar({Key key,  this.room}) : super(key: key);
+  final Room room;
+
 
   @override
   Widget build(BuildContext context) {
+    DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+        .reference()
+        .child(kRTCRoom)
+        .child(room.id);
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, RoomScreen.pageId,
-            arguments: RoomScreenArguments(agoraRoom));
+            arguments: RoomScreenArguments(room));
       },
       child: Card(
         margin: EdgeInsets.symmetric(
@@ -35,15 +41,29 @@ class InRoomBottomBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Container(
-                // color: Colors.white,
-                // alignment: Alignment.center,
-                width: 100,
-                height: 50,
-                child: Stack(
-                  alignment: Alignment.centerRight,
-                  children: buildProfileStack(members: agoraRoom.room.members),
-                ),
+              StreamBuilder<Event>(
+                stream: roomReference.onValue,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    if (snapShot.data.snapshot.value != null) {
+                      Map<String, dynamic> userDetails =
+                      new Map<String, dynamic>.from(
+                          snapShot.data.snapshot.value);
+                      return Container(
+                        width: 100,
+                        height: 50,
+                        child: Stack(
+                          alignment: Alignment.centerRight,
+                          children: buildProfileStack(members: userDetails.values.toList()),
+                        ),
+                      );
+                    }
+                  }
+                  return Container(
+                    width: 100,
+                    height: 50,
+                  );
+                },
               ),
               Expanded(
                 child: Column(
@@ -51,7 +71,7 @@ class InRoomBottomBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      agoraRoom.room.name,
+                      room.name,
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -59,7 +79,7 @@ class InRoomBottomBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '$kHostedBy ${agoraRoom.room.createdBy.name}',
+                      '$kHostedBy ${room.createdBy.name}',
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -71,7 +91,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<AgoraProvider>().leaveRoom(agoraRoom.room.id);
+                  context.read<RTCProvider>().leaveRoom(room.id);
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
@@ -93,21 +113,24 @@ class InRoomBottomBar extends StatelessWidget {
   }
 }
 
-List<Widget> buildProfileStack({required List<AuthUser> members}) {
+List<Widget> buildProfileStack({List<dynamic> members}) {
+
   List<Widget> profileStack = [];
-  for (AuthUser user in members) {
+  for (var member in members) {
     if (profileStack.length == 3) break;
-    if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
+    AuthUser user = AuthUser.fromJson(
+        Map<String, dynamic>.from(member));
+    if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
       Widget avatar = buildCircleAvatar(
           imageUrl: user.profilePictureUrl ?? '',
-          left: profileStack.length * 25);
+          left: profileStack.length * 25.0);
       profileStack.add(avatar);
     }
   }
   return profileStack;
 }
 
-Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
+Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
   return Positioned(
     left: left,
     child: Container(

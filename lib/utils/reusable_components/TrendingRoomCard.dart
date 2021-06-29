@@ -1,22 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/screens/event_rooms/event_room.dart';
-import 'package:sports_house/screens/room_screen/room_screen.dart';
-import 'package:sports_house/utils/Room.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {
   const TrendingRoomCard({
-    Key? key,
-    required this.room,
+    Key key,
+    this.room,
   }) : super(key: key);
   final Room room;
 
   @override
   Widget build(BuildContext context) {
+    DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
+        .reference()
+        .child(kRTCRoom)
+        .child(room.id);
+
     return Card(
       color: kTrendingCardBgColor,
       elevation: 5,
@@ -36,6 +38,15 @@ class TrendingRoomCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    if (room.type == 'private')
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 2, 6, 5),
+                        child: Icon(
+                          Icons.lock,
+                          color: Colors.white54,
+                          size: 16,
+                        ),
+                      ),
                     Expanded(
                       child: Text(
                         room.name,
@@ -48,12 +59,6 @@ class TrendingRoomCard extends StatelessWidget {
                     SizedBox(
                       width: 6,
                     ),
-                    if (false)
-                      Icon(
-                        Icons.verified,
-                        color: kColorGreen,
-                        size: 18,
-                      ),
                   ],
                 ),
                 SizedBox(
@@ -69,12 +74,30 @@ class TrendingRoomCard extends StatelessWidget {
                     SizedBox(
                       width: 4,
                     ),
-                    Text(
-                      '${room.count} $kListners',
-                      style: TextStyle(
-                        color: Colors.white54,
-                      ),
-                    )
+                    StreamBuilder<Event>(
+                      stream: roomReference.onValue,
+                      builder: (context, snapShot) {
+                        if (snapShot.hasData) {
+                          if (snapShot.data.snapshot.value != null) {
+                            Map<String, dynamic> userDetails =
+                                new Map<String, dynamic>.from(
+                                    snapShot.data.snapshot.value);
+                            return Text(
+                              '${userDetails.length} $kListeners',
+                              style: TextStyle(
+                                color: Colors.white54,
+                              ),
+                            );
+                          }
+                        }
+                        return Text(
+                          '0 $kListeners',
+                          style: TextStyle(
+                            color: Colors.white54,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -148,22 +171,21 @@ class TrendingRoomCard extends StatelessWidget {
     );
   }
 
-  List<Widget> buildProfileStack({required List<AuthUser> members}) {
+  List<Widget> buildProfileStack({List<AuthUser> members}) {
     List<Widget> profileStack = [];
     for (AuthUser user in members) {
       if (profileStack.length == 3) break;
-      if (user.profilePictureUrl != null &&
-          user.profilePictureUrl!.isNotEmpty) {
+      if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
-            left: profileStack.length * 25);
+            left: profileStack.length * 25.0);
         profileStack.add(avatar);
       }
     }
     return profileStack;
   }
 
-  Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

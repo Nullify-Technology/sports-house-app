@@ -1,6 +1,6 @@
-# sports_house
+# match_cafe
 
-Sports House mobile application
+Match Cafe mobile application
 
 ## Getting Started
 

@@ -4,21 +4,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sports_house/models/fixture.dart';
-import 'package:sports_house/screens/event_rooms/event_room.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/models/fixture.dart';
+import 'package:match_cafe/screens/event_rooms/event_room.dart';
+import 'package:match_cafe/screens/room_screen/timer_widget.dart';
+import 'package:match_cafe/utils/constants.dart';
 
-class EventsCard extends StatelessWidget {
+class FixtureCard extends StatelessWidget {
   final Fixture fixture;
 
-  const EventsCard({
-    Key? key,
-    required this.fixture,
+  const FixtureCard({
+    Key key,
+    this.fixture,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    late DatabaseReference databaseReference =
+    DatabaseReference databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl)
             .reference()
             .child("fixture")
@@ -26,9 +27,11 @@ class EventsCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, EventRooms.pageId,
-            arguments: EventRoomsArguments(fixture.id,
-                fixture.teams.home.name + " Vs " + fixture.teams.away.name));
+        Navigator.pushNamed(
+          context,
+          EventRooms.pageId,
+          arguments: EventRoomsArguments(fixture),
+        );
       },
       child: Card(
         elevation: 5,
@@ -59,10 +62,10 @@ class EventsCard extends StatelessWidget {
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data!.snapshot.value != null) {
+                        if (snapShot.data.snapshot.value != null) {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
-                                  snapShot.data!.snapshot.value);
+                                  snapShot.data.snapshot.value);
 
                           return buildTimerWidget(status);
                           // return Center();
@@ -76,15 +79,18 @@ class EventsCard extends StatelessWidget {
               SizedBox(
                 height: 2,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    '${fixture.venue.name}, ${fixture.venue.city}',
-                    style: TextStyle(fontSize: 11),
-                  ),
-                ],
-              ),
+              if (fixture.venue != null &&
+                  fixture.venue.name != null &&
+                  fixture.venue.city != null)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${fixture.venue.name} - ${fixture.venue.city}',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,10 +111,10 @@ class EventsCard extends StatelessWidget {
                             .onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            if (snapShot.data!.snapshot.value != null) {
+                            if (snapShot.data.snapshot.value != null) {
                               Map<String, dynamic> score =
                                   new Map<String, dynamic>.from(
-                                      snapShot.data!.snapshot.value);
+                                      snapShot.data.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(
@@ -176,7 +182,7 @@ class EventsCard extends StatelessWidget {
     );
   }
 
-  static Widget buildTimerWidget(Map<String, dynamic> status) {
+  static Widget buildTimerWidgetOld(Map<String, dynamic> status) {
     var short = status['short'];
     var elapsed = status['elapsed'];
     return Container(

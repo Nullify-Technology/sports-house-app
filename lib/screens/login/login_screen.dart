@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sports_house/screens/profile/profile_screen.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:match_cafe/screens/profile/profile_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/RoundedRectangleButton.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen();
@@ -15,10 +15,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late TabController _controller;
-  late String _verificationId;
+   TabController _controller;
+   String _verificationId;
   final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
   final GlobalKey<FormState> _otpFormKey = GlobalKey();
 
@@ -27,15 +26,17 @@ class _LoginScreenState extends State<LoginScreen>
 
     PhoneVerificationFailed phoneVerificationFailed =
         (FirebaseAuthException authException) {
-          _controller.animateTo(0);
-          final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          print('Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
+      _controller.animateTo(0);
+      final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      print(
+          'Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
     };
 
     PhoneVerificationCompleted phoneVerificationCompleted =
         (PhoneAuthCredential credentials) async {
-      final User user = (await _auth.signInWithCredential(credentials)).user as User;
+      final User user =
+          (await _auth.signInWithCredential(credentials)).user as User;
       print("Successfully signed in UID: ${user.uid}");
       if (user.uid.isNotEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen>
     };
 
     PhoneCodeSent codeSent =
-        (String verificationId, [int? forceResendingToken]) async {
+        (String verificationId, [int forceResendingToken]) async {
       this._verificationId = verificationId;
       _controller.animateTo(2);
     };
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen>
         (String verificationId) {
       this._verificationId = verificationId;
       // _controller.animateTo(0);
-      print( "timeout");
+      print("timeout");
     };
 
     try {
@@ -71,17 +72,16 @@ class _LoginScreenState extends State<LoginScreen>
 
   void verifyOtp(String otp) async {
     _controller.animateTo(1);
-    try{
+    try {
       final AuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: this._verificationId,
-          smsCode: otp
-      );
-      final User user = (await _auth.signInWithCredential(credential)).user as User;
+          verificationId: this._verificationId, smsCode: otp);
+      final User user =
+          (await _auth.signInWithCredential(credential)).user as User;
       print("Successfully signed in UID: ${user.uid}");
       if (user.uid.isNotEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       }
-    } catch(e){
+    } catch (e) {
       final snackBar = SnackBar(content: Text(kInvalidOtp));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       _controller.animateTo(2);
@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen>
                 fillColor: kTextFieldBgColor,
               ),
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -218,10 +218,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_phoneNumberFormKey.currentState!.validate()) {
+                if (!_phoneNumberFormKey.currentState.validate()) {
                   return;
                 }
-                _phoneNumberFormKey.currentState!.save();
+                _phoneNumberFormKey.currentState.save();
               },
             ),
           ],
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               textAlign: TextAlign.center,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -304,10 +304,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_otpFormKey.currentState!.validate()) {
+                if (!_otpFormKey.currentState.validate()) {
                   return;
                 }
-                _otpFormKey.currentState!.save();
+                _otpFormKey.currentState.save();
               },
             ),
           ],

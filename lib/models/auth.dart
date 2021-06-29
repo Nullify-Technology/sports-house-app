@@ -1,17 +1,17 @@
 
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/user.dart';
+import 'package:match_cafe/models/user.dart';
 
 part 'auth.g.dart';
 
 @JsonSerializable()
 class Auth{
   @JsonKey(name: "user")
-  final AuthUser? user;
+  final AuthUser user;
 
   @JsonKey(name: "token")
-  final String? accessToken;
+  final String accessToken;
 
   Auth({this.user, this.accessToken});
 

@@ -1,9 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sports_house/models/coach.dart';
-import 'package:sports_house/models/match_details.dart';
-import 'package:sports_house/models/player.dart';
-import 'package:sports_house/models/teams.dart';
-import 'package:sports_house/models/venue.dart';
+import 'package:match_cafe/models/match_details.dart';
+import 'package:match_cafe/models/teams.dart';
+import 'package:match_cafe/models/venue.dart';
 
 import 'player_data.dart';
 
@@ -21,12 +19,14 @@ class Fixture {
   final Teams teams;
   @JsonKey(name: "externalId")
   final int externalId;
+  @JsonKey(name: "round")
+  final String round;
   @JsonKey(name: "score", includeIfNull: false)
-  final MatchDetails? score;
+  final MatchDetails score;
   @JsonKey(name: "status", includeIfNull: false)
-  final String? status;
+  final String status;
   @JsonKey(name: "players", includeIfNull: false)
-  final Map<String, PlayerData>? players;
+  final Map<String, PlayerData> players;
 
   Fixture(
     this.id,
@@ -34,6 +34,7 @@ class Fixture {
     this.date,
     this.teams,
     this.externalId,
+    this.round,
     this.score,
     this.status,
     this.players,

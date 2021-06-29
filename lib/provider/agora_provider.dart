@@ -1,22 +1,22 @@
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sports_house/blocs/rooms_bloc.dart';
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/utils/constants.dart';
+import 'package:match_cafe/blocs/rooms_bloc.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/utils/constants.dart';
 
 class AgoraProvider with ChangeNotifier {
-  RtcEngine? _engine;
+  RtcEngine _engine;
   List<AuthUser> roomUsers = [];
-  late DatabaseReference _rtDbReference;
-  late RoomsBloc _roomsBloc;
+   DatabaseReference _rtDbReference;
+   RoomsBloc _roomsBloc;
   bool isJoined = false;
-  AuthUser? currentUser;
-  late AgoraRoom room;
+  AuthUser currentUser;
+   AgoraRoom room;
 
-  bool get muted => (currentUser == null || currentUser?.muted == null || currentUser!.muted!);
+  bool get muted => (currentUser == null || currentUser?.muted == null || currentUser.muted);
   AgoraProvider({this.currentUser}) {
     _roomsBloc = RoomsBloc(client: RestClient.create());
     _rtDbReference =
@@ -26,12 +26,12 @@ class AgoraProvider with ChangeNotifier {
   Future joinAgoraRoom(String token, AgoraRoom room) async {
     this.room = room;
     _engine = await RtcEngine.create(kAgoraAppId);
-    currentUser!.muted = true;
+    currentUser.muted = true;
     await _engine?.disableVideo();
     await _engine?.enableAudio();
     await _engine?.setChannelProfile(ChannelProfile.Game);
     await _engine?.setDefaultAudioRoutetoSpeakerphone(true);
-    await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser!.id);
+    await _engine?.registerLocalUserAccount(kAgoraAppId, currentUser.id);
     await _engine?.adjustRecordingSignalVolume(130);
     await _engine?.adjustPlaybackSignalVolume(130);
     addEventHandlers(token, room.room.id);
@@ -43,16 +43,16 @@ class AgoraProvider with ChangeNotifier {
     isJoined = false;
     notifyListeners();
     await _engine?.leaveChannel();
-    await _rtDbReference.child("rooms_$roomId").child(currentUser!.id).remove();
+    await _rtDbReference.child("rooms_$roomId").child(currentUser.id).remove();
     await _roomsBloc.leaveRoom(roomId);
     await _engine?.destroy();
   }
 
   Future toggleMute() async {
-    currentUser!.muted = !(currentUser!.muted!);
+    currentUser.muted = !(currentUser.muted);
     await _rtDbReference
-        .child("rooms_${room.room.id}").child(currentUser!.id).set(currentUser!.toJson());
-    await _engine?.muteLocalAudioStream(currentUser!.muted!);
+        .child("rooms_${room.room.id}").child(currentUser.id).set(currentUser.toJson());
+    await _engine?.muteLocalAudioStream(currentUser.muted);
     notifyListeners();
   }
 
@@ -64,7 +64,7 @@ class AgoraProvider with ChangeNotifier {
       await _engine?.muteLocalAudioStream(true);
       _rtDbReference
           .child("rooms_$channelName")
-          .child(currentUser!.id)
+          .child(currentUser.id)
           .set(currentUser?.toJson());
       isJoined = true;
       notifyListeners();
@@ -92,7 +92,7 @@ class AgoraProvider with ChangeNotifier {
     super.dispose();
     if (isJoined) {
       _roomsBloc.leaveRoom(room.room.id);
-      _rtDbReference.child(currentUser!.id).remove();
+      _rtDbReference.child(currentUser.id).remove();
     }
     _engine?.destroy();
     _roomsBloc.dispose();

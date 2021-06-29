@@ -8,6 +8,51 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:639663034253:android:11ff321572e597edadb7c4",
+        "android_client_info": {
+          "package_name": "app.matchcafe.match_cafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639663034253-1heu56c8gmfma3q5hmlsb4cnlpab8s1m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.matchcafe.match_cafe",
+            "certificate_hash": "eb2de516a80e9e0f492a428d3debdd4e654730f5"
+          }
+        },
+        {
+          "client_id": "639663034253-carb8aqjghifbr81nqa1qrv6f673qld5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.matchcafe.match_cafe",
+            "certificate_hash": "7fe83ecc857eb902a88b90debf679c330e0b7b78"
+          }
+        },
+        {
+          "client_id": "639663034253-qaonmir5d9nkm5s22o8glmukkm0ev0fi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH4H3NPyGTqFaIXiXSKOvTKMjfbhTUa2w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639663034253-qaonmir5d9nkm5s22o8glmukkm0ev0fi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:639663034253:android:5c098ce3f49878ccadb7c4",
         "android_client_info": {
           "package_name": "com.sportshouse.sports_house"

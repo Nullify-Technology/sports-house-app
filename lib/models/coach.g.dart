@@ -8,9 +8,9 @@ part of 'coach.dart';
 
 Coach _$CoachFromJson(Map<String, dynamic> json) {
   return Coach(
-    json['id'] as int?,
-    json['name'] as String?,
-    json['photo'] as String?,
+    json['id'] as int,
+    json['name'] as String,
+    json['photo'] as String,
   );
 }
 

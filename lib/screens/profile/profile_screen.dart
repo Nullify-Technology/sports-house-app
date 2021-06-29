@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sports_house/models/user.dart';
-import 'package:sports_house/network/rest_client.dart';
-import 'package:sports_house/provider/user_provider.dart';
-import 'package:sports_house/screens/home/home_screen.dart';
-import 'package:sports_house/utils/constants.dart';
-import 'package:sports_house/utils/reusable_components/CenterProgressBar.dart';
-import 'package:sports_house/utils/reusable_components/RoundedRectangleButton.dart';
+import 'package:match_cafe/models/user.dart';
+import 'package:match_cafe/network/rest_client.dart';
+import 'package:match_cafe/provider/user_provider.dart';
+import 'package:match_cafe/screens/home/home_screen.dart';
+import 'package:match_cafe/utils/constants.dart';
+import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
+import 'package:match_cafe/utils/reusable_components/RoundedRectangleButton.dart';
 import 'package:provider/provider.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:async';
@@ -23,11 +23,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final GlobalKey<FormState> _profileNameForm = GlobalKey();
-  String profileUrl = "";
-  late AuthUser? currentUser;
+  String profileUrl;
+   AuthUser currentUser;
   final ImagePicker picker = ImagePicker();
-  late AppState state;
-  File? imageFile;
+   AppState state;
+  File imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: currentUser == null
           ? CenterProgressBar()
-          : buildProfileScreen(currentUser!),
+          : buildProfileScreen(currentUser),
     );
   }
 
@@ -123,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fillColor: kTextFieldBgColor,
                     ),
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (value.isEmpty) {
                         return kNameCannotBeEmpty;
                       }
                       return null;
@@ -145,10 +145,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     text: kProfileScreenButtonText,
                     textColor: kColorBlack,
                     onClick: () {
-                      if (!_profileNameForm.currentState!.validate()) {
+                      if (!_profileNameForm.currentState.validate()) {
                         return;
                       }
-                      _profileNameForm.currentState!.save();
+                      _profileNameForm.currentState.save();
                     },
                   ),
                 ],
@@ -174,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> updateProfilePicture(String userId) async {
     try {
       final pickedFile = await picker.getImage(source: ImageSource.gallery);
-      File image = File(pickedFile!.path);
+      File image = File(pickedFile.path);
     } catch (e) {
       print(e);
     }
@@ -193,8 +193,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<Null> _cropImage(AuthUser user) async {
-    File? croppedFile = await ImageCropper.cropImage(
-        sourcePath: imageFile!.path,
+    File croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFile.path,
         maxHeight: 400,
         maxWidth: 400,
         compressQuality: 70,
@@ -230,7 +230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       await context
           .read<UserProvider>()
-          .updateProfilePicture(user.id, imageFile!);
+          .updateProfilePicture(user.id, imageFile);
       _clearImage();
     }
   }

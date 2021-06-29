@@ -1,20 +1,20 @@
 import 'dart:async';
 
-import 'package:sports_house/models/agora_room.dart';
-import 'package:sports_house/models/api_response.dart';
-import 'package:sports_house/models/response.dart';
-import 'package:sports_house/models/room.dart';
-import 'package:sports_house/network/rest_client.dart';
+import 'package:match_cafe/models/agora_room.dart';
+import 'package:match_cafe/models/api_response.dart';
+import 'package:match_cafe/models/response.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/network/rest_client.dart';
 
 class RoomsBloc {
   final RestClient client;
-  late StreamController<Response<List<Room>>> _roomsController;
-  late List<Room> rooms;
+  StreamController<Response<List<Room>>> _roomsController;
+  List<Room> rooms;
   StreamSink<Response<List<Room>>> get roomsSink => _roomsController.sink;
 
   Stream<Response<List<Room>>> get roomsStream => _roomsController.stream;
 
-  RoomsBloc({required this.client}) {
+  RoomsBloc({this.client}) {
     this._roomsController = StreamController<Response<List<Room>>>.broadcast();
   }
 
@@ -42,16 +42,17 @@ class RoomsBloc {
     }
   }
 
-  Future<AgoraRoom?> createRoom(fixtureId, userId, name) async {
+  Future<AgoraRoom> createRoom(fixtureId, name, type) async {
     try {
-      AgoraRoom response = await client.createRoom(fixtureId, "0", name);
+      print('Test : createRoom : $type');
+      AgoraRoom response = await client.createRoom(fixtureId, name, type);
       return response;
     } catch (e) {
       print(e);
     }
   }
 
-  Future<AgoraRoom?> joinRoom(String roomId) async {
+  Future<AgoraRoom> joinRoom(String roomId) async {
     try {
       AgoraRoom response = await client.joinRoom(roomId);
       return response;

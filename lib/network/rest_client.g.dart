@@ -13,7 +13,7 @@ class _RestClient implements RestClient {
 
   final Dio _dio;
 
-  String? baseUrl;
+  String baseUrl;
 
   @override
   Future<Auth> getUser(phone, idToken) async {
@@ -29,7 +29,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/user',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Auth.fromJson(_result.data!);
+    final value = Auth.fromJson(_result.data);
     return value;
   }
 
@@ -49,7 +49,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/user',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Auth.fromJson(_result.data!);
+    final value = Auth.fromJson(_result.data);
     return value;
   }
 
@@ -65,9 +65,61 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Fixture>.fromJson(
-      _result.data!,
+      _result.data,
       (json) => Fixture.fromJson(json as Map<String, dynamic>),
     );
+    return value;
+  }
+
+  @override
+  Future<ApiResponse<Tournament>> getTournaments() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ApiResponse<Tournament>>(
+            Options(method: 'GET', headers: <String, dynamic>{}, extra: _extra)
+                .compose(_dio.options, '/tournament',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = ApiResponse<Tournament>.fromJson(
+      _result.data,
+      (json) => Tournament.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<ApiResponse<Fixture>> getLiveTournamentFixtures(tournamentId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ApiResponse<Fixture>>(Options(
+                method: 'GET', headers: <String, dynamic>{}, extra: _extra)
+            .compose(
+                _dio.options, '/tournament/$tournamentId/fixtures?live=true',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = ApiResponse<Fixture>.fromJson(
+      _result.data,
+      (json) => Fixture.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<TournamentStandings> getStandings(tournamentId) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<TournamentStandings>(
+            Options(method: 'GET', headers: <String, dynamic>{}, extra: _extra)
+                .compose(_dio.options, '/tournament/$tournamentId/standings',
+                    queryParameters: queryParameters, data: _data)
+                .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = TournamentStandings.fromJson(_result.data);
     return value;
   }
 
@@ -83,7 +135,7 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Room>.fromJson(
-      _result.data!,
+      _result.data,
       (json) => Room.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -101,17 +153,17 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Room>.fromJson(
-      _result.data!,
+      _result.data,
       (json) => Room.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }
 
   @override
-  Future<AgoraRoom> createRoom(fixtureId, userId, name) async {
+  Future<AgoraRoom> createRoom(fixtureId, name, type) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _data = {'fixture_id': fixtureId, 'user_id': userId, 'name': name};
+    final _data = {'fixture_id': fixtureId, 'name': name, 'type': type};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<AgoraRoom>(Options(
                 method: 'POST',
@@ -121,7 +173,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/room',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = AgoraRoom.fromJson(_result.data!);
+    final value = AgoraRoom.fromJson(_result.data);
     return value;
   }
 
@@ -136,7 +188,7 @@ class _RestClient implements RestClient {
                 .compose(_dio.options, '/room/$roomId/join',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = AgoraRoom.fromJson(_result.data!);
+    final value = AgoraRoom.fromJson(_result.data);
     return value;
   }
 

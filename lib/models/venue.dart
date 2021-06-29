@@ -7,7 +7,7 @@ part 'venue.g.dart';
 @JsonSerializable()
 class Venue{
   @JsonKey(name: "id" ,includeIfNull: false)
-  final int? id;
+  final int id;
   @JsonKey(name: "name")
   final String name;
   @JsonKey(name: "city")
