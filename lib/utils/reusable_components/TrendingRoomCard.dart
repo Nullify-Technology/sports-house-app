@@ -1,11 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:match_cafe/models/agora_room.dart';
 import 'package:match_cafe/models/room.dart';
 import 'package:match_cafe/models/user.dart';
-import 'package:match_cafe/screens/event_rooms/event_room.dart';
-import 'package:match_cafe/screens/room_screen/room_screen.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {

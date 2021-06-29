@@ -328,6 +328,7 @@ class _EventRoomsState extends State<EventRooms> {
                       listners: 0,
                       participants: [],
                       hostedBy: rooms[index].createdBy.name ?? '',
+                      type: rooms[index].type,
                     ),
                     onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
                         arguments: RoomScreenArguments(
