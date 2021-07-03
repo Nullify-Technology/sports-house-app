@@ -14,6 +14,7 @@ import 'package:match_cafe/screens/room_screen/room_screen.dart';
 import 'package:match_cafe/screens/room_screen/squad_tab.dart';
 import 'package:match_cafe/screens/room_screen/timeline_tab.dart';
 import 'package:match_cafe/screens/room_screen/timer_widget.dart';
+import 'package:match_cafe/utils/classes/event_classes.dart';
 import 'package:match_cafe/utils/constants.dart';
 import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
 import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
@@ -72,7 +73,7 @@ class _EventRoomsState extends State<EventRooms> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 260.0,
+                expandedHeight: 310.0,
                 floating: false,
                 backgroundColor: kHomeAppBarBgColor,
                 pinned: true,
@@ -278,7 +279,35 @@ class _EventRoomsState extends State<EventRooms> {
               "${widget.arguments.fixture.venue.name ?? ''} - ${widget.arguments.fixture.venue.city ?? ''}",
           fontSize: 12,
         ),
-        SizedBox(height: 40),
+        SizedBox(
+          height: 15,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            StreamBuilder<Event>(
+              stream: fixtureReference.child("events").onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data.snapshot.value != null) {
+                    var events = snapShot.data.snapshot.value;
+                    List<dynamic> matchEvents = events
+                        .map((event) => MatchEvent.fromDb(event))
+                        .toList() as List<dynamic>;
+                    MatchEvent event = matchEvents.last;
+                    return buildTimelineEvent(event);
+                  }
+                }
+                return Container(
+                  child: Text(''),
+                );
+              },
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 40,
+        ),
       ],
     );
   }
