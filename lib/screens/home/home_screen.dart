@@ -559,15 +559,18 @@ class _HomeScreenState extends State<HomeScreen> {
       items: rooms.map((room) {
         return Builder(
           builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              child: GestureDetector(
-                child: TrendingRoomCard(
-                  room: room,
+            if (!room.isClosed)
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                child: GestureDetector(
+                  child: TrendingRoomCard(
+                    room: room,
+                  ),
+                  onTap: () => joinRoom(room),
                 ),
-                onTap: () => joinRoom(room),
-              ),
-            );
+              );
+            else
+              return null;
           },
         );
       }).toList(),
