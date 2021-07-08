@@ -15,7 +15,8 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) {
     hasAccess: json['has_access'] as bool,
   )
     ..muted = json['muted'] as bool
-    ..joined = json['joined'] as bool;
+    ..joined = json['joined'] as bool
+    ..peerId = json["peedId"] as String;
 }
 
 Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
@@ -35,5 +36,6 @@ Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
 
   writeNotNull('muted', instance.muted);
   writeNotNull('joined', instance.joined);
+  writeNotNull('peerId', instance.peerId);
   return val;
 }

@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:match_cafe/blocs/rooms_bloc.dart';
-import 'package:match_cafe/config/mediasoup/websocket/signaling.dart';
+import 'package:match_cafe/helper/pion_service_helper.dart';
 import 'package:match_cafe/models/response.dart';
 import 'package:match_cafe/models/room.dart';
 import 'package:match_cafe/models/user.dart';
@@ -11,21 +12,18 @@ import 'package:match_cafe/network/rest_client.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 class RTCProvider with ChangeNotifier {
-  AuthUser currentUser;
+  AuthUser _currentUser;
   DatabaseReference _databaseReference;
   Room _room;
   RoomsBloc _roomBloc;
   Room get room => _room;
-  Signaling _signaling;
-
-  bool get muted =>
-      (currentUser == null || currentUser?.muted == null || currentUser.muted);
-
-  bool get joined =>
-      (currentUser != null && currentUser.joined != null && currentUser.joined);
-  setMuted(muted) => currentUser.muted = muted;
-
-  RTCProvider({this.currentUser}) {
+  bool get muted => (_currentUser == null || _currentUser?.muted == null || _currentUser.muted);
+  bool get joined => (_currentUser != null && _currentUser.joined != null && _currentUser.joined);
+  setMuted(muted) => _currentUser.muted = muted;
+  IONService _ionService;
+  MethodChannel _channel = MethodChannel(kMethodChannel);
+  RTCProvider({AuthUser currentUser}) {
+    this._currentUser = currentUser;
     _roomBloc = RoomsBloc(client: RestClient.create());
     _databaseReference =
         FirebaseDatabase(databaseURL: kRTDBUrl).reference().child(kRTCRoom);
@@ -44,76 +42,63 @@ class RTCProvider with ChangeNotifier {
   }
 
   Future joinRTCRoom(Room room) async {
-    if (_room != null) {
-      await this.leaveRoom(_room.id);
-    }
     if (!(await internetConnectivity())) {
       throw Response.error("No network");
     }
+    if (_ionService != null) {
+      await this.leaveRoom(_room.id);
+    }
     await _roomBloc.joinRoom(room.id);
-    _signaling = new Signaling(kMediaServer)..connect(room.id);
-    DatabaseReference roomRef = _databaseReference.child(room.id);
-    _signaling.onStateChange = (SignalingState state) {
-      switch (state) {
-        case SignalingState.CallStateNew:
-          break;
-        case SignalingState.CallStateBye:
-          break;
-        case SignalingState.CallStateInvite:
-          print("connection inviting");
-          break;
-        case SignalingState.CallStateConnected:
-          print("connection connected");
-          break;
-        case SignalingState.CallStateRinging:
-          print("connection ringing");
-          break;
-        case SignalingState.ConnectionClosed:
-          print("connection closed");
-          break;
-        case SignalingState.ConnectionError:
-          print("connection error");
-          throw Response.error("unable to connect");
-        case SignalingState.ConnectionOpen:
-          _room = room;
-          currentUser.muted = false;
-          currentUser.joined = true;
-          notifyListeners();
-          roomRef.child(currentUser.id).set(currentUser.toJson());
-          break;
-      }
+    _ionService = new IONService(kIonMediaServer);
+
+    _ionService.onJoin = (streamId) async {
+      await _channel.invokeMethod("startService", {"roomId": room.id,"userId": _currentUser.id,"roomName": room.name, "createdBy" : room.createdBy.name});
+      print("local_streamId $streamId");
+      _room = room;
+      _currentUser.muted = true;
+      _currentUser.joined = true;
+      _currentUser.peerId = streamId;
+      notifyListeners();
+      _databaseReference.child(room.id).child(_currentUser.id).set(_currentUser.toJson());
     };
 
-    _signaling.onPeersUpdate = ((event) {});
+    _ionService.onSpeaker = (speakers){
+      print("Speakers $speakers");
+    };
 
-    _signaling.onLocalStream = ((stream) {});
-
-    _signaling.onAddRemoteStream = ((stream) {});
-
-    _signaling.onRemoveRemoteStream = ((stream) {});
-
-    _signaling.invite();
+    await _ionService.connect(roomId: room.id, userId: _currentUser.id);
   }
 
   Future leaveRoom(String roomId) async {
+    _channel.invokeMethod("stopService");
+    _ionService.closePeer();
+    _ionService = null;
     DatabaseReference roomRef = _databaseReference.child(room.id);
     _roomBloc.leaveRoom(room.id);
     _room = null;
-    if (_signaling != null) {
-      _signaling.bye();
-      _signaling.close();
-    }
-    currentUser.joined = false;
-    await roomRef.child(currentUser.id).remove();
+    _currentUser.joined = false;
+    roomRef.child(_currentUser.id).remove();
     notifyListeners();
   }
 
   Future toggleMute(String roomId) async {
     DatabaseReference roomRef = _databaseReference.child(room.id);
     setMuted(!muted);
-    roomRef.child(currentUser.id).update(currentUser.toJson());
-    _signaling.mute(muted);
+    await _ionService.toggleMute(muted);
+    roomRef.child(_currentUser.id).update(_currentUser.toJson());
     print("status muted $muted");
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    if(_ionService != null){
+      _ionService.closePeer();
+      DatabaseReference roomRef = _databaseReference.child(room.id);
+      _roomBloc.leaveRoom(room.id);
+      roomRef.child(_currentUser.id).remove();
+      _ionService = null;
+    }
+    super.dispose();
   }
 }

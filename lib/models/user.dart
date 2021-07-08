@@ -20,8 +20,10 @@ class AuthUser{
  bool muted = true;
  @JsonKey(name: "joined" ,includeIfNull: false)
  bool joined = false;
+ @JsonKey(name: "peerId" ,includeIfNull: false)
+ String peerId;
 
- AuthUser({ this.id,  this.phone, this.name, this.profilePictureUrl,  this.hasAccess});
+ AuthUser({ this.id,  this.phone, this.name, this.profilePictureUrl,  this.hasAccess, this.peerId});
 
  factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
  Map<String, dynamic> toJson() => _$AuthUserToJson(this);

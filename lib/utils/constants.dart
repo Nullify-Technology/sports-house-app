@@ -121,7 +121,7 @@ const String kRTDBUrl =
     "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
 const String kProfilePlaceHolderUrl =
     "https://firebasestorage.googleapis.com/v0/b/sports-house-1b0a9.appspot.com/o/user_profiles%2Fprofile_soccer.png?alt=media&token=867c80e2-8391-4b96-9b39-ee6b0e055522";
-
+const String kMethodChannel = "app.matchcafe.match_cafe";
 const String kCropImageTitle = "Crop Profile";
 const String kTimelineNotAvailable = "Timeline not available";
 const String kStartingXI = "Starting XI";
@@ -154,6 +154,7 @@ const String kUnavailable = "Unavailable";
 const String kRoomNetworkAlert =
     "Unable to join the room now. Please try again later";
 const String kMediaServer = "media.sports-house.in";
+const String kIonMediaServer = "http://3.141.198.24:50051";
 const String kNewUpdateAvailable = "New update available!";
 const String kClickHereToInstall = "Click here to install";
 const String kWebSiteUrl = "https://matchcafe.app/";

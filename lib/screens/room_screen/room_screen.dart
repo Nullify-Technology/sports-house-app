@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -36,19 +38,30 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   DatabaseReference fixtureReference;
   DatabaseReference roomReference;
   AuthUser _currentUser;
+  StreamSubscription<Event> roomStatusSubscription;
 
   Future _joinRTCRoom(Room room) async {
+    
     try {
+      if(room.type == "public"){
+        throw "public room is disabled for this build";
+      }
       Room currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
-      print(
-          "current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
+      print("current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
       if ((currentRoom == null || currentRoom.id != room.id) &&
           !room.isClosed) {
         print("inside if");
-        await Provider.of<RTCProvider>(context, listen: false)
-            .joinRTCRoom(room);
+        await Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(room);
+        roomStatusSubscription = roomReference.onChildRemoved.listen((event) {
+          if(event.snapshot.key != null){
+            if(event.snapshot.key == Provider.of<UserProvider>(context, listen: false).currentUser.id){
+              Navigator.of(context).pop();
+            }
+          }
+        });
       }
     } catch (e) {
+      print(e);
       showAlertDialog(context);
     }
   }
@@ -89,12 +102,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         .child(kRTCRoom)
         .child(widget.arguments.room.id);
     _joinRTCRoom(widget.arguments.room);
-
     super.initState();
   }
 
   @override
   void dispose() {
+    roomStatusSubscription.cancel();
     super.dispose();
   }
 
@@ -279,7 +292,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             SizedBox(
               height: 10,
             ),
-            StreamBuilder<Event>(
+            context.watch<RTCProvider>().joined ? StreamBuilder<Event>(
               stream: roomReference.onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
@@ -315,7 +328,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   child: CenterProgressBar(),
                 );
               },
-            ),
+            ): Expanded(child: CenterProgressBar()),
 
             //Needed for padding bottomNavBar
             SizedBox(

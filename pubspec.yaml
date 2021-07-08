@@ -43,6 +43,11 @@ dependencies:
   url_launcher: ^6.0.6
   firebase_dynamic_links: ^2.0.6
   share: ^2.0.4
+  move_to_background:
+  flutter_ion:
+    git:
+      url: git://github.com/pion/ion-sdk-flutter.git
+  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:
