@@ -1,13 +1,13 @@
 import 'package:flutter_ion/flutter_ion.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 class IONService {
-  Function(String streamId) onJoin;
-  Function(Map<String, dynamic> speakers) onSpeaker;
-  Signal signal;
-  Client client;
-  String _localSteamId;
-  LocalStream _localStream;
-  RemoteStream _remoteStream;
+  Function(String streamId)? onJoin;
+  Function(Map<String, dynamic> speakers)? onSpeaker;
+  late Signal signal;
+  Client? client;
+  String? _localSteamId;
+  LocalStream? _localStream;
+  RemoteStream? _remoteStream;
   Constraints get _defaultConstraints => Constraints.defaults
     ..simulcast = false
     ..audio = true
@@ -16,20 +16,18 @@ class IONService {
     signal = GRPCWebSignal(sfuUrl);
   }
 
-  Future connect({String roomId, String userId}) async{
+  Future connect({required String roomId, required String userId}) async{
     try{
       if(client == null){
         // _clientPub = await Client.create(sid: roomId, uid: userId, signal: _signalLocal);
         // await _clientPub.publish(_localStream);
 
         client = await Client.create(sid: roomId, uid: userId, signal: signal);
-        client.ontrack = (track, RemoteStream stream){
+        client!.ontrack = (track, RemoteStream stream){
           _remoteStream = stream;
         };
-        client.onspeaker = (Map<String, dynamic> speakers) {
-          if(speakers != null){
-            onSpeaker?.call(speakers);
-          }
+        client!.onspeaker = (Map<String, dynamic> speakers) {
+          onSpeaker?.call(speakers);
         };
 
 
@@ -40,10 +38,10 @@ class IONService {
         mediaDevices.forEach((element) {
           print("media device ${element.label}, ${element.kind}, ${element.deviceId}, ${element.groupId}");
         });
-        await client.publish(_localStream);
+        await client!.publish(_localStream!);
 
-        _localStream.stream.getAudioTracks()[0].enabled = false;
-        onJoin?.call(_localStream.stream.id);
+        _localStream!.stream.getAudioTracks()[0].enabled = false;
+        onJoin?.call(_localStream!.stream.id);
       }
     }catch(e){
       throw e;
@@ -52,15 +50,15 @@ class IONService {
 
   Future toggleMute(muted) async{
     if(_localStream != null){
-      _localStream.stream.getAudioTracks()[0].enabled = !muted;
+      _localStream!.stream.getAudioTracks()[0].enabled = !muted;
     }
   }
 
   closePeer() async {
     if(client != null){
-      if(_remoteStream != null) _remoteStream.stream.dispose();
-      _localStream.stream.dispose();
-      client.close();
+      if(_remoteStream != null) _remoteStream!.stream.dispose();
+      _localStream!.stream.dispose();
+      client!.close();
     }
   }
 

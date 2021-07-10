@@ -7,8 +7,8 @@ import 'package:match_cafe/utils/constants.dart';
 
 class TrendingRoomCard extends StatelessWidget {
   const TrendingRoomCard({
-    Key key,
-    this.room,
+    Key? key,
+    required this.room,
   }) : super(key: key);
   final Room room;
 
@@ -17,7 +17,7 @@ class TrendingRoomCard extends StatelessWidget {
     DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child(kRTCRoom)
-        .child(room.id);
+        .child(room.id!);
 
     return Card(
       color: kTrendingCardBgColor,
@@ -49,7 +49,7 @@ class TrendingRoomCard extends StatelessWidget {
                       ),
                     Expanded(
                       child: Text(
-                        room.name,
+                        room.name!,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19,
@@ -78,10 +78,10 @@ class TrendingRoomCard extends StatelessWidget {
                       stream: roomReference.onValue,
                       builder: (context, snapShot) {
                         if (snapShot.hasData) {
-                          if (snapShot.data.snapshot.value != null) {
+                          if (snapShot.data!.snapshot.value != null) {
                             Map<String, dynamic> userDetails =
                                 new Map<String, dynamic>.from(
-                                    snapShot.data.snapshot.value);
+                                    snapShot.data!.snapshot.value);
                             return Text(
                               '${userDetails.length} $kListeners',
                               style: TextStyle(
@@ -105,7 +105,7 @@ class TrendingRoomCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (room.members.length > 0)
+                if (room.members!.length > 0)
                   Container(
                     alignment: Alignment.center,
                     width: 100,
@@ -113,7 +113,7 @@ class TrendingRoomCard extends StatelessWidget {
                     height: 55,
                     child: Stack(
                       alignment: Alignment.centerRight,
-                      children: buildProfileStack(members: room.members),
+                      children: buildProfileStack(members: room.members!),
                     ),
                   ),
               ],
@@ -126,9 +126,9 @@ class TrendingRoomCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (room.createdBy.name != '')
+                    if (room.createdBy!.name != '')
                       Text(
-                        '$kHostedBy ${room.createdBy.name}',
+                        '$kHostedBy ${room.createdBy!.name}',
                         style: TextStyle(
                           // color: Colors.white54,
                           fontSize: 14,
@@ -140,7 +140,7 @@ class TrendingRoomCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildTeamIcon(room.fixture.teams.home.logoUrl),
+                    buildTeamIcon(room.fixture!.teams!.home!.logoUrl!),
                     Container(
                       padding: EdgeInsets.all(5),
                       child: Text(
@@ -152,7 +152,7 @@ class TrendingRoomCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    buildTeamIcon(room.fixture.teams.away.logoUrl),
+                    buildTeamIcon(room.fixture!.teams!.away!.logoUrl!),
                   ],
                 ),
                 // Text(
@@ -171,11 +171,11 @@ class TrendingRoomCard extends StatelessWidget {
     );
   }
 
-  List<Widget> buildProfileStack({List<AuthUser> members}) {
+  List<Widget> buildProfileStack({required List<AuthUser> members}) {
     List<Widget> profileStack = [];
     for (AuthUser user in members) {
       if (profileStack.length == 3) break;
-      if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
+      if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
             left: profileStack.length * 25.0);
@@ -185,7 +185,7 @@ class TrendingRoomCard extends StatelessWidget {
     return profileStack;
   }
 
-  Widget buildCircleAvatar({String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

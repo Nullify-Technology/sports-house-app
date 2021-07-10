@@ -7,15 +7,15 @@ part 'tournament_standings.g.dart';
 @JsonSerializable()
 class TournamentStandings {
   @JsonKey(name: "id")
-  final String id;
+  final String? id;
   @JsonKey(name: "name")
-  final String name;
+  final String? name;
   @JsonKey(name: "banner")
-  final String banner;
+  final String? banner;
   @JsonKey(name: "logo")
-  final String logo;
+  final String? logo;
   @JsonKey(name: "standings")
-  final List<Standings> standings;
+  final List<Standings>? standings;
 
   TournamentStandings(
     this.id,

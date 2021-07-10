@@ -8,9 +8,9 @@ part of 'venue.dart';
 
 Venue _$VenueFromJson(Map<String, dynamic> json) {
   return Venue(
-    json['id'] as int,
-    json['name'] as String,
-    json['city'] as String,
+    json['id'] as int?,
+    json['name'] as String?,
+    json['city'] as String?,
   );
 }
 

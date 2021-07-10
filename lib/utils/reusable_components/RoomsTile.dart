@@ -2,18 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:match_cafe/models/user.dart';
 import 'package:match_cafe/utils/constants.dart';
-import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 
 class RoomsTile extends StatelessWidget {
   const RoomsTile({
-    Key key,
-    this.title,
+    Key? key,
+    required this.title,
     this.isVerified = false,
     this.hostedBy = '',
-    this.listners,
-    this.participants,
-    this.type,
+    required this.listners,
+    required this.participants,
+    required this.type,
   }) : super(key: key);
   final String title;
   final bool isVerified;
@@ -108,12 +107,12 @@ class RoomsTile extends StatelessWidget {
     );
   }
 
-  List<Widget> buildProfileStack({List<dynamic> members}) {
+  List<Widget> buildProfileStack({required List<dynamic> members}) {
     List<Widget> profileStack = [];
     for (var member in members) {
       AuthUser user = AuthUser.fromJson(Map<String, dynamic>.from(member));
       if (profileStack.length == 3) break;
-      if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
+      if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
         Widget avatar = buildCircleAvatar(
             imageUrl: user.profilePictureUrl ?? '',
             left: profileStack.length * 25.0);
@@ -123,7 +122,7 @@ class RoomsTile extends StatelessWidget {
     return profileStack;
   }
 
-  Widget buildCircleAvatar({String imageUrl, double left = 0}) {
+  Widget buildCircleAvatar({required String imageUrl, double left = 0}) {
     return Positioned(
       left: left,
       child: CircleAvatar(

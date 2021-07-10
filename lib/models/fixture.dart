@@ -10,23 +10,23 @@ part 'fixture.g.dart';
 @JsonSerializable()
 class Fixture {
   @JsonKey(name: "id")
-  final String id;
+  final String? id;
   @JsonKey(name: "venue")
-  final Venue venue;
+  final Venue? venue;
   @JsonKey(name: "date")
-  final String date;
+  final String? date;
   @JsonKey(name: "teams")
-  final Teams teams;
+  final Teams? teams;
   @JsonKey(name: "externalId")
-  final int externalId;
+  final int? externalId;
   @JsonKey(name: "round")
-  final String round;
+  final String? round;
   @JsonKey(name: "score", includeIfNull: false)
-  final MatchDetails score;
+  final MatchDetails? score;
   @JsonKey(name: "status", includeIfNull: false)
-  final String status;
+  final String? status;
   @JsonKey(name: "players", includeIfNull: false)
-  final Map<String, PlayerData> players;
+  final Map<String, PlayerData>? players;
 
   Fixture(
     this.id,

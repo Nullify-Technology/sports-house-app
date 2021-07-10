@@ -28,6 +28,7 @@ public class MainActivity extends FlutterActivity {
     private Intent roomService;
     private String roomId = "";
     private String userId = "";
+    private String userType = "";
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
@@ -40,6 +41,7 @@ public class MainActivity extends FlutterActivity {
                 String createdBy = methodCall.argument("createdBy");
                 roomId = methodCall.argument("roomId");
                 userId = methodCall.argument("userId");
+                userType = methodCall.argument("userType");
                 Log.d("current room details", currentRoom + " " + createdBy+ " "+ roomId+ " "+ userId);
                 roomService.putExtra("roomName", currentRoom);
                 roomService.putExtra("createdBy", createdBy);
@@ -71,7 +73,7 @@ public class MainActivity extends FlutterActivity {
         stopService(roomService);
         if(null != roomId && null != userId && !roomId.isEmpty() && !userId.isEmpty()){
             FirebaseDatabase.getInstance("https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/")
-                    .getReference().child("rtc_room").child(roomId).child(userId).removeValue();
+                    .getReference().child("rtc_room").child(roomId).child(userType).child(userId).removeValue();
         }
     }
 

@@ -1,5 +1,7 @@
 package app.matchcafe.match_cafe;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -40,6 +42,7 @@ public class RoomService extends Service {
             PendingIntent pendingPlayIntent = PendingIntent.getService(this, 0, playIntent, 0);
             NotificationCompat.Action leaveAction = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Leave room", pendingPlayIntent);
             builder.addAction(leaveAction);
+            builder.setPriority(NotificationManager.IMPORTANCE_MAX);
             startForeground(101,builder.build());
         }
     }

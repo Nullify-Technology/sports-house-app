@@ -8,19 +8,23 @@ part of 'room.dart';
 
 Room _$RoomFromJson(Map<String, dynamic> json) {
   return Room(
-    json['id'] as String,
-    json['fixture_id'] as String,
-    Fixture.fromJson(json['fixture'] as Map<String, dynamic>),
-    AuthUser.fromJson(json['created_by'] as Map<String, dynamic>),
-    json['count'] as int,
-    json['name'] as String,
-    (json['members'] as List<dynamic>)
-        .map((e) => AuthUser.fromJson(e as Map<String, dynamic>))
+    json['id'] as String?,
+    json['fixture_id'] as String?,
+    json['fixture'] == null
+        ? null
+        : Fixture.fromJson(json['fixture'] as Map<String, dynamic>),
+    json['created_by'] == null
+        ? null
+        : AuthUser.fromJson(json['created_by'] as Map<String, dynamic>),
+    json['count'] as int?,
+    json['name'] as String?,
+    (json['members'] as List<dynamic>?)
+        ?.map((e) => AuthUser.fromJson(e as Map<String, dynamic>))
         .toList(),
-    json['created_by_id'] as String,
-    json['dynamicLink'] as String,
-    json['type'] as String,
-    json['is_closed'] as bool,
+    json['created_by_id'] as String?,
+    json['dynamicLink'] as String?,
+    json['type'] as String?,
+    json['is_closed'] as bool?,
   );
 }
 
@@ -31,9 +35,9 @@ Map<String, dynamic> _$RoomToJson(Room instance) => <String, dynamic>{
       'created_by': instance.createdBy,
       'count': instance.count,
       'name': instance.name,
-      'members': instance.members,
-      'created_by_id': instance.createdById,
-      'dynamicLink': instance.dynamicLink,
       'type': instance.type,
       'is_closed': instance.isClosed,
+      'dynamicLink': instance.dynamicLink,
+      'members': instance.members,
+      'created_by_id': instance.createdById,
     };

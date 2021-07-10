@@ -9,21 +9,21 @@ class MatchEvent {
   final Time time;
   final String type;
   MatchEvent(
-      { this.comments,
-       this.detail,
-       this.player,
-       this.team,
-       this.time,
-       this.type,
-       this.assist});
+      { required this.comments,
+       required this.detail,
+       required this.player,
+       required this.team,
+       required this.time,
+       required this.type,
+       required this.assist});
 
   MatchEvent copyWith({
-    String comments,
-    String detail,
-    Player player,
-    RtTeam team,
-    Time time,
-    String type,
+    String? comments,
+    String? detail,
+    Player? player,
+    RtTeam? team,
+    Time? time,
+    String? type,
   }) {
     return MatchEvent(
       comments: comments ?? this.comments,
@@ -110,13 +110,13 @@ class Player {
   final int id;
   final String name;
   Player({
-     this.id,
-     this.name,
+     required this.id,
+     required this.name,
   });
 
   Player copyWith({
-    int id,
-    String name,
+    int? id,
+    String? name,
   }) {
     return Player(
       id: id ?? this.id,
@@ -167,15 +167,15 @@ class RtTeam {
   final String logo;
   final String name;
   RtTeam({
-     this.id,
-     this.logo,
-     this.name,
+     required this.id,
+     required this.logo,
+     required this.name,
   });
 
   RtTeam copyWith({
-    int id,
-    String logo,
-    String name,
+    int? id,
+    String? logo,
+    String? name,
   }) {
     return RtTeam(
       id: id ?? this.id,
@@ -231,11 +231,11 @@ class RtTeam {
 class Time {
   final int elapsed;
   Time({
-     this.elapsed,
+     required this.elapsed,
   });
 
   Time copyWith({
-    int elapsed,
+    int? elapsed,
   }) {
     return Time(
       elapsed: elapsed ?? this.elapsed,

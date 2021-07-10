@@ -8,7 +8,9 @@ part of 'match_details.dart';
 
 MatchDetails _$MatchDetailsFromJson(Map<String, dynamic> json) {
   return MatchDetails(
-    Score.fromJson(json['current'] as Map<String, dynamic>),
+    json['current'] == null
+        ? null
+        : Score.fromJson(json['current'] as Map<String, dynamic>),
   );
 }
 

@@ -13,8 +13,8 @@ class FixtureTile extends StatelessWidget {
   final Fixture fixture;
 
   const FixtureTile({
-    Key key,
-    this.fixture,
+    Key? key,
+    required this.fixture,
   }) : super(key: key);
 
   @override
@@ -47,7 +47,7 @@ class FixtureTile extends StatelessWidget {
                 children: [
                   CustomText(
                     text: DateFormat.jm('en_US').format(
-                      DateTime.parse(fixture.date).toLocal(),
+                      DateTime.parse(fixture.date!).toLocal(),
                     ),
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -59,10 +59,10 @@ class FixtureTile extends StatelessWidget {
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data.snapshot.value != null) {
+                        if (snapShot.data!.snapshot.value != null) {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
-                                  snapShot.data.snapshot.value);
+                                  snapShot.data!.snapshot.value);
 
                           return buildTimerWidget(status);
                           // return Center();
@@ -83,10 +83,10 @@ class FixtureTile extends StatelessWidget {
                       databaseReference.child("score").child("current").onValue,
                   builder: (context, snapShot) {
                     if (snapShot.hasData) {
-                      if (snapShot.data.snapshot.value != null) {
+                      if (snapShot.data!.snapshot.value != null) {
                         Map<String, dynamic> score =
                             new Map<String, dynamic>.from(
-                                snapShot.data.snapshot.value);
+                                snapShot.data!.snapshot.value);
 
                         return buildTeamAndScore(score: score);
                       }
@@ -102,14 +102,14 @@ class FixtureTile extends StatelessWidget {
     );
   }
 
-  Widget buildTeamAndScore({Map<String, dynamic> score}) {
+  Widget buildTeamAndScore({Map<String, dynamic>? score}) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: CustomText(
-                text: fixture.teams.home.name,
+                text: fixture.teams!.home!.name!,
                 fontSize: 16,
               ),
             ),
@@ -127,7 +127,7 @@ class FixtureTile extends StatelessWidget {
           children: [
             Expanded(
               child: CustomText(
-                text: fixture.teams.away.name,
+                text: fixture.teams!.away!.name!,
                 fontSize: 16,
               ),
             ),

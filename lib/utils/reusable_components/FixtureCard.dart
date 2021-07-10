@@ -13,8 +13,8 @@ class FixtureCard extends StatelessWidget {
   final Fixture fixture;
 
   const FixtureCard({
-    Key key,
-    this.fixture,
+    Key? key,
+    required this.fixture,
   }) : super(key: key);
 
   @override
@@ -49,9 +49,9 @@ class FixtureCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      fixture.teams.home.name +
+                      fixture.teams!.home!.name! +
                           " Vs " +
-                          fixture.teams.away.name,
+                          fixture.teams!.away!.name!,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17,
@@ -62,10 +62,10 @@ class FixtureCard extends StatelessWidget {
                     stream: databaseReference.child("status").onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data.snapshot.value != null) {
+                        if (snapShot.data!.snapshot.value != null) {
                           Map<String, dynamic> status =
                               new Map<String, dynamic>.from(
-                                  snapShot.data.snapshot.value);
+                                  snapShot.data!.snapshot.value);
 
                           return buildTimerWidget(status);
                           // return Center();
@@ -80,13 +80,13 @@ class FixtureCard extends StatelessWidget {
                 height: 2,
               ),
               if (fixture.venue != null &&
-                  fixture.venue.name != null &&
-                  fixture.venue.city != null)
+                  fixture.venue!.name != null &&
+                  fixture.venue!.city != null)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      '${fixture.venue.name} - ${fixture.venue.city}',
+                      '${fixture.venue!.name} - ${fixture.venue!.city}',
                       style: TextStyle(fontSize: 11),
                     ),
                   ],
@@ -95,7 +95,7 @@ class FixtureCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    buildTeamIcon(fixture.teams.home.logoUrl),
+                    buildTeamIcon(fixture.teams!.home!.logoUrl!),
                     Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -111,10 +111,10 @@ class FixtureCard extends StatelessWidget {
                             .onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            if (snapShot.data.snapshot.value != null) {
+                            if (snapShot.data!.snapshot.value != null) {
                               Map<String, dynamic> score =
                                   new Map<String, dynamic>.from(
-                                      snapShot.data.snapshot.value);
+                                      snapShot.data!.snapshot.value);
                               return Text(
                                 '${score["home"]} - ${score["away"]}',
                                 style: TextStyle(
@@ -134,7 +134,7 @@ class FixtureCard extends StatelessWidget {
                         },
                       ),
                     ),
-                    buildTeamIcon(fixture.teams.away.logoUrl),
+                    buildTeamIcon(fixture.teams!.away!.logoUrl!),
                   ],
                 ),
               ),
@@ -151,7 +151,7 @@ class FixtureCard extends StatelessWidget {
                     children: [
                       Text(
                         DateFormat.yMMMMd('en_US').add_jm().format(
-                              DateTime.parse(fixture.date).toLocal(),
+                              DateTime.parse(fixture.date!).toLocal(),
                             ),
                       ),
                     ],

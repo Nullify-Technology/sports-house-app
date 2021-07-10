@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:match_cafe/provider/user_provider.dart';
+import 'package:flutter/services.dart';
 import 'package:match_cafe/utils/classes/event_classes.dart';
+import 'package:match_cafe/provider/user_provider.dart';
+import 'package:match_cafe/utils/client_events.dart';
 import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/models/room.dart';
@@ -26,8 +28,8 @@ class RoomScreenArguments {
 
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
-
-  RoomScreen({Key key, this.arguments}) : super(key: key);
+  final Stream<ClientEvents> parentEvents;
+  RoomScreen({Key? key, required this.arguments, required this.parentEvents}) : super(key: key);
   static String pageId = 'RoomScreen';
 
   @override
@@ -35,30 +37,23 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
-  DatabaseReference fixtureReference;
-  DatabaseReference roomReference;
-  AuthUser _currentUser;
-  StreamSubscription<Event> roomStatusSubscription;
+  late DatabaseReference fixtureReference;
+  late DatabaseReference roomReference;
+  late AuthUser _currentUser;
 
   Future _joinRTCRoom(Room room) async {
-    
     try {
-      if(room.type == "public"){
+      if (room.type == "public") {
         throw "public room is disabled for this build";
       }
-      Room currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
-      print("current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
+      Room? currentRoom = Provider.of<RTCProvider>(context, listen: false).room;
+      print(
+          "current room ${currentRoom == null ? currentRoom : currentRoom.id} , future room ${room.id}");
       if ((currentRoom == null || currentRoom.id != room.id) &&
-          !room.isClosed) {
+          !room.isClosed!) {
         print("inside if");
-        await Provider.of<RTCProvider>(context, listen: false).joinRTCRoom(room);
-        roomStatusSubscription = roomReference.onChildRemoved.listen((event) {
-          if(event.snapshot.key != null){
-            if(event.snapshot.key == Provider.of<UserProvider>(context, listen: false).currentUser.id){
-              Navigator.of(context).pop();
-            }
-          }
-        });
+        await Provider.of<RTCProvider>(context, listen: false)
+            .joinRTCRoom(room);
       }
     } catch (e) {
       print(e);
@@ -91,29 +86,97 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     );
   }
 
+  showParticipantOptions(BuildContext context, AuthUser user) {
+    // show the dialog
+    if (user.id == widget.arguments.room.createdById ||
+        user.id == _currentUser.id) {
+      return;
+    }
+    List<Widget> options = [];
+    if (user.isModerator!) {
+      options.add(SimpleDialogOption(
+        padding: EdgeInsets.all(15),
+        child: Text("Demote to listener"),
+        onPressed: () {
+          Provider.of<RTCProvider>(context, listen: false)
+              .demoteToListener(user);
+          Navigator.of(context).pop();
+        },
+      ));
+    } else if (!user.isModerator! && user.isSpeaker!) {
+      options.add(SimpleDialogOption(
+        padding: EdgeInsets.all(15),
+        onPressed: () {
+          Provider.of<RTCProvider>(context, listen: false)
+              .promoToModerator(user);
+          Navigator.of(context).pop();
+        },
+        child: Text("Promote to Moderator"),
+      ));
+      options.add(SimpleDialogOption(
+        padding: EdgeInsets.all(15),
+        onPressed: () {
+          Provider.of<RTCProvider>(context, listen: false)
+              .demoteToListener(user);
+          Navigator.of(context).pop();
+        },
+        child: Text("Demote to listener"),
+      ));
+    } else if (!user.isSpeaker!) {
+      options.add(SimpleDialogOption(
+        padding: EdgeInsets.all(15),
+        onPressed: () {
+          Provider.of<RTCProvider>(context, listen: false)
+              .promoteToSpeaker(user);
+          Navigator.of(context).pop();
+        },
+        child: Text("Promote to Speaker"),
+      ));
+    }
+    SimpleDialog alert = SimpleDialog(children: options);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void initState() {
     fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child("fixture")
-        .child("fixture_${widget.arguments.room.fixture.id}");
+        .child("fixture_${widget.arguments.room.fixture!.id}");
     roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child(kRTCRoom)
-        .child(widget.arguments.room.id);
+        .child(widget.arguments.room.id!);
     _joinRTCRoom(widget.arguments.room);
+    listenForGlobalEvents();
     super.initState();
+  }
+
+  void listenForGlobalEvents() {
+    widget.parentEvents.listen((event) {
+      if(event == ClientEvents.LeveRoom){
+        Room? room = Provider.of<RTCProvider>(context, listen: false).room;
+        if(room != null){
+          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
+        }
+        Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
+      }
+    });
   }
 
   @override
   void dispose() {
-    roomStatusSubscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _currentUser = context.watch<UserProvider>().currentUser;
+    _currentUser = context.watch<UserProvider>().currentUser!;
     return Scaffold(
       backgroundColor: kColorBlack,
       extendBody: true,
@@ -170,8 +233,8 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               children: [
                 buildParticipantsView(),
                 buildMatchTimeline(
-                    widget.arguments.room.fixture, fixtureReference),
-                buildMatchXI(widget.arguments.room.fixture, context),
+                    widget.arguments.room.fixture!, fixtureReference),
+                buildMatchXI(widget.arguments.room.fixture!, context),
                 // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
               ],
             ),
@@ -203,7 +266,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           children: [
             TextButton(
               onPressed: () async {
-                context.read<RTCProvider>().leaveRoom(widget.arguments.room.id);
+                context
+                    .read<RTCProvider>()
+                    .leaveRoom(widget.arguments.room.id!);
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -231,25 +296,27 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () => context
-                  .read<RTCProvider>()
-                  .toggleMute(widget.arguments.room.id),
-              style: TextButton.styleFrom(
-                backgroundColor: kMuteButtonBgColor,
-                shape: CircleBorder(),
-                padding: EdgeInsets.all(10),
-              ),
-              child: context.watch<RTCProvider>().muted
-                  ? Icon(
-                      Icons.mic_off_rounded,
-                      color: kMutedButtonColor,
-                    )
-                  : Icon(
-                      Icons.mic_rounded,
-                      color: kUnmutedButtonColor,
+            context.watch<RTCProvider>().isSpeaker
+                ? TextButton(
+                    onPressed: () => context
+                        .read<RTCProvider>()
+                        .toggleMute(widget.arguments.room.id!),
+                    style: TextButton.styleFrom(
+                      backgroundColor: kMuteButtonBgColor,
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(10),
                     ),
-            )
+                    child: context.watch<RTCProvider>().muted
+                        ? Icon(
+                            Icons.mic_off_rounded,
+                            color: kMutedButtonColor,
+                          )
+                        : Icon(
+                            Icons.mic_rounded,
+                            color: kUnmutedButtonColor,
+                          ),
+                  )
+                : SizedBox()
           ],
         ),
       ),
@@ -292,44 +359,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             SizedBox(
               height: 10,
             ),
-            context.watch<RTCProvider>().joined ? StreamBuilder<Event>(
-              stream: roomReference.onValue,
-              builder: (context, snapShot) {
-                if (snapShot.hasData) {
-                  if (snapShot.data.snapshot.value != null) {
-                    Map<String, dynamic> userDetails =
-                        new Map<String, dynamic>.from(
-                            snapShot.data.snapshot.value);
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (BuildContext context, int index) {
-                        AuthUser user = AuthUser.fromJson(
-                            Map<String, dynamic>.from(
-                                userDetails.values.toList()[index]));
-                        return buildParticipant(
-                            imageUrl: user.profilePictureUrl,
-                            name: user.name,
-                            isMuted: user.muted);
-                      },
-                      itemCount: userDetails.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.5,
-                      ),
-                    );
-                  }
-                }
-                return Container(
-                  // height: MediaQuery.of(context).size.height - 600,
-                  child: CenterProgressBar(),
-                );
-              },
-            ): Expanded(child: CenterProgressBar()),
-
+            ...buildParticipantList(),
             //Needed for padding bottomNavBar
             SizedBox(
               height: 60,
@@ -340,11 +370,129 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     );
   }
 
-  Container buildParticipant({
-    String imageUrl,
-    String name,
-    bool isMuted = true,
-  }) {
+  List<Widget> buildParticipantList() {
+    return context.watch<RTCProvider>().joined
+        ? [
+            StreamBuilder<Event>(
+              stream: roomReference.child(kDBSpeaker).onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    Map<String, dynamic> userDetails =
+                        new Map<String, dynamic>.from(
+                            snapShot.data!.snapshot.value);
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (BuildContext context, int index) {
+                        AuthUser user = AuthUser.fromJson(
+                            Map<String, dynamic>.from(
+                                userDetails.values.toList()[index]));
+                        if (_currentUser.isModerator!) {
+                          return GestureDetector(
+                            onTap: () =>
+                                showParticipantOptions(context, user),
+                            child: buildParticipant(
+                                  imageUrl: user.profilePictureUrl,
+                                  name: user.name,
+                                  peerId: user.peerId,
+                                  isMuted: user.muted,
+                                  isModerator: user.isModerator,
+                                  isSpeaker: user.isSpeaker)!,
+                          );
+                        } else {
+                          return buildParticipant(
+                                imageUrl: user.profilePictureUrl,
+                                name: user.name,
+                                peerId: user.peerId,
+                                isMuted: user.muted,
+                                isModerator: user.isModerator,
+                                isSpeaker: user.isSpeaker)!;
+                        }
+                      },
+                      itemCount: userDetails.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisSpacing: 10,
+                        crossAxisCount: 4,
+                        childAspectRatio: 0.5,
+                      ),
+                    );
+                  }
+                }
+                return Container();
+              },
+            ),
+            StreamBuilder<Event>(
+              stream: roomReference.child(kDBAudience).onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    Map<String, dynamic> userDetails =
+                        new Map<String, dynamic>.from(
+                            snapShot.data!.snapshot.value);
+                    return Column(
+                      children: [
+                        Text(kAudience),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (BuildContext context, int index) {
+                            AuthUser user = AuthUser.fromJson(
+                                Map<String, dynamic>.from(
+                                    userDetails.values.toList()[index]));
+                            if (_currentUser.isModerator!) {
+                              return GestureDetector(
+                                    onTap: () =>
+                                        showParticipantOptions(context, user),
+                                    child: buildParticipant(
+                                        imageUrl: user.profilePictureUrl,
+                                        name: user.name,
+                                        peerId: user.peerId,
+                                        isMuted: user.muted,
+                                        isModerator: user.isModerator,
+                                        isSpeaker: user.isSpeaker)!,
+                                  );
+                            } else {
+                              return buildParticipant(
+                                    imageUrl: user.profilePictureUrl,
+                                    name: user.name,
+                                    peerId: user.peerId,
+                                    isMuted: user.muted,
+                                    isModerator: user.isModerator,
+                                    isSpeaker: user.isSpeaker)!;
+                            }
+                          },
+                          itemCount: userDetails.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisSpacing: 10,
+                            crossAxisCount: 4,
+                            childAspectRatio: 0.5,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                }
+                return Container();
+              },
+            )
+          ]
+        : [Expanded(child: CenterProgressBar())];
+  }
+
+  Container? buildParticipant(
+      {String? imageUrl,
+      String? name,
+      String? peerId,
+      bool? isMuted = true,
+      bool? isModerator = false,
+      bool? isSpeaker = false}) {
+    // ignore: unnecessary_null_comparison
     if (imageUrl == null && name == null && isMuted == null) {
       print(imageUrl.toString() + name.toString() + isMuted.toString());
       return null;
@@ -363,32 +511,64 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage(
-                    kProfilePlaceHolder,
-                  ),
-                  foregroundImage: CachedNetworkImageProvider(
-                    imageUrl ?? kProfilePlaceHolderUrl,
-                  ),
-                  onForegroundImageError: (exception, stackTrace) {
-                    print(exception);
-                  },
-                ),
                 Container(
-                  padding: EdgeInsets.all(2),
+                  padding: EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: kProfileMutedBgColor,
+                    color: (isModerator != null && isModerator)
+                        ? kInRoomBottomBarBgColor
+                        : null,
                   ),
-                  child: Icon(
-                    isMuted ? Icons.mic_off_rounded : Icons.mic,
-                    color: isMuted == null || isMuted
-                        ? kMutedButtonColor
-                        : kUnmutedButtonColor,
-                    size: 17,
+                  child: CircleAvatar(
+                    radius: 30.0,
+                    backgroundImage: AssetImage(
+                      kProfilePlaceHolder,
+                    ),
+                    foregroundImage: CachedNetworkImageProvider(
+                      imageUrl ?? kProfilePlaceHolderUrl,
+                    ),
+                    onForegroundImageError: (exception, stackTrace) {
+                      print(exception);
+                    },
                   ),
-                )
+                ),
+                (isSpeaker != null && isSpeaker)
+                    ? StreamBuilder<List<String>>(
+                        stream: context.watch<RTCProvider>().roomsStream,
+                        builder: (context, snapShot) {
+                          if (snapShot.hasData &&
+                              snapShot.data!.contains(peerId)) {
+                            return Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: kProfileMutedBgColor,
+                              ),
+                              child: Icon(
+                                isMuted! ? Icons.mic_off_rounded : Icons.mic,
+                                color: isMuted
+                                    ? kMutedButtonColor
+                                    : kUnmutedButtonColor,
+                                size: 17,
+                              ),
+                            );
+                          }
+                          return Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: kProfileMutedBgColor,
+                            ),
+                            child: Icon(
+                              isMuted! ? Icons.mic_off_rounded : Icons.mic_none,
+                              color: isMuted
+                                  ? kMutedButtonColor
+                                  : kUnmutedButtonColor,
+                              size: 17,
+                            ),
+                          );
+                        })
+                    : Container(),
               ],
             ),
           ),
@@ -458,7 +638,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                                   ),
                                 ),
                               Text(
-                                room.name,
+                                room.name!,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 19,
@@ -469,9 +649,9 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                           SizedBox(
                             height: 2,
                           ),
-                          if (room.createdBy.name != null)
+                          if (room.createdBy!.name != null)
                             Text(
-                              'Hosted By: ${room.createdBy.name}',
+                              'Hosted By: ${room.createdBy!.name}',
                               style: TextStyle(
                                 // color: Colors.white54,
                                 fontSize: 14,
@@ -484,7 +664,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                       onPressed: () {
                         //TODO : Add option for sharing room link
                         Share.share(
-                            '${user.name} is inviting you to virtually watch together ${room.fixture.teams.home.name} Vs ${room.fixture.teams.away.name} match on Match Cafe app.\nJoin Here : ${room.dynamicLink}');
+                            '${user.name} is inviting you to virtually watch together ${room.fixture!.teams!.home!.name} Vs ${room.fixture!.teams!.away!.name} match on Match Cafe app.\nJoin Here : ${room.dynamicLink}');
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: kMuteButtonBgColor,
@@ -519,10 +699,10 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                             stream: roomReference.onValue,
                             builder: (context, snapShot) {
                               if (snapShot.hasData) {
-                                if (snapShot.data.snapshot.value != null) {
+                                if (snapShot.data!.snapshot.value != null) {
                                   Map<String, dynamic> members =
                                       new Map<String, dynamic>.from(
-                                          snapShot.data.snapshot.value);
+                                          snapShot.data!.snapshot.value);
 
                                   return Text(
                                     '${members.length} $kListeners',
@@ -550,10 +730,10 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                       stream: fixtureReference.child("status").onValue,
                       builder: (context, snapShot) {
                         if (snapShot.hasData) {
-                          if (snapShot.data.snapshot.value != null) {
+                          if (snapShot.data!.snapshot.value != null) {
                             Map<String, dynamic> status =
                                 new Map<String, dynamic>.from(
-                                    snapShot.data.snapshot.value);
+                                    snapShot.data!.snapshot.value);
                             return buildTimerWidget(status, fontSize: 15.0);
                           }
                         }
@@ -601,7 +781,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildTeamIcon(room.fixture.teams.home.logoUrl),
+                    buildTeamIcon(room.fixture!.teams!.home!.logoUrl!),
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 14,
@@ -622,10 +802,10 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                             .onValue,
                         builder: (context, snapShot) {
                           if (snapShot.hasData) {
-                            if (snapShot.data.snapshot.value != null) {
+                            if (snapShot.data!.snapshot.value != null) {
                               Map<String, dynamic> score =
                                   new Map<String, dynamic>.from(
-                                      snapShot.data.snapshot.value);
+                                      snapShot.data!.snapshot.value);
                               return Column(
                                 children: [
                                   Text(
@@ -649,7 +829,7 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                         },
                       ),
                     ),
-                    buildTeamIcon(room.fixture.teams.away.logoUrl),
+                    buildTeamIcon(room.fixture!.teams!.away!.logoUrl!),
                   ],
                 ),
                 SizedBox(
@@ -662,8 +842,8 @@ Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
                       stream: fixtureReference.child("events").onValue,
                       builder: (context, snapShot) {
                         if (snapShot.hasData) {
-                          if (snapShot.data.snapshot.value != null) {
-                            var events = snapShot.data.snapshot.value;
+                          if (snapShot.data!.snapshot.value != null) {
+                            var events = snapShot.data!.snapshot.value;
                             List<dynamic> matchEvents = events
                                 .map((event) => MatchEvent.fromDb(event))
                                 .toList() as List<dynamic>;
@@ -769,7 +949,7 @@ buildTimelineEvent(MatchEvent event) {
           SizedBox(
             width: 10,
           ),
-          buildEventTypeIcon(icon, color,iconSize: 18),
+          buildEventTypeIcon(icon, color, iconSize: 18),
         ],
       ));
 }

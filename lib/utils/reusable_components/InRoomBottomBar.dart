@@ -9,7 +9,7 @@ import 'package:match_cafe/screens/room_screen/room_screen.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 class InRoomBottomBar extends StatelessWidget {
-  const InRoomBottomBar({Key key,  this.room}) : super(key: key);
+  const InRoomBottomBar({Key? key,  required this.room}) : super(key: key);
   final Room room;
 
 
@@ -18,7 +18,7 @@ class InRoomBottomBar extends StatelessWidget {
     DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child(kRTCRoom)
-        .child(room.id);
+        .child(room.id!);
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, RoomScreen.pageId,
@@ -45,10 +45,10 @@ class InRoomBottomBar extends StatelessWidget {
                 stream: roomReference.onValue,
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
-                    if (snapShot.data.snapshot.value != null) {
+                    if (snapShot.data!.snapshot.value != null) {
                       Map<String, dynamic> userDetails =
                       new Map<String, dynamic>.from(
-                          snapShot.data.snapshot.value);
+                          snapShot.data!.snapshot.value);
                       return Container(
                         width: 100,
                         height: 50,
@@ -71,7 +71,7 @@ class InRoomBottomBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      room.name,
+                      room.name!,
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -79,7 +79,7 @@ class InRoomBottomBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '$kHostedBy ${room.createdBy.name}',
+                      '$kHostedBy ${room.createdBy!.name}',
                       maxLines: 1,
                       style: TextStyle(
                         color: kColorBlack,
@@ -91,7 +91,7 @@ class InRoomBottomBar extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  context.read<RTCProvider>().leaveRoom(room.id);
+                  context.read<RTCProvider>().leaveRoom(room.id!);
                 },
                 child: Container(
                   padding: EdgeInsets.all(10),
@@ -113,14 +113,14 @@ class InRoomBottomBar extends StatelessWidget {
   }
 }
 
-List<Widget> buildProfileStack({List<dynamic> members}) {
+List<Widget> buildProfileStack({required List<dynamic> members}) {
 
   List<Widget> profileStack = [];
   for (var member in members) {
     if (profileStack.length == 3) break;
     AuthUser user = AuthUser.fromJson(
         Map<String, dynamic>.from(member));
-    if (user.profilePictureUrl != null && user.profilePictureUrl.isNotEmpty) {
+    if (user.profilePictureUrl != null && user.profilePictureUrl!.isNotEmpty) {
       Widget avatar = buildCircleAvatar(
           imageUrl: user.profilePictureUrl ?? '',
           left: profileStack.length * 25.0);
@@ -130,7 +130,7 @@ List<Widget> buildProfileStack({List<dynamic> members}) {
   return profileStack;
 }
 
-Widget buildCircleAvatar({ String imageUrl, double left = 0}) {
+Widget buildCircleAvatar({ required String imageUrl, double left = 0}) {
   return Positioned(
     left: left,
     child: Container(

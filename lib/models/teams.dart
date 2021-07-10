@@ -8,9 +8,9 @@ part 'teams.g.dart';
 @JsonSerializable()
 class Teams{
   @JsonKey(name: "home")
-  final Team home;
+  final Team? home;
   @JsonKey(name: "away")
-  final Team away;
+  final Team? away;
 
   Teams(this.home, this.away);
 

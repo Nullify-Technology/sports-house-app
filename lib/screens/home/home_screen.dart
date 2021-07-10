@@ -4,6 +4,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:match_cafe/utils/client_events.dart';
 import 'package:move_to_background/move_to_background.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/blocs/fixtures_bloc.dart';
@@ -23,7 +24,6 @@ import 'package:match_cafe/screens/profile/profile_screen.dart';
 import 'package:match_cafe/screens/room_screen/room_screen.dart';
 import 'package:match_cafe/screens/tournament/tournament.dart';
 import 'package:match_cafe/utils/constants.dart';
-import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
 import 'package:match_cafe/utils/reusable_components/FixtureCard.dart';
 import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:match_cafe/utils/reusable_components/TrendingRoomCard.dart';
@@ -32,7 +32,8 @@ import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen();
+  final Stream<ClientEvents> parentEvents;
+  HomeScreen({required this.parentEvents});
 
   static String pageId = 'HomeScreen';
 
@@ -41,24 +42,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  FixtureBloc fixtureBloc;
-  TournamentBloc tournamentBloc;
-  AuthUser currentUser;
-  RoomsBloc roomsBloc;
+  FixtureBloc? fixtureBloc;
+  TournamentBloc? tournamentBloc;
+  AuthUser? currentUser;
+  RoomsBloc? roomsBloc;
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   RemoteConfig remoteConfig = RemoteConfig.instance;
-  double _appLatestVersion;
+  double? _appLatestVersion;
 
   Future joinRoomWithId(BuildContext context, String roomId) async {
     print('retrieveDynamicLink $roomId');
     try {
-      AgoraRoom agoraRoom = await roomsBloc.joinRoom(roomId);
-      Room room = agoraRoom.room;
+      AgoraRoom? agoraRoom = await roomsBloc!.joinRoom(roomId);
+      Room? room = agoraRoom!.room;
       print(room);
       Navigator.of(context)
-          .pushNamed(RoomScreen.pageId, arguments: RoomScreenArguments(room));
+          .pushNamed(RoomScreen.pageId, arguments: RoomScreenArguments(room!));
     } catch (e) {
       print("failed to join room : " + e.toString());
     }
@@ -66,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void initDynamicLinks() async {
     FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      final Uri deepLink = dynamicLink?.link;
+        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+      final Uri? deepLink = dynamicLink?.link;
       print('Deeplink 1: ' + deepLink.toString());
       if (deepLink != null) {
         List<String> segments = deepLink.pathSegments;
@@ -77,12 +78,12 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
-      print('Deeplink : ' + e.message);
+      print('Deeplink : ' + e.message!);
     });
 
-    final PendingDynamicLinkData data =
+    final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
-    final Uri deepLink = data?.link;
+    final Uri? deepLink = data?.link;
 
     if (deepLink != null) {
       List<String> segments = deepLink.pathSegments;
@@ -134,16 +135,16 @@ class _HomeScreenState extends State<HomeScreen> {
     fixtureBloc = FixtureBloc(client: client);
     tournamentBloc = TournamentBloc(client: client);
     roomsBloc = RoomsBloc(client: RestClient.create());
-    roomsBloc.getTrendingRooms();
-    tournamentBloc.getTournaments();
-    initialiseMethodeChannel();
+    roomsBloc!.getTrendingRooms();
+    tournamentBloc!.getTournaments();
+    listenForGlobalEvents();
     fetchConfig();
   }
 
   @override
   void dispose() {
-    fixtureBloc.dispose();
-    tournamentBloc.dispose();
+    fixtureBloc!.dispose();
+    tournamentBloc!.dispose();
     super.dispose();
   }
 
@@ -155,10 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     currentUser = context.watch<UserProvider>().currentUser;
     if (currentUser != null) {
-      if (currentUser.name == null || currentUser.name.isEmpty) {
+      if (currentUser!.name!.isEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       } else {
-        fixtureBloc.getFixtures();
+        fixtureBloc!.getFixtures();
       }
     }
 
@@ -282,16 +283,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
                         child: StreamBuilder<Response<List<Room>>>(
-                          stream: roomsBloc.roomsStream,
+                          stream: roomsBloc!.roomsStream,
                           builder: (context, snapShot) {
                             if (snapShot.hasData) {
-                              switch (snapShot.data.status) {
+                              switch (snapShot.data!.status) {
                                 case Status.LOADING:
                                 case Status.ERROR:
                                   return Container();
                                 case Status.COMPLETED:
                                   return buildTrendingCarousel(
-                                    snapShot.data.data,
+                                    snapShot.data!.data,
                                   );
                               }
                             }
@@ -304,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            if (kAppVersion < _appLatestVersion)
+            if (kAppVersion < _appLatestVersion!)
               SliverToBoxAdapter(
                 child: GestureDetector(
                   onTap: () => _launchURL(),
@@ -344,10 +345,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             StreamBuilder<Response<List<Tournament>>>(
-                stream: tournamentBloc.tournamentsStream,
+                stream: tournamentBloc!.tournamentsStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    switch (snapshot.data.status) {
+                    switch (snapshot.data!.status) {
                       case Status.LOADING:
                       case Status.ERROR:
                         return SliverToBoxAdapter(child: Container());
@@ -356,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
                             child: Center(
-                              child: buildTournamentList(snapshot.data.data),
+                              child: buildTournamentList(snapshot.data!.data),
                             ),
                           ),
                         );
@@ -371,15 +372,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             StreamBuilder<Response<List<Fixture>>>(
-                stream: fixtureBloc.fixturesStream,
+                stream: fixtureBloc!.fixturesStream,
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
-                    switch (snapShot.data.status) {
+                    switch (snapShot.data!.status) {
                       case Status.LOADING:
                       case Status.ERROR:
                         return SliverToBoxAdapter(child: Container());
                       case Status.COMPLETED:
-                        return buildFixtureList(snapShot.data.data);
+                        return buildFixtureList(snapShot.data!.data);
                     }
                   }
                   return SliverToBoxAdapter(child: Container());
@@ -394,14 +395,14 @@ class _HomeScreenState extends State<HomeScreen> {
         extendBody: true,
         bottomNavigationBar: context.watch<RTCProvider>().joined
             ? InRoomBottomBar(
-                room: context.watch<RTCProvider>().room,
+                room: context.watch<RTCProvider>().room!,
               )
             : null,
       ),
     );
   }
 
-  Row buildSectionHeading({IconData icon, String heading}) {
+  Row buildSectionHeading({required IconData icon, required String heading}) {
     return Row(
       children: [
         SizedBox(
@@ -515,8 +516,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               tournamentName: tournaments[i].name ?? '',
                               banner: tournaments[i].banner ?? '',
                               startDate:
-                                  tournaments[i].currentSeason.start ?? '',
-                              endDate: tournaments[i].currentSeason.end ?? '',
+                                  tournaments[i].currentSeason!.start ?? '',
+                              endDate: tournaments[i].currentSeason!.end ?? '',
                             ),
                           );
                         });
@@ -529,8 +530,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildIconTitle({
-    IconData icon,
-    String title,
+    required IconData icon,
+    required String title,
     EdgeInsets padding = const EdgeInsets.all(0),
   }) {
     return Padding(
@@ -568,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
       items: rooms.map((room) {
         return Builder(
           builder: (BuildContext context) {
-            if (!room.isClosed)
+            if (!room.isClosed!)
               return Container(
                 width: MediaQuery.of(context).size.width,
                 child: GestureDetector(
@@ -579,28 +580,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             else
-              return null;
+              return Container();
           },
         );
       }).toList(),
     );
   }
 
-  void initialiseMethodeChannel() {
-    MethodChannel channel = MethodChannel(kMethodChannel);
-    channel.setMethodCallHandler(_methodCallHandler);
-  }
-
-  Future<void> _methodCallHandler(MethodCall call) async {
-    switch (call.method) {
-      case 'leaveRoom':
-        Room room = Provider.of<RTCProvider>(context, listen: false).room;
+  void listenForGlobalEvents() {
+    widget.parentEvents.listen((event) {
+      if(event == ClientEvents.LeveRoom){
+        Room? room = Provider.of<RTCProvider>(context, listen: false).room;
         if(room != null){
-          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id);
+          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
         }
-        break;
-      default:
-        print('TestFairy: Ignoring invoke from native. This normally shouldn\'t happen.');
-    }
+      }
+    });
   }
 }

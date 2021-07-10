@@ -5,9 +5,9 @@ part 'score.g.dart';
 @JsonSerializable()
 class Score {
   @JsonKey(name: "home")
-  final int home;
+  final int? home;
   @JsonKey(name: "away")
-  final int away;
+  final int? away;
 
   Score(this.home, this.away);
 

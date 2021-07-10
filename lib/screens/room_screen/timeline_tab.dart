@@ -14,8 +14,8 @@ StreamBuilder<Event> buildMatchTimeline(
     stream: fixtureReference.child("events").onValue,
     builder: (context, snapShot) {
       if (snapShot.hasData) {
-        if (snapShot.data.snapshot.value != null) {
-          var events = snapShot.data.snapshot.value;
+        if (snapShot.data!.snapshot.value != null) {
+          var events = snapShot.data!.snapshot.value;
           List<dynamic> matchEvents = events
               .map((event) => MatchEvent.fromDb(event))
               .toList() as List<dynamic>;
@@ -52,10 +52,10 @@ StreamBuilder<Event> buildMatchTimeline(
                     ),
                   ),
                 ),
-                startChild: (event.team.name == fixture.teams.home.name)
+                startChild: (event.team.name == fixture.teams!.home!.name)
                     ? buildEventCard(event, Position.left)
                     : Center(),
-                endChild: (matchEvents[i].team.name == fixture.teams.away.name)
+                endChild: (matchEvents[i].team.name == fixture.teams!.away!.name)
                     ? buildEventCard(event, Position.right)
                     : Center(),
               );

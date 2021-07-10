@@ -8,11 +8,13 @@ part of 'team.dart';
 
 Team _$TeamFromJson(Map<String, dynamic> json) {
   return Team(
-    json['id'] as String,
-    json['name'] as String,
-    json['externalId'] as int,
-    json['logo_url'] as String,
-    Lineup.fromJson(json['lineups'] as Map<String, dynamic>),
+    json['id'] as String?,
+    json['name'] as String?,
+    json['externalId'] as int?,
+    json['logo_url'] as String?,
+    json['lineups'] == null
+        ? null
+        : Lineup.fromJson(json['lineups'] as Map<String, dynamic>),
   );
 }
 
