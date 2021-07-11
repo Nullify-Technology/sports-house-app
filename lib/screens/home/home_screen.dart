@@ -4,6 +4,9 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:match_cafe/blocs/score_bat_bloc.dart';
+import 'package:match_cafe/models/score_bat.dart';
+import 'package:match_cafe/screens/highlight_screen/highlight_screen.dart';
 import 'package:match_cafe/utils/client_events.dart';
 import 'package:move_to_background/move_to_background.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TournamentBloc? tournamentBloc;
   AuthUser? currentUser;
   RoomsBloc? roomsBloc;
+  late ScoreBatBloc _scoreBatBloc;
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -135,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
     fixtureBloc = FixtureBloc(client: client);
     tournamentBloc = TournamentBloc(client: client);
     roomsBloc = RoomsBloc(client: RestClient.create());
+    _scoreBatBloc = ScoreBatBloc();
     roomsBloc!.getTrendingRooms();
     tournamentBloc!.getTournaments();
     listenForGlobalEvents();
@@ -282,8 +287,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                        child: StreamBuilder<Response<List<Room>>>(
-                          stream: roomsBloc!.roomsStream,
+                        child: StreamBuilder<Response<List<Fixture>>>(
+                          stream: fixtureBloc!.fixturesStream,
                           builder: (context, snapShot) {
                             if (snapShot.hasData) {
                               switch (snapShot.data!.status) {
@@ -299,6 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             return Container();
                           },
                         ),
+
                       ),
                     ],
                   ),
@@ -557,33 +563,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildTrendingCarousel(List<Room> rooms) {
-    return CarouselSlider(
-      options: CarouselOptions(
-        viewportFraction: 0.85,
-        height: 240.0,
-        enlargeStrategy: CenterPageEnlargeStrategy.scale,
-        enableInfiniteScroll: false,
-        enlargeCenterPage: true,
-      ),
-      items: rooms.map((room) {
-        return Builder(
-          builder: (BuildContext context) {
-            if (!room.isClosed!)
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                child: GestureDetector(
-                  child: TrendingRoomCard(
-                    room: room,
-                  ),
-                  onTap: () => joinRoom(room),
-                ),
-              );
+  Widget buildTrendingCarousel(List<Fixture> fixtures) {
+    return FutureBuilder<List<ScoreBat>>(
+      future: _scoreBatBloc.getHighLights(fixtures),
+      builder: (context, snapshot){
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting: return SizedBox();
+          default:
+            if (snapshot.hasError)
+              return SizedBox();
             else
-              return Container();
-          },
-        );
-      }).toList(),
+              return CarouselSlider(
+                options: CarouselOptions(
+                  viewportFraction: 0.85,
+                  height: 240.0,
+                  enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                  enableInfiniteScroll: false,
+                  enlargeCenterPage: true,
+                ),
+                items: snapshot.data?.map((scoreBat) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: GestureDetector(
+                            child: Image(image: CachedNetworkImageProvider(
+                              scoreBat.thumbnail!,
+                            ),fit: BoxFit.cover,),
+                            onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HighLightScreen(video: scoreBat.videos,)));},
+                          ),
+                        );
+                    },
+                  );
+                }).toList(),
+              );
+        }
+      },
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:match_cafe/models/score_bat.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:match_cafe/models/agora_room.dart';
 import 'package:match_cafe/models/api_response.dart';
@@ -58,6 +59,9 @@ abstract class RestClient {
   @POST("/room/{roomId}/leave")
   Future<void> leaveRoom(@Path() String roomId);
 
+  @GET("/")
+  Future<List<ScoreBat>> fetchHighlights();
+
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
   static RestClient create() {
@@ -65,5 +69,11 @@ abstract class RestClient {
     dio.interceptors.add(HttpLoggingInterceptor());
     dio.options.headers["Content-Type"] = "application/json";
     return RestClient(dio);
+  }
+
+  static RestClient createWithUrl(String url) {
+    final dio = Dio();
+    dio.interceptors.add(HttpLoggingInterceptor());
+    return RestClient(dio, baseUrl: url);
   }
 }
