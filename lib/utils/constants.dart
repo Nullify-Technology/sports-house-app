@@ -21,7 +21,7 @@ const Color kProfileMutedBgColor = Color(0xbb000000);
 
 // Login Screen
 const String kAppName = 'Match Cafe';
-const double kAppVersion = 0.2;
+const double kAppVersion = 0.3;
 const String kPhone = 'Phone';
 const String kOtp = 'OTP';
 const String kSendOtp = 'Send OTP';
