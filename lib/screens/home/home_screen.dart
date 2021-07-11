@@ -33,6 +33,7 @@ import 'package:match_cafe/utils/reusable_components/TrendingRoomCard.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   final Stream<ClientEvents> parentEvents;
@@ -281,8 +282,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     children: [
                       buildIconTitle(
-                        icon: Icons.recommend,
-                        title: kTrending,
+                        icon: Icons.movie_filter,
+                        title: kHighlights,
                         padding: EdgeInsets.only(left: 30),
                       ),
                       Padding(
@@ -304,7 +305,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             return Container();
                           },
                         ),
-
                       ),
                     ],
                   ),
@@ -566,9 +566,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget buildTrendingCarousel(List<Fixture> fixtures) {
     return FutureBuilder<List<ScoreBat>>(
       future: _scoreBatBloc.getHighLights(fixtures),
-      builder: (context, snapshot){
+      builder: (context, snapshot) {
         switch (snapshot.connectionState) {
-          case ConnectionState.waiting: return SizedBox();
+          case ConnectionState.waiting:
+            return SizedBox();
           default:
             if (snapshot.hasError)
               return SizedBox();
@@ -584,15 +585,94 @@ class _HomeScreenState extends State<HomeScreen> {
                 items: snapshot.data?.map((scoreBat) {
                   return Builder(
                     builder: (BuildContext context) {
-                        return Container(
+                      return Card(
+                        clipBehavior: Clip.hardEdge,
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Container(
                           width: MediaQuery.of(context).size.width,
                           child: GestureDetector(
-                            child: Image(image: CachedNetworkImageProvider(
-                              scoreBat.thumbnail!,
-                            ),fit: BoxFit.cover,),
-                            onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HighLightScreen(video: scoreBat.videos,)));},
+                            child: Container(
+                              // clipBehavior: Clip.hardEdge,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    color: Colors.black,
+                                  ),
+                                  Image(
+                                    image: CachedNetworkImageProvider(
+                                      scoreBat.thumbnail!,
+                                    ),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Opacity(
+                                    opacity: 0.7,
+                                    child: Container(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kColorGreen,
+                                    ),
+                                    child: Icon(
+                                      Icons.play_arrow,
+                                      color: kCardBgColor,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  if (scoreBat.side1 != null &&
+                                      scoreBat.side1!.name != null &&
+                                      scoreBat.side2 != null &&
+                                      scoreBat.side2!.name != null)
+                                    Positioned(
+                                      bottom: 0,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                '${scoreBat.side1!.name} Vs ${scoreBat.side2!.name}',
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: kHeadingFontSize,
+                                          ),
+                                          SizedBox(
+                                            height: 3,
+                                          ),
+                                          CustomText(
+                                            text:
+                                                '${DateFormat.yMMMMd().add_jm().format(DateTime.parse(scoreBat.date!).toLocal())}',
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HighLightScreen(
+                                    video: scoreBat.videos,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
+                        ),
+                      );
                     },
                   );
                 }).toList(),
@@ -604,9 +684,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void listenForGlobalEvents() {
     widget.parentEvents.listen((event) {
-      if(event == ClientEvents.LeveRoom){
+      if (event == ClientEvents.LeveRoom) {
         Room? room = Provider.of<RTCProvider>(context, listen: false).room;
-        if(room != null){
+        if (room != null) {
           Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
         }
       }

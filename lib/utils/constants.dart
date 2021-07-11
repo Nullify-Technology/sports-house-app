@@ -152,6 +152,6 @@ const String kListening = "Listening";
 const String kTalking = "Talking";
 const String kDBSpeaker = "speakers";
 const String kDBAudience = "audience";
+const String kHighlights = "Highlights";
 
 const String kScoreBatApi = "https://www.scorebat.com/video-api/v1/";
-
