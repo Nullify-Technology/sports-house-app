@@ -341,7 +341,7 @@ class _EventRoomsState extends State<EventRooms> {
                 FirebaseDatabase(databaseURL: kRTDBUrl)
                     .reference()
                     .child(kRTCRoom)
-                    .child(rooms[index].id!);
+                    .child(rooms[index].id!).child(kDBSpeaker);
 
             return StreamBuilder<Event>(
               stream: roomReference.onValue,

@@ -18,7 +18,7 @@ class InRoomBottomBar extends StatelessWidget {
     DatabaseReference roomReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child(kRTCRoom)
-        .child(room.id!);
+        .child(room.id!).child(kDBSpeaker);
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, RoomScreen.pageId,

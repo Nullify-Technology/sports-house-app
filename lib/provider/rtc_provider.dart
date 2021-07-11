@@ -81,7 +81,11 @@ class RTCProvider with ChangeNotifier {
         if(event.snapshot.key != null){
           if(event.snapshot.key == _currentUser!.id){
             _currentUser!.isSpeaker = true;
-            print("speaker added ${event.snapshot.value}");
+            _databaseReference.child(room.id!).child(kDBSpeaker).child(_currentUser!.id!).child("isModerator").onValue.listen((event) {
+              if(event.snapshot.value != null){
+                _currentUser!.isModerator = event.snapshot.value;
+              }
+            });
             notifyListeners();
           }
         }
@@ -128,6 +132,7 @@ class RTCProvider with ChangeNotifier {
 
   Future promoToModerator(AuthUser user) async {
     user.isModerator = true;
+    user.isSpeaker = true;
     await _databaseReference.child(room!.id!).child(kDBSpeaker).child(user.id!).set(user.toJson());
   }
 

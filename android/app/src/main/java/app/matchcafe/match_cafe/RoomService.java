@@ -16,11 +16,13 @@ public class RoomService extends Service {
 
     public static final String ACTION_LEAVE = "ACTION_LEAVE";
     public static final String ACTION_START = "ACTION_START";
+    public static final String ACTION_OPEN = "ACTION_OPEN";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null)
         {
             String action = intent.getAction();
+            Log.d("Actions", action);
             if (ACTION_LEAVE.equals(action)) {
                 leaveRoom();
             }else if(ACTION_START.equals(action)){
@@ -36,11 +38,19 @@ public class RoomService extends Service {
                     .setContentText("Created by: "+ createdBy)
                     .setContentTitle("You are now listening to " + roomName)
                     .setSmallIcon(R.mipmap.ic_launcher);
-            Intent playIntent = new Intent(this, RoomService.class);
-            playIntent.setAction(ACTION_LEAVE);
-            PendingIntent pendingPlayIntent = PendingIntent.getService(this, 0, playIntent, 0);
+            Intent leaveIntent = new Intent(this, RoomService.class);
+            leaveIntent.setAction(ACTION_LEAVE);
+
+            Intent openIntent = new Intent(this, MainActivity.class);
+            openIntent.setAction(ACTION_OPEN);
+            PendingIntent pendingIntent=PendingIntent.getActivity(this, 0,
+                    openIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+            PendingIntent pendingPlayIntent = PendingIntent.getService(this, 0, leaveIntent, 0);
             NotificationCompat.Action leaveAction = new NotificationCompat.Action(android.R.drawable.ic_media_next, "Leave room", pendingPlayIntent);
             builder.addAction(leaveAction);
+            builder.setContentIntent(pendingIntent);
             builder.setPriority(NotificationManager.IMPORTANCE_MAX);
             startForeground(101,builder.build());
         }

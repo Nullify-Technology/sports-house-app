@@ -22,6 +22,7 @@ import io.flutter.embedding.engine.plugins.util.GeneratedPluginRegister;
 import io.flutter.plugin.common.MethodChannel;
 
 import static app.matchcafe.match_cafe.MatchCafeApplication.CHANNEL;
+import static app.matchcafe.match_cafe.RoomService.ACTION_OPEN;
 import static app.matchcafe.match_cafe.RoomService.ACTION_START;
 
 public class MainActivity extends FlutterActivity {
@@ -83,5 +84,10 @@ public class MainActivity extends FlutterActivity {
         } else {
             startService(roomService);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }
