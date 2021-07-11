@@ -135,7 +135,7 @@ const String kUnavailable = "Unavailable";
 const String kRoomNetworkAlert =
     "Unable to join the room now. Please try again later";
 const String kMediaServer = "media.sports-house.in";
-const String kIonMediaServer = "http://52.14.92.61:50051";
+const String kIonMediaServer = "http://media.sports-house.in:50051";
 const String kNewUpdateAvailable = "New update available!";
 const String kClickHereToInstall = "Click here to install";
 const String kWebSiteUrl = "https://matchcafe.app/";
