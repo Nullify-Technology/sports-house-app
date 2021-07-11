@@ -29,7 +29,8 @@ class RoomScreenArguments {
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
   final Stream<ClientEvents> parentEvents;
-  RoomScreen({Key? key, required this.arguments, required this.parentEvents}) : super(key: key);
+  RoomScreen({Key? key, required this.arguments, required this.parentEvents})
+      : super(key: key);
   static String pageId = 'RoomScreen';
 
   @override
@@ -96,7 +97,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     if (user.isModerator!) {
       options.add(SimpleDialogOption(
         padding: EdgeInsets.all(15),
-        child: Text("Demote to listener"),
+        child: Text("Move to listeners"),
         onPressed: () {
           Provider.of<RTCProvider>(context, listen: false)
               .demoteToListener(user);
@@ -120,7 +121,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .demoteToListener(user);
           Navigator.of(context).pop();
         },
-        child: Text("Demote to listener"),
+        child: Text("Move to listeners"),
       ));
     } else if (!user.isSpeaker!) {
       options.add(SimpleDialogOption(
@@ -130,7 +131,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .promoteToSpeaker(user);
           Navigator.of(context).pop();
         },
-        child: Text("Promote to Speaker"),
+        child: Text("Invite to speak"),
       ));
     }
     SimpleDialog alert = SimpleDialog(children: options);
@@ -159,9 +160,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   void listenForGlobalEvents() {
     widget.parentEvents.listen((event) {
-      if(event == ClientEvents.LeveRoom){
+      if (event == ClientEvents.LeveRoom) {
         Room? room = Provider.of<RTCProvider>(context, listen: false).room;
-        if(room != null){
+        if (room != null) {
           Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
         }
         Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
@@ -392,24 +393,23 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                 userDetails.values.toList()[index]));
                         if (_currentUser.isModerator!) {
                           return GestureDetector(
-                            onTap: () =>
-                                showParticipantOptions(context, user),
+                            onTap: () => showParticipantOptions(context, user),
                             child: buildParticipant(
-                                  imageUrl: user.profilePictureUrl,
-                                  name: user.name,
-                                  peerId: user.peerId,
-                                  isMuted: user.muted,
-                                  isModerator: user.isModerator,
-                                  isSpeaker: user.isSpeaker)!,
-                          );
-                        } else {
-                          return buildParticipant(
                                 imageUrl: user.profilePictureUrl,
                                 name: user.name,
                                 peerId: user.peerId,
                                 isMuted: user.muted,
                                 isModerator: user.isModerator,
-                                isSpeaker: user.isSpeaker)!;
+                                isSpeaker: user.isSpeaker)!,
+                          );
+                        } else {
+                          return buildParticipant(
+                              imageUrl: user.profilePictureUrl,
+                              name: user.name,
+                              peerId: user.peerId,
+                              isMuted: user.muted,
+                              isModerator: user.isModerator,
+                              isSpeaker: user.isSpeaker)!;
                         }
                       },
                       itemCount: userDetails.length,
@@ -446,24 +446,24 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                     userDetails.values.toList()[index]));
                             if (_currentUser.isModerator!) {
                               return GestureDetector(
-                                    onTap: () =>
-                                        showParticipantOptions(context, user),
-                                    child: buildParticipant(
-                                        imageUrl: user.profilePictureUrl,
-                                        name: user.name,
-                                        peerId: user.peerId,
-                                        isMuted: user.muted,
-                                        isModerator: user.isModerator,
-                                        isSpeaker: user.isSpeaker)!,
-                                  );
-                            } else {
-                              return buildParticipant(
+                                onTap: () =>
+                                    showParticipantOptions(context, user),
+                                child: buildParticipant(
                                     imageUrl: user.profilePictureUrl,
                                     name: user.name,
                                     peerId: user.peerId,
                                     isMuted: user.muted,
                                     isModerator: user.isModerator,
-                                    isSpeaker: user.isSpeaker)!;
+                                    isSpeaker: user.isSpeaker)!,
+                              );
+                            } else {
+                              return buildParticipant(
+                                  imageUrl: user.profilePictureUrl,
+                                  name: user.name,
+                                  peerId: user.peerId,
+                                  isMuted: user.muted,
+                                  isModerator: user.isModerator,
+                                  isSpeaker: user.isSpeaker)!;
                             }
                           },
                           itemCount: userDetails.length,
@@ -575,9 +575,31 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           SizedBox(
             height: 10,
           ),
-          Text(
-            name ?? '',
-            textAlign: TextAlign.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isModerator != null && isModerator)
+                Container(
+                  decoration: BoxDecoration(
+                    color: kColorGreen,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.stream,
+                    size: 15,
+                    color: kColorBlack,
+                  ),
+                ),
+              SizedBox(
+                width: 5,
+              ),
+              CustomText(
+                text: (name!.indexOf(" ") > 0)
+                    ? '${name.substring(0, name.indexOf(" "))}'
+                    : '$name',
+                fontWeight: FontWeight.bold,
+              ),
+            ],
           ),
         ],
       ),
