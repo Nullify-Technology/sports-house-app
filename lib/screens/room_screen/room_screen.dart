@@ -374,55 +374,58 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   List<Widget> buildParticipantList() {
     return context.watch<RTCProvider>().joined
         ? [
-            StreamBuilder<Event>(
-              stream: roomReference.child(kDBSpeaker).onValue,
-              builder: (context, snapShot) {
-                if (snapShot.hasData) {
-                  if (snapShot.data!.snapshot.value != null) {
-                    Map<String, dynamic> userDetails =
-                        new Map<String, dynamic>.from(
-                            snapShot.data!.snapshot.value);
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (BuildContext context, int index) {
-                        AuthUser user = AuthUser.fromJson(
-                            Map<String, dynamic>.from(
-                                userDetails.values.toList()[index]));
-                        if (_currentUser.isModerator!) {
-                          return GestureDetector(
-                            onTap: () => showParticipantOptions(context, user),
-                            child: buildParticipant(
+            Container(
+              child: StreamBuilder<Event>(
+                stream: roomReference.child(kDBSpeaker).onValue,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    if (snapShot.data!.snapshot.value != null) {
+                      Map<String, dynamic> userDetails =
+                          new Map<String, dynamic>.from(
+                              snapShot.data!.snapshot.value);
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (BuildContext context, int index) {
+                          AuthUser user = AuthUser.fromJson(
+                              Map<String, dynamic>.from(
+                                  userDetails.values.toList()[index]));
+                          if (_currentUser.isModerator!) {
+                            return GestureDetector(
+                              onTap: () =>
+                                  showParticipantOptions(context, user),
+                              child: buildParticipant(
+                                  imageUrl: user.profilePictureUrl,
+                                  name: user.name,
+                                  peerId: user.peerId,
+                                  isMuted: user.muted,
+                                  isModerator: user.isModerator,
+                                  isSpeaker: user.isSpeaker)!,
+                            );
+                          } else {
+                            return buildParticipant(
                                 imageUrl: user.profilePictureUrl,
                                 name: user.name,
                                 peerId: user.peerId,
                                 isMuted: user.muted,
                                 isModerator: user.isModerator,
-                                isSpeaker: user.isSpeaker)!,
-                          );
-                        } else {
-                          return buildParticipant(
-                              imageUrl: user.profilePictureUrl,
-                              name: user.name,
-                              peerId: user.peerId,
-                              isMuted: user.muted,
-                              isModerator: user.isModerator,
-                              isSpeaker: user.isSpeaker)!;
-                        }
-                      },
-                      itemCount: userDetails.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.5,
-                      ),
-                    );
+                                isSpeaker: user.isSpeaker)!;
+                          }
+                        },
+                        itemCount: userDetails.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing: 10,
+                          crossAxisCount: 4,
+                          childAspectRatio: 0.5,
+                        ),
+                      );
+                    }
                   }
-                }
-                return Container();
-              },
+                  return Container();
+                },
+              ),
             ),
             StreamBuilder<Event>(
               stream: roomReference.child(kDBAudience).onValue,
@@ -434,7 +437,20 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                             snapShot.data!.snapshot.value);
                     return Column(
                       children: [
-                        Text(kAudience),
+                        Row(
+                          children: [
+                            Text(
+                              kAudience,
+                              style: TextStyle(
+                                fontSize: kHeadingFontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
                         GridView.builder(
                           shrinkWrap: true,
                           physics: ClampingScrollPhysics(),
@@ -511,63 +527,32 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
-                Container(
-                  padding: EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (isModerator != null && isModerator)
-                        ? kInRoomBottomBarBgColor
-                        : null,
-                  ),
-                  child: CircleAvatar(
-                    radius: 30.0,
-                    backgroundImage: AssetImage(
-                      kProfilePlaceHolder,
-                    ),
-                    foregroundImage: CachedNetworkImageProvider(
-                      imageUrl ?? kProfilePlaceHolderUrl,
-                    ),
-                    onForegroundImageError: (exception, stackTrace) {
-                      print(exception);
-                    },
-                  ),
-                ),
                 (isSpeaker != null && isSpeaker)
                     ? StreamBuilder<List<String>>(
                         stream: context.watch<RTCProvider>().roomsStream,
                         builder: (context, snapShot) {
                           if (snapShot.hasData &&
                               snapShot.data!.contains(peerId)) {
-                            return Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: kProfileMutedBgColor,
-                              ),
-                              child: Icon(
-                                isMuted! ? Icons.mic_off_rounded : Icons.mic,
-                                color: isMuted
-                                    ? kMutedButtonColor
-                                    : kUnmutedButtonColor,
-                                size: 17,
-                              ),
-                            );
+                            return buildSpeakingContainer(true, imageUrl);
                           }
-                          return Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: kProfileMutedBgColor,
-                            ),
-                            child: Icon(
-                              isMuted! ? Icons.mic_off_rounded : Icons.mic_none,
-                              color: isMuted
-                                  ? kMutedButtonColor
-                                  : kUnmutedButtonColor,
-                              size: 17,
-                            ),
-                          );
+                          return buildSpeakingContainer(false, imageUrl);
                         })
+                    : buildSpeakingContainer(false, imageUrl),
+                // buildSpeakingContainer(isModerator, imageUrl),
+                (isSpeaker != null && isSpeaker)
+                    ? Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: kProfileMutedBgColor,
+                        ),
+                        child: Icon(
+                          isMuted! ? Icons.mic_off_rounded : Icons.mic_none,
+                          color:
+                              isMuted ? kMutedButtonColor : kUnmutedButtonColor,
+                          size: 17,
+                        ),
+                      )
                     : Container(),
               ],
             ),
@@ -602,6 +587,29 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Container buildSpeakingContainer(bool? isSpeaking, String? imageUrl) {
+    print('isSpeaking $isSpeaking');
+    return Container(
+      padding: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: (isSpeaking! && isSpeaking) ? kInRoomBottomBarBgColor : null,
+      ),
+      child: CircleAvatar(
+        radius: 30.0,
+        backgroundImage: AssetImage(
+          kProfilePlaceHolder,
+        ),
+        foregroundImage: CachedNetworkImageProvider(
+          imageUrl!,
+        ),
+        onForegroundImageError: (exception, stackTrace) {
+          print(exception);
+        },
       ),
     );
   }

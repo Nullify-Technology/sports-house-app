@@ -147,7 +147,6 @@ const String kShareMessage =
     "Hi,\nWe are talking about #GAME in this Match Cafe room, you can join our chat by clicking the following link.";
 
 const String kSpeakers = "Speakers";
-const String kAudience = "Audience";
+const String kAudience = "Listeners";
 const String kDBSpeaker = "speakers";
 const String kDBAudience = "audience";
-
