@@ -112,7 +112,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .promoToModerator(user);
           Navigator.of(context).pop();
         },
-        child: Text("Promote to Moderator"),
+        child: Text("Promote to moderator"),
       ));
       options.add(SimpleDialogOption(
         padding: EdgeInsets.all(15),
@@ -134,7 +134,10 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         child: Text("Invite to speak"),
       ));
     }
-    SimpleDialog alert = SimpleDialog(children: options);
+    SimpleDialog alert = SimpleDialog(
+      children: options,
+      title: Text('Actions'),
+    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -325,48 +328,74 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Widget buildParticipantsView() {
-    return Card(
-      margin: EdgeInsets.all(0),
-      color: kCardBgColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: kCreateRoomCardRadius,
-          topRight: kCreateRoomCardRadius,
+    return SingleChildScrollView(
+      child: Card(
+        margin: EdgeInsets.all(0),
+        color: kCardBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: kCreateRoomCardRadius,
+            topRight: kCreateRoomCardRadius,
+          ),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.fromLTRB(
+            30,
+            30,
+            30,
+            70,
+          ),
+          color: kCardBgColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              buildIconTitle(
+                icon: Icons.graphic_eq,
+                title: kTalking,
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              ...buildParticipantList(),
+              //Needed for padding bottomNavBar
+              // SizedBox(
+              //   height: 60,
+              // ),
+            ],
+          ),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          30,
-          30,
-          30,
-          70,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                Text(
-                  kParticipants,
-                  style: TextStyle(
-                    fontSize: kHeadingFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    );
+  }
+
+  Widget buildIconTitle({
+    required IconData icon,
+    required String title,
+    EdgeInsets padding = const EdgeInsets.all(0),
+  }) {
+    return Padding(
+      padding: padding,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: kHeadingFontSize + 3,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: kHeadingFontSize,
+              fontWeight: FontWeight.bold,
             ),
-            SizedBox(
-              height: 10,
-            ),
-            ...buildParticipantList(),
-            //Needed for padding bottomNavBar
-            SizedBox(
-              height: 60,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -416,9 +445,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                         },
                         itemCount: userDetails.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisSpacing: 10,
-                          crossAxisCount: 4,
-                          childAspectRatio: 0.5,
+                          crossAxisSpacing: 5,
+                          crossAxisCount: 3,
+                          childAspectRatio: 0.85,
                         ),
                       );
                     }
@@ -437,19 +466,12 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                             snapShot.data!.snapshot.value);
                     return Column(
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              kAudience,
-                              style: TextStyle(
-                                fontSize: kHeadingFontSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        buildIconTitle(
+                          icon: Icons.hearing,
+                          title: kListening,
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         GridView.builder(
                           shrinkWrap: true,
@@ -487,7 +509,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisSpacing: 10,
                             crossAxisCount: 4,
-                            childAspectRatio: 0.5,
+                            childAspectRatio: 0.85,
                           ),
                         ),
                       ],
@@ -515,15 +537,16 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 5,
-      ),
+      // padding: EdgeInsets.symmetric(
+      //   horizontal: 5,
+      //   vertical: 5,
+      // ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             // color: Colors.red,
+            alignment: Alignment.center,
             child: Stack(
               alignment: Alignment.bottomRight,
               children: [
@@ -600,7 +623,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
         color: (isSpeaking! && isSpeaking) ? kInRoomBottomBarBgColor : null,
       ),
       child: CircleAvatar(
-        radius: 30.0,
+        radius: 32.0,
         backgroundImage: AssetImage(
           kProfilePlaceHolder,
         ),
