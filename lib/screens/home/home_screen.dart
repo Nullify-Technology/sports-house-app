@@ -643,6 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 '${scoreBat.side1!.name} Vs ${scoreBat.side2!.name}',
                                             fontWeight: FontWeight.bold,
                                             fontSize: kHeadingFontSize,
+                                            color: Colors.white60,
                                           ),
                                           SizedBox(
                                             height: 3,
@@ -650,6 +651,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           CustomText(
                                             text:
                                                 '${DateFormat.yMMMMd().add_jm().format(DateTime.parse(scoreBat.date!).toLocal())}',
+                                            color: Colors.white60,
                                           ),
                                           SizedBox(
                                             height: 20,
