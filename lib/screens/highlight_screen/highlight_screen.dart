@@ -83,7 +83,9 @@ class _HighLightScreenState extends State<HighLightScreen> {
                   loading = false;
                 });
               },
-              onLoadError: (controller, url, code, message) {},
+              onLoadError: (controller, url, code, message) {
+                print(message);
+              },
             ),
             loading
                 ? Container(
