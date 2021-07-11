@@ -628,7 +628,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           kProfilePlaceHolder,
         ),
         foregroundImage: CachedNetworkImageProvider(
-          imageUrl!,
+          imageUrl != null ? imageUrl : kProfilePlaceHolder,
         ),
         onForegroundImageError: (exception, stackTrace) {
           print(exception);
