@@ -29,7 +29,8 @@ class RoomScreenArguments {
 class RoomScreen extends StatefulWidget {
   final RoomScreenArguments arguments;
   final Stream<ClientEvents> parentEvents;
-  RoomScreen({Key? key, required this.arguments, required this.parentEvents}) : super(key: key);
+  RoomScreen({Key? key, required this.arguments, required this.parentEvents})
+      : super(key: key);
   static String pageId = 'RoomScreen';
 
   @override
@@ -96,7 +97,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     if (user.isModerator!) {
       options.add(SimpleDialogOption(
         padding: EdgeInsets.all(15),
-        child: Text("Demote to listener"),
+        child: Text("Move to listeners"),
         onPressed: () {
           Provider.of<RTCProvider>(context, listen: false)
               .demoteToListener(user);
@@ -111,7 +112,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .promoToModerator(user);
           Navigator.of(context).pop();
         },
-        child: Text("Promote to Moderator"),
+        child: Text("Promote to moderator"),
       ));
       options.add(SimpleDialogOption(
         padding: EdgeInsets.all(15),
@@ -120,7 +121,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .demoteToListener(user);
           Navigator.of(context).pop();
         },
-        child: Text("Demote to listener"),
+        child: Text("Move to listeners"),
       ));
     } else if (!user.isSpeaker!) {
       options.add(SimpleDialogOption(
@@ -130,10 +131,13 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
               .promoteToSpeaker(user);
           Navigator.of(context).pop();
         },
-        child: Text("Promote to Speaker"),
+        child: Text("Invite to speak"),
       ));
     }
-    SimpleDialog alert = SimpleDialog(children: options);
+    SimpleDialog alert = SimpleDialog(
+      children: options,
+      title: Text('Actions'),
+    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -159,9 +163,9 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
 
   void listenForGlobalEvents() {
     widget.parentEvents.listen((event) {
-      if(event == ClientEvents.LeveRoom){
+      if (event == ClientEvents.LeveRoom) {
         Room? room = Provider.of<RTCProvider>(context, listen: false).room;
-        if(room != null){
+        if (room != null) {
           Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
         }
         Navigator.popUntil(context, ModalRoute.withName(HomeScreen.pageId));
@@ -200,7 +204,7 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                   // centerTitle: true,
                   background: Padding(
                     padding:
-                        const EdgeInsets.only(top: 70, left: 15, right: 15),
+                        const EdgeInsets.only(top: 30, left: 15, right: 15),
                     child: buildRoomHeader(widget.arguments.room,
                         fixtureReference, roomReference, _currentUser),
                   ),
@@ -324,48 +328,74 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   }
 
   Widget buildParticipantsView() {
-    return Card(
-      margin: EdgeInsets.all(0),
-      color: kCardBgColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: kCreateRoomCardRadius,
-          topRight: kCreateRoomCardRadius,
+    return SingleChildScrollView(
+      child: Card(
+        margin: EdgeInsets.all(0),
+        color: kCardBgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: kCreateRoomCardRadius,
+            topRight: kCreateRoomCardRadius,
+          ),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.fromLTRB(
+            30,
+            30,
+            30,
+            70,
+          ),
+          color: kCardBgColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              buildIconTitle(
+                icon: Icons.graphic_eq,
+                title: kTalking,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              ...buildParticipantList(),
+              //Needed for padding bottomNavBar
+              // SizedBox(
+              //   height: 60,
+              // ),
+            ],
+          ),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          30,
-          30,
-          30,
-          70,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                Text(
-                  kParticipants,
-                  style: TextStyle(
-                    fontSize: kHeadingFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    );
+  }
+
+  Widget buildIconTitle({
+    required IconData icon,
+    required String title,
+    EdgeInsets padding = const EdgeInsets.all(0),
+  }) {
+    return Padding(
+      padding: padding,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: kHeadingFontSize + 3,
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: kHeadingFontSize,
+              fontWeight: FontWeight.bold,
             ),
-            SizedBox(
-              height: 10,
-            ),
-            ...buildParticipantList(),
-            //Needed for padding bottomNavBar
-            SizedBox(
-              height: 60,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -373,8 +403,71 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
   List<Widget> buildParticipantList() {
     return context.watch<RTCProvider>().joined
         ? [
+            Container(
+              child: StreamBuilder<Event>(
+                stream: roomReference.child(kDBSpeaker).onValue,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    if (snapShot.data!.snapshot.value != null) {
+                      Map<String, dynamic> userDetails =
+                          new Map<String, dynamic>.from(
+                              snapShot.data!.snapshot.value);
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (BuildContext context, int index) {
+                          AuthUser user = AuthUser.fromJson(
+                              Map<String, dynamic>.from(
+                                  userDetails.values.toList()[index]));
+                          if (_currentUser.isModerator!) {
+                            return GestureDetector(
+                              onTap: () =>
+                                  showParticipantOptions(context, user),
+                              child: buildParticipant(
+                                  imageUrl: user.profilePictureUrl,
+                                  name: user.name,
+                                  peerId: user.peerId,
+                                  isMuted: user.muted,
+                                  isModerator: user.isModerator,
+                                  isSpeaker: user.isSpeaker)!,
+                            );
+                          } else {
+                            return buildParticipant(
+                                imageUrl: user.profilePictureUrl,
+                                name: user.name,
+                                peerId: user.peerId,
+                                isMuted: user.muted,
+                                isModerator: user.isModerator,
+                                isSpeaker: user.isSpeaker)!;
+                          }
+                        },
+                        itemCount: userDetails.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing: 5,
+                          crossAxisCount: 3,
+                          // childAspectRatio: 0.9,
+                        ),
+                      );
+                    }
+                  }
+                  return Container();
+                },
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            buildIconTitle(
+              icon: Icons.hearing,
+              title: kListening,
+            ),
+            SizedBox(
+              height: 20,
+            ),
             StreamBuilder<Event>(
-              stream: roomReference.child(kDBSpeaker).onValue,
+              stream: roomReference.child(kDBAudience).onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
                   if (snapShot.data!.snapshot.value != null) {
@@ -392,89 +485,31 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
                                 userDetails.values.toList()[index]));
                         if (_currentUser.isModerator!) {
                           return GestureDetector(
-                            onTap: () =>
-                                showParticipantOptions(context, user),
+                            onTap: () => showParticipantOptions(context, user),
                             child: buildParticipant(
-                                  imageUrl: user.profilePictureUrl,
-                                  name: user.name,
-                                  peerId: user.peerId,
-                                  isMuted: user.muted,
-                                  isModerator: user.isModerator,
-                                  isSpeaker: user.isSpeaker)!,
-                          );
-                        } else {
-                          return buildParticipant(
                                 imageUrl: user.profilePictureUrl,
                                 name: user.name,
                                 peerId: user.peerId,
                                 isMuted: user.muted,
                                 isModerator: user.isModerator,
-                                isSpeaker: user.isSpeaker)!;
+                                isSpeaker: user.isSpeaker)!,
+                          );
+                        } else {
+                          return buildParticipant(
+                              imageUrl: user.profilePictureUrl,
+                              name: user.name,
+                              peerId: user.peerId,
+                              isMuted: user.muted,
+                              isModerator: user.isModerator,
+                              isSpeaker: user.isSpeaker)!;
                         }
                       },
                       itemCount: userDetails.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 4,
-                        childAspectRatio: 0.5,
+                        crossAxisSpacing: 5,
+                        crossAxisCount: 3,
+                        // childAspectRatio: 0.9,
                       ),
-                    );
-                  }
-                }
-                return Container();
-              },
-            ),
-            StreamBuilder<Event>(
-              stream: roomReference.child(kDBAudience).onValue,
-              builder: (context, snapShot) {
-                if (snapShot.hasData) {
-                  if (snapShot.data!.snapshot.value != null) {
-                    Map<String, dynamic> userDetails =
-                        new Map<String, dynamic>.from(
-                            snapShot.data!.snapshot.value);
-                    return Column(
-                      children: [
-                        Text(kAudience),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: ClampingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (BuildContext context, int index) {
-                            AuthUser user = AuthUser.fromJson(
-                                Map<String, dynamic>.from(
-                                    userDetails.values.toList()[index]));
-                            if (_currentUser.isModerator!) {
-                              return GestureDetector(
-                                    onTap: () =>
-                                        showParticipantOptions(context, user),
-                                    child: buildParticipant(
-                                        imageUrl: user.profilePictureUrl,
-                                        name: user.name,
-                                        peerId: user.peerId,
-                                        isMuted: user.muted,
-                                        isModerator: user.isModerator,
-                                        isSpeaker: user.isSpeaker)!,
-                                  );
-                            } else {
-                              return buildParticipant(
-                                    imageUrl: user.profilePictureUrl,
-                                    name: user.name,
-                                    peerId: user.peerId,
-                                    isMuted: user.muted,
-                                    isModerator: user.isModerator,
-                                    isSpeaker: user.isSpeaker)!;
-                            }
-                          },
-                          itemCount: userDetails.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisSpacing: 10,
-                            crossAxisCount: 4,
-                            childAspectRatio: 0.5,
-                          ),
-                        ),
-                      ],
                     );
                   }
                 }
@@ -499,75 +534,48 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 5,
-        vertical: 5,
-      ),
+      // padding: EdgeInsets.symmetric(
+      //   horizontal: 5,
+      //   vertical: 5,
+      // ),
+      // color: kColorBlack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             // color: Colors.red,
+            alignment: Alignment.center,
             child: Stack(
-              alignment: Alignment.bottomRight,
+              alignment: (isSpeaker != null && isSpeaker)
+                  ? Alignment.bottomRight
+                  : Alignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (isModerator != null && isModerator)
-                        ? kInRoomBottomBarBgColor
-                        : null,
-                  ),
-                  child: CircleAvatar(
-                    radius: 30.0,
-                    backgroundImage: AssetImage(
-                      kProfilePlaceHolder,
-                    ),
-                    foregroundImage: CachedNetworkImageProvider(
-                      imageUrl ?? kProfilePlaceHolderUrl,
-                    ),
-                    onForegroundImageError: (exception, stackTrace) {
-                      print(exception);
-                    },
-                  ),
-                ),
                 (isSpeaker != null && isSpeaker)
                     ? StreamBuilder<List<String>>(
                         stream: context.watch<RTCProvider>().roomsStream,
                         builder: (context, snapShot) {
                           if (snapShot.hasData &&
                               snapShot.data!.contains(peerId)) {
-                            return Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: kProfileMutedBgColor,
-                              ),
-                              child: Icon(
-                                isMuted! ? Icons.mic_off_rounded : Icons.mic,
-                                color: isMuted
-                                    ? kMutedButtonColor
-                                    : kUnmutedButtonColor,
-                                size: 17,
-                              ),
-                            );
+                            return buildSpeakingContainer(true, imageUrl);
                           }
-                          return Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: kProfileMutedBgColor,
-                            ),
-                            child: Icon(
-                              isMuted! ? Icons.mic_off_rounded : Icons.mic_none,
-                              color: isMuted
-                                  ? kMutedButtonColor
-                                  : kUnmutedButtonColor,
-                              size: 17,
-                            ),
-                          );
+                          return buildSpeakingContainer(false, imageUrl);
                         })
+                    : buildSpeakingContainer(false, imageUrl),
+                // buildSpeakingContainer(isModerator, imageUrl),
+                (isSpeaker != null && isSpeaker)
+                    ? Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: kProfileMutedBgColor,
+                        ),
+                        child: Icon(
+                          isMuted! ? Icons.mic_off_rounded : Icons.mic_none,
+                          color:
+                              isMuted ? kMutedButtonColor : kUnmutedButtonColor,
+                          size: 17,
+                        ),
+                      )
                     : Container(),
               ],
             ),
@@ -575,11 +583,56 @@ class _RoomScreenState extends State<RoomScreen> with TickerProviderStateMixin {
           SizedBox(
             height: 10,
           ),
-          Text(
-            name ?? '',
-            textAlign: TextAlign.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isModerator != null && isModerator)
+                Container(
+                  decoration: BoxDecoration(
+                    color: kColorGreen,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.stream,
+                    size: 15,
+                    color: kColorBlack,
+                  ),
+                ),
+              SizedBox(
+                width: 5,
+              ),
+              CustomText(
+                text: (name!.indexOf(" ") > 0)
+                    ? '${name.substring(0, name.indexOf(" "))}'
+                    : '$name',
+                fontWeight: FontWeight.bold,
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Container buildSpeakingContainer(bool? isSpeaking, String? imageUrl) {
+    print('isSpeaking $isSpeaking');
+    return Container(
+      padding: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: (isSpeaking! && isSpeaking) ? kInRoomBottomBarBgColor : null,
+      ),
+      child: CircleAvatar(
+        radius: 32.0,
+        backgroundImage: AssetImage(
+          kProfilePlaceHolder,
+        ),
+        foregroundImage: CachedNetworkImageProvider(
+          imageUrl!,
+        ),
+        onForegroundImageError: (exception, stackTrace) {
+          print(exception);
+        },
       ),
     );
   }
@@ -602,268 +655,250 @@ Container buildTeamIcon(String url, {size = 30.0}) {
   );
 }
 
-Column buildRoomHeader(Room room, DatabaseReference fixtureReference,
+Widget buildRoomHeader(Room room, DatabaseReference fixtureReference,
     DatabaseReference roomReference, AuthUser user) {
-  return Column(
-    children: [
-      Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  return Container(
+    // color: kColorGreen,
+    padding: EdgeInsets.all(10),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              if (room.type == 'private')
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 2, 6, 4),
-                                  child: Icon(
-                                    Icons.lock,
-                                    color: Colors.white54,
-                                    size: 16,
-                                  ),
-                                ),
-                              Text(
-                                room.name!,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 19,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          if (room.createdBy!.name != null)
-                            Text(
-                              'Hosted By: ${room.createdBy!.name}',
-                              style: TextStyle(
-                                // color: Colors.white54,
-                                fontSize: 14,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        //TODO : Add option for sharing room link
-                        Share.share(
-                            '${user.name} is inviting you to virtually watch together ${room.fixture!.teams!.home!.name} Vs ${room.fixture!.teams!.away!.name} match on Match Cafe app.\nJoin Here : ${room.dynamicLink}');
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: kMuteButtonBgColor,
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(12),
-                      ),
-                      child: Icon(
-                        Icons.share,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 6,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.hearing,
-                            size: 18,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (room.type == 'private')
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 2, 6, 4),
+                          child: Icon(
+                            Icons.lock,
                             color: Colors.white54,
+                            size: 16,
                           ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          StreamBuilder<Event>(
-                            stream: roomReference.onValue,
-                            builder: (context, snapShot) {
-                              if (snapShot.hasData) {
-                                if (snapShot.data!.snapshot.value != null) {
-                                  Map<String, dynamic> members =
-                                      new Map<String, dynamic>.from(
-                                          snapShot.data!.snapshot.value);
-
-                                  return Text(
-                                    '${members.length} $kListeners',
-                                    style: TextStyle(
-                                      color: Colors.white54,
-                                      fontSize: 17,
-                                    ),
-                                  );
-                                }
-                              }
-
-                              return Text(
-                                '${room.count} $kListeners',
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 17,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
+                      Text(
+                        room.name!,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 19,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  if (room.createdBy!.name != null)
+                    Text(
+                      'Hosted By: ${room.createdBy!.name}',
+                      style: TextStyle(
+                        // color: Colors.white54,
+                        fontSize: 14,
                       ),
                     ),
-                    StreamBuilder<Event>(
-                      stream: fixtureReference.child("status").onValue,
-                      builder: (context, snapShot) {
-                        if (snapShot.hasData) {
-                          if (snapShot.data!.snapshot.value != null) {
-                            Map<String, dynamic> status =
-                                new Map<String, dynamic>.from(
-                                    snapShot.data!.snapshot.value);
-                            return buildTimerWidget(status, fontSize: 15.0);
-                          }
-                        }
-                        return Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 5,
-                          ),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: kCardBgColor,
-                              borderRadius: BorderRadius.circular(
-                                20,
-                              )),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.timer,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: 4,
-                              ),
-                              Text(
-                                kNotStarted,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-            Column(
-              children: [
-                SizedBox(
-                  height: 6,
-                ),
-                Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    buildTeamIcon(room.fixture!.teams!.home!.logoUrl!),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
-                      ),
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 14,
-                      ),
-                      decoration: new BoxDecoration(
-                        color: kCardBgColor,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(40.0)),
-                      ),
-                      child: StreamBuilder<Event>(
-                        stream: fixtureReference
-                            .child("score")
-                            .child("current")
-                            .onValue,
-                        builder: (context, snapShot) {
-                          if (snapShot.hasData) {
-                            if (snapShot.data!.snapshot.value != null) {
-                              Map<String, dynamic> score =
-                                  new Map<String, dynamic>.from(
-                                      snapShot.data!.snapshot.value);
-                              return Column(
-                                children: [
-                                  Text(
-                                    '${score["home"]} - ${score["away"]}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          }
+            TextButton(
+              onPressed: () {
+                //TODO : Add option for sharing room link
+                Share.share(
+                    '${user.name} is inviting you to virtually watch together ${room.fixture!.teams!.home!.name} Vs ${room.fixture!.teams!.away!.name} match on Match Cafe app.\nJoin Here : ${room.dynamicLink}');
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: kMuteButtonBgColor,
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(12),
+              ),
+              child: Icon(
+                Icons.share,
+                color: Colors.white,
+                size: 18,
+              ),
+            )
+          ],
+        ),
+        SizedBox(
+          height: 6,
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.hearing,
+                    size: 18,
+                    color: Colors.white54,
+                  ),
+                  SizedBox(
+                    width: 4,
+                  ),
+                  StreamBuilder<Event>(
+                    stream: roomReference.onValue,
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        if (snapShot.data!.snapshot.value != null) {
+                          Map<String, dynamic> members =
+                              new Map<String, dynamic>.from(
+                                  snapShot.data!.snapshot.value);
+
                           return Text(
-                            'Vs',
+                            '${members.length} $kListeners',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 17,
+                            ),
+                          );
+                        }
+                      }
+
+                      return Text(
+                        '${room.count} $kListeners',
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 17,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            StreamBuilder<Event>(
+              stream: fixtureReference.child("status").onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    Map<String, dynamic> status = new Map<String, dynamic>.from(
+                        snapShot.data!.snapshot.value);
+                    return buildTimerWidget(status, fontSize: 15.0);
+                  }
+                }
+                return Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 5,
+                    horizontal: 5,
+                  ),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: kCardBgColor,
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      )),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.timer,
+                        size: 16,
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Text(
+                        kNotStarted,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 6,
+        ),
+        Divider(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            buildTeamIcon(room.fixture!.teams!.home!.logoUrl!),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 6,
+              ),
+              margin: EdgeInsets.symmetric(
+                horizontal: 14,
+              ),
+              decoration: new BoxDecoration(
+                color: kCardBgColor,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(40.0)),
+              ),
+              child: StreamBuilder<Event>(
+                stream:
+                    fixtureReference.child("score").child("current").onValue,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    if (snapShot.data!.snapshot.value != null) {
+                      Map<String, dynamic> score =
+                          new Map<String, dynamic>.from(
+                              snapShot.data!.snapshot.value);
+                      return Column(
+                        children: [
+                          Text(
+                            '${score["home"]} - ${score["away"]}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        ],
+                      );
+                    }
+                  }
+                  return Text(
+                    'Vs',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
-                    buildTeamIcon(room.fixture!.teams!.away!.logoUrl!),
-                  ],
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    StreamBuilder<Event>(
-                      stream: fixtureReference.child("events").onValue,
-                      builder: (context, snapShot) {
-                        if (snapShot.hasData) {
-                          if (snapShot.data!.snapshot.value != null) {
-                            var events = snapShot.data!.snapshot.value;
-                            List<dynamic> matchEvents = events
-                                .map((event) => MatchEvent.fromDb(event))
-                                .toList() as List<dynamic>;
-                            MatchEvent event = matchEvents.last;
-                            return buildTimelineEvent(event);
-                          }
-                        }
-                        return Container(
-                          child: Text(''),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                  );
+                },
+              ),
+            ),
+            buildTeamIcon(room.fixture!.teams!.away!.logoUrl!),
+          ],
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            StreamBuilder<Event>(
+              stream: fixtureReference.child("events").onValue,
+              builder: (context, snapShot) {
+                if (snapShot.hasData) {
+                  if (snapShot.data!.snapshot.value != null) {
+                    var events = snapShot.data!.snapshot.value;
+                    List<dynamic> matchEvents = events
+                        .map((event) => MatchEvent.fromDb(event))
+                        .toList() as List<dynamic>;
+                    MatchEvent event = matchEvents.last;
+                    return buildTimelineEvent(event);
+                  }
+                }
+                return Container(
+                    // child: Text(''),
+                    );
+              },
             ),
           ],
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
 

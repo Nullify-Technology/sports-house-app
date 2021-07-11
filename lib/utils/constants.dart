@@ -45,7 +45,7 @@ const String kInvalidPhoneNumber = "Invalid Phone Number";
 const String kOtpFailed = "Failed to send OTP! Try again later";
 const String kInvalidOtp = "Invalid OTP";
 
-const String kTrending = 'Highlights';
+const String kTrending = 'Recommended';
 const String kPeopleTalkingText = 'people are talking about this';
 
 const String kCreate = 'Create';
@@ -148,6 +148,8 @@ const String kShareMessage =
 
 const String kSpeakers = "Speakers";
 const String kAudience = "Audience";
+const String kListening = "Listening";
+const String kTalking = "Talking";
 const String kDBSpeaker = "speakers";
 const String kDBAudience = "audience";
 
