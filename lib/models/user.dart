@@ -7,21 +7,27 @@ part 'user.g.dart';
 @JsonSerializable()
 class AuthUser{
  @JsonKey(name: "id")
- final String id;
+ final String? id;
  @JsonKey(name: "phone")
- final String phone;
+ final String? phone;
  @JsonKey(name: "name")
- final String name;
+ final String? name;
  @JsonKey(name: "profile_picture_url")
- final String profilePictureUrl;
+ final String? profilePictureUrl;
  @JsonKey(name: "has_access")
- final bool hasAccess;
+ final bool? hasAccess;
  @JsonKey(name: "muted" ,includeIfNull: false)
- bool muted = true;
+ bool? muted = true;
  @JsonKey(name: "joined" ,includeIfNull: false)
- bool joined = false;
+ bool? joined = false;
+ @JsonKey(name: "isModerator" ,includeIfNull: false)
+ bool? isModerator = false;
+ @JsonKey(name: "isSpeaker" ,includeIfNull: false)
+ bool? isSpeaker = false;
+ @JsonKey(name: "peerId" ,includeIfNull: false)
+ String? peerId;
 
- AuthUser({ this.id,  this.phone, this.name, this.profilePictureUrl,  this.hasAccess});
+ AuthUser(this.id,  this.phone, this.name, this.profilePictureUrl,  this.hasAccess, this.peerId);
 
  factory AuthUser.fromJson(Map<String, dynamic> json) => _$AuthUserFromJson(json);
  Map<String, dynamic> toJson() => _$AuthUserToJson(this);

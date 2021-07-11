@@ -23,8 +23,8 @@ abstract class RestClient {
   @PATCH("/user")
   @FormUrlEncoded()
   Future<Auth> updateUser(
-      {@Field("name") String name,
-        @Field("profile_picture_url") String profileUrl});
+      {@Field("name") String? name,
+        @Field("profile_picture_url") String? profileUrl});
 
   @GET("/fixture")
   Future<ApiResponse<Fixture>> getFixtures();

@@ -8,8 +8,8 @@ part of 'score.dart';
 
 Score _$ScoreFromJson(Map<String, dynamic> json) {
   return Score(
-    json['home'] as int,
-    json['away'] as int,
+    json['home'] as int?,
+    json['away'] as int?,
   );
 }
 

@@ -10,7 +10,7 @@ import 'package:match_cafe/network/rest_client.dart';
 class FixtureBloc{
 
   final RestClient client;
-   StreamController<Response<List<Fixture>>> _fixturesController;
+  late StreamController<Response<List<Fixture>>> _fixturesController;
   final flutterStorage = FlutterSecureStorage();
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
@@ -22,7 +22,7 @@ class FixtureBloc{
       _fixturesController.stream;
 
 
-  FixtureBloc({ this.client}){
+  FixtureBloc({ required this.client}){
     this._fixturesController = StreamController<Response<List<Fixture>>>.broadcast();
     fixturesSink.add(Response.loading('Initialising fixtures Details'));
   }

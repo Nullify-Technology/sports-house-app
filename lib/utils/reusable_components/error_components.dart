@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:match_cafe/utils/constants.dart';
 
 Column buildSquadDetailsUnavilable({
-   BuildContext context,
-   IconData icon,
+   required BuildContext context,
+   required IconData icon,
   double bottomPadding = 70,
-   String error,
+   required String error,
 }) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,

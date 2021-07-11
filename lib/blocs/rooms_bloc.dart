@@ -8,13 +8,13 @@ import 'package:match_cafe/network/rest_client.dart';
 
 class RoomsBloc {
   final RestClient client;
-  StreamController<Response<List<Room>>> _roomsController;
-  List<Room> rooms;
+  late StreamController<Response<List<Room>>> _roomsController;
+  late List<Room> rooms;
   StreamSink<Response<List<Room>>> get roomsSink => _roomsController.sink;
 
   Stream<Response<List<Room>>> get roomsStream => _roomsController.stream;
 
-  RoomsBloc({this.client}) {
+  RoomsBloc({required this.client}) {
     this._roomsController = StreamController<Response<List<Room>>>.broadcast();
   }
 
@@ -42,7 +42,7 @@ class RoomsBloc {
     }
   }
 
-  Future<AgoraRoom> createRoom(fixtureId, name, type) async {
+  Future<AgoraRoom?> createRoom(fixtureId, name, type) async {
     try {
       print('Test : createRoom : $type');
       AgoraRoom response = await client.createRoom(fixtureId, name, type);
@@ -52,7 +52,7 @@ class RoomsBloc {
     }
   }
 
-  Future<AgoraRoom> joinRoom(String roomId) async {
+  Future<AgoraRoom?> joinRoom(String roomId) async {
     try {
       AgoraRoom response = await client.joinRoom(roomId);
       return response;

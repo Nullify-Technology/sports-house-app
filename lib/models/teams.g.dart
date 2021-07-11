@@ -8,8 +8,12 @@ part of 'teams.dart';
 
 Teams _$TeamsFromJson(Map<String, dynamic> json) {
   return Teams(
-    Team.fromJson(json['home'] as Map<String, dynamic>),
-    Team.fromJson(json['away'] as Map<String, dynamic>),
+    json['home'] == null
+        ? null
+        : Team.fromJson(json['home'] as Map<String, dynamic>),
+    json['away'] == null
+        ? null
+        : Team.fromJson(json['away'] as Map<String, dynamic>),
   );
 }
 

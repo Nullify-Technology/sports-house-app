@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:match_cafe/blocs/rooms_bloc.dart';
 import 'package:match_cafe/helper/life_cycle_event_handler.dart';
 import 'package:match_cafe/models/fixture.dart';
@@ -15,6 +16,7 @@ import 'package:match_cafe/screens/room_screen/squad_tab.dart';
 import 'package:match_cafe/screens/room_screen/timeline_tab.dart';
 import 'package:match_cafe/screens/room_screen/timer_widget.dart';
 import 'package:match_cafe/utils/classes/event_classes.dart';
+import 'package:match_cafe/utils/client_events.dart';
 import 'package:match_cafe/utils/constants.dart';
 import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
 import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
@@ -31,7 +33,8 @@ class EventRoomsArguments {
 
 class EventRooms extends StatefulWidget {
   final EventRoomsArguments arguments;
-  EventRooms({Key key, this.arguments}) : super(key: key);
+  final Stream<ClientEvents> parentEvents;
+  EventRooms({Key? key, required this.arguments, required this.parentEvents}) : super(key: key);
   static String pageId = 'EventRooms';
 
   @override
@@ -39,22 +42,34 @@ class EventRooms extends StatefulWidget {
 }
 
 class _EventRoomsState extends State<EventRooms> {
-  RoomsBloc roomsBloc;
-  AuthUser currentUser;
-  DatabaseReference fixtureReference;
+  RoomsBloc? roomsBloc;
+  AuthUser? currentUser;
+  DatabaseReference? fixtureReference;
 
   @override
   void initState() {
+    listenForGlobalEvents();
     currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
     fixtureReference = FirebaseDatabase(databaseURL: kRTDBUrl)
         .reference()
         .child("fixture")
         .child("fixture_${widget.arguments.fixture.id}");
     roomsBloc = RoomsBloc(client: RestClient.create());
-    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-        resumeCallBack: () => roomsBloc.getRooms(widget.arguments.fixture.id)));
-    roomsBloc.getRooms(widget.arguments.fixture.id);
+    WidgetsBinding.instance!.addObserver(LifecycleEventHandler(
+        resumeCallBack: () => roomsBloc!.getRooms(widget.arguments.fixture.id)));
+    roomsBloc!.getRooms(widget.arguments.fixture.id);
     super.initState();
+  }
+
+  void listenForGlobalEvents() {
+    widget.parentEvents.listen((event) {
+      if(event == ClientEvents.LeveRoom){
+        Room? room = Provider.of<RTCProvider>(context, listen: false).room;
+        if(room != null){
+          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
+        }
+      }
+    });
   }
 
   @override
@@ -64,7 +79,7 @@ class _EventRoomsState extends State<EventRooms> {
       extendBody: true,
       bottomNavigationBar: context.watch<RTCProvider>().joined
           ? InRoomBottomBar(
-              room: context.watch<RTCProvider>().room,
+              room: context.watch<RTCProvider>().room!,
             )
           : null,
       body: DefaultTabController(
@@ -78,7 +93,7 @@ class _EventRoomsState extends State<EventRooms> {
                 backgroundColor: kHomeAppBarBgColor,
                 pinned: true,
                 title: Text(
-                  '${widget.arguments.fixture.teams.home.name} Vs ${widget.arguments.fixture.teams.away.name}',
+                  '${widget.arguments.fixture.teams!.home!.name} Vs ${widget.arguments.fixture.teams!.away!.name}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 centerTitle: true,
@@ -88,7 +103,7 @@ class _EventRoomsState extends State<EventRooms> {
                     padding:
                         const EdgeInsets.only(top: 70, left: 15, right: 15),
                     child: buildRoomHeader(
-                        widget.arguments.fixture, fixtureReference),
+                        widget.arguments.fixture, fixtureReference!),
                   ),
                 ),
                 bottom: TabBar(
@@ -119,10 +134,10 @@ class _EventRoomsState extends State<EventRooms> {
               children: [
                 KeepAliveTab(
                   child: StreamBuilder<Response<List<Room>>>(
-                    stream: roomsBloc.roomsStream,
+                    stream: roomsBloc!.roomsStream,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        switch (snapShot.data.status) {
+                        switch (snapShot.data!.status) {
                           case Status.LOADING:
                             return Container(
                               height: MediaQuery.of(context).size.width,
@@ -131,7 +146,7 @@ class _EventRoomsState extends State<EventRooms> {
                           case Status.ERROR:
                             return Container();
                           case Status.COMPLETED:
-                            return buildRoomList(snapShot.data.data);
+                            return buildRoomList(snapShot.data!.data);
                         }
                       }
                       return Container(
@@ -143,7 +158,7 @@ class _EventRoomsState extends State<EventRooms> {
                 ),
                 KeepAliveTab(
                     child: buildMatchTimeline(
-                        widget.arguments.fixture, fixtureReference)),
+                        widget.arguments.fixture, fixtureReference!)),
                 KeepAliveTab(
                     child: buildMatchXI(widget.arguments.fixture, context)),
                 // buildSubstitutesHomeAndAway(widget.arguments.agoraRoom.room),
@@ -168,9 +183,9 @@ class _EventRoomsState extends State<EventRooms> {
               stream: fixtureReference.child("status").onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
-                  if (snapShot.data.snapshot.value != null) {
+                  if (snapShot.data!.snapshot.value != null) {
                     Map<String, dynamic> status = new Map<String, dynamic>.from(
-                        snapShot.data.snapshot.value);
+                        snapShot.data!.snapshot.value);
 
                     return buildTimerWidget(status, fontSize: 15.0);
                   }
@@ -215,7 +230,7 @@ class _EventRoomsState extends State<EventRooms> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            buildTeamIcon(fixture.teams.home.logoUrl, size: 60.0),
+            buildTeamIcon(fixture.teams!.home!.logoUrl!, size: 60.0),
             Column(
               children: [
                 Container(
@@ -238,10 +253,10 @@ class _EventRoomsState extends State<EventRooms> {
                         .onValue,
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        if (snapShot.data.snapshot.value != null) {
+                        if (snapShot.data!.snapshot.value != null) {
                           Map<String, dynamic> score =
                               new Map<String, dynamic>.from(
-                                  snapShot.data.snapshot.value);
+                                  snapShot.data!.snapshot.value);
                           return Column(
                             children: [
                               CustomText(
@@ -265,7 +280,7 @@ class _EventRoomsState extends State<EventRooms> {
                 ),
               ],
             ),
-            buildTeamIcon(fixture.teams.away.logoUrl, size: 60.0),
+            buildTeamIcon(fixture.teams!.away!.logoUrl!, size: 60.0),
           ],
         ),
         SizedBox(height: 5),
@@ -276,7 +291,7 @@ class _EventRoomsState extends State<EventRooms> {
         ),
         CustomText(
           text:
-              "${widget.arguments.fixture.venue.name ?? ''} - ${widget.arguments.fixture.venue.city ?? ''}",
+              "${widget.arguments.fixture.venue!.name ?? ''} - ${widget.arguments.fixture.venue!.city ?? ''}",
           fontSize: 12,
         ),
         SizedBox(
@@ -289,8 +304,8 @@ class _EventRoomsState extends State<EventRooms> {
               stream: fixtureReference.child("events").onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
-                  if (snapShot.data.snapshot.value != null) {
-                    var events = snapShot.data.snapshot.value;
+                  if (snapShot.data!.snapshot.value != null) {
+                    var events = snapShot.data!.snapshot.value;
                     List<dynamic> matchEvents = events
                         .map((event) => MatchEvent.fromDb(event))
                         .toList() as List<dynamic>;
@@ -326,38 +341,37 @@ class _EventRoomsState extends State<EventRooms> {
                 FirebaseDatabase(databaseURL: kRTDBUrl)
                     .reference()
                     .child(kRTCRoom)
-                    .child(rooms[index].id);
+                    .child(rooms[index].id!);
 
             return StreamBuilder<Event>(
               stream: roomReference.onValue,
               builder: (context, snapShot) {
                 if (snapShot.hasData) {
-                  if (snapShot.data.snapshot.value != null) {
+                  if (snapShot.data!.snapshot.value != null) {
                     Map<String, dynamic> userDetails =
                         new Map<String, dynamic>.from(
-                            snapShot.data.snapshot.value);
+                            snapShot.data!.snapshot.value);
                     return GestureDetector(
                         child: RoomsTile(
-                          title: rooms[index].name,
+                          title: rooms[index].name!,
                           listners: userDetails.length,
                           participants: userDetails.values.toList(),
-                          hostedBy: rooms[index].createdBy.name ?? '',
-                          type: rooms[index].type,
+                          hostedBy: rooms[index].createdBy!.name ?? '',
+                          type: rooms[index].type!,
                         ),
-                        onTap: () => Navigator.pushNamed(
-                            context, RoomScreen.pageId,
-                            arguments: RoomScreenArguments(
-                                rooms[index])) //joinRoom(rooms[index]),
+                        onTap: () {
+                              Navigator.pushNamed(context, RoomScreen.pageId,arguments: RoomScreenArguments(rooms[index]));
+                            } //joinRoom(rooms[index]),
                         );
                   }
                 }
                 return GestureDetector(
                     child: RoomsTile(
-                      title: rooms[index].name,
+                      title: rooms[index].name!,
                       listners: 0,
                       participants: [],
-                      hostedBy: rooms[index].createdBy.name ?? '',
-                      type: rooms[index].type,
+                      hostedBy: rooms[index].createdBy!.name ?? '',
+                      type: rooms[index].type!,
                     ),
                     onTap: () => Navigator.pushNamed(context, RoomScreen.pageId,
                         arguments: RoomScreenArguments(

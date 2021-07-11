@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:match_cafe/utils/SportsEvent.dart';
 
 //Colors
 const Color kColorGreen = Color(0xffD2FF79);
@@ -84,16 +83,6 @@ const String kProfilePlaceHolder = 'assets/images/profile_soccer.png';
 const String kDummyProfileImageUrl =
     'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
 const String kDummyUserName = 'Aswin Divakar';
-SportsEvent kDummyEvent = new SportsEvent(
-  title: 'MUN Vs BAR',
-  minutes: '120',
-  score: '2 - 1',
-  talkingCount: '2k',
-  team1Url:
-      'https://assets.webiconspng.com/uploads/2017/09/Manchester-United-PNG-Image-55861.png',
-  team2Url:
-      'https://icons.iconarchive.com/icons/giannis-zographos/spanish-football-club/256/FC-Barcelona-icon.png',
-);
 
 const List<String> kDummyParticipants = [
   kDummyProfileImageUrl,
@@ -104,14 +93,6 @@ const List<String> kDummyParticipants = [
 String kDummyImageUrl =
     'https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80';
 
-List<SportsEvent> eventList = [
-  kDummyEvent,
-  kDummyEvent,
-  kDummyEvent,
-  kDummyEvent,
-  kDummyEvent
-];
-
 const String kPermissionText =
     "Inorder to join a room, you must allow $kAppName to access your microphone!";
 const String kCompletedEventText = "Cannot join room of a completed event!";
@@ -121,7 +102,7 @@ const String kRTDBUrl =
     "https://sports-house-bab4a.asia-southeast1.firebasedatabase.app/";
 const String kProfilePlaceHolderUrl =
     "https://firebasestorage.googleapis.com/v0/b/sports-house-1b0a9.appspot.com/o/user_profiles%2Fprofile_soccer.png?alt=media&token=867c80e2-8391-4b96-9b39-ee6b0e055522";
-
+const String kMethodChannel = "app.matchcafe.match_cafe";
 const String kCropImageTitle = "Crop Profile";
 const String kTimelineNotAvailable = "Timeline not available";
 const String kStartingXI = "Starting XI";
@@ -154,6 +135,7 @@ const String kUnavailable = "Unavailable";
 const String kRoomNetworkAlert =
     "Unable to join the room now. Please try again later";
 const String kMediaServer = "media.sports-house.in";
+const String kIonMediaServer = "http://52.14.92.61:50051";
 const String kNewUpdateAvailable = "New update available!";
 const String kClickHereToInstall = "Click here to install";
 const String kWebSiteUrl = "https://matchcafe.app/";
@@ -163,3 +145,9 @@ const String kPrivateRoomsUnavailable =
     "Private rooms are unavailable right now!";
 const String kShareMessage =
     "Hi,\nWe are talking about #GAME in this Match Cafe room, you can join our chat by clicking the following link.";
+
+const String kSpeakers = "Speakers";
+const String kAudience = "Audience";
+const String kDBSpeaker = "speakers";
+const String kDBAudience = "audience";
+

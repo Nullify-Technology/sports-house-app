@@ -1,7 +1,6 @@
 
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:match_cafe/models/fixture.dart';
 import 'package:match_cafe/models/room.dart';
 
 part 'agora_room.g.dart';
@@ -9,9 +8,9 @@ part 'agora_room.g.dart';
 @JsonSerializable()
 class AgoraRoom{
   @JsonKey(name: "room")
-  final Room room;
+  final Room? room;
   @JsonKey(name: "token")
-  final String token;
+  final String? token;
 
 
   AgoraRoom(this.room, this.token);

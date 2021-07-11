@@ -1,5 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:match_cafe/models/room.dart';
+import 'package:match_cafe/provider/rtc_provider.dart';
+import 'package:match_cafe/utils/client_events.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/blocs/fixtures_bloc.dart';
 import 'package:match_cafe/blocs/rooms_bloc.dart';
@@ -17,7 +21,8 @@ import 'package:match_cafe/utils/reusable_components/drop_down_list.dart';
 import 'package:intl/intl.dart';
 
 class CreateRoom extends StatefulWidget {
-  CreateRoom({Key key}) : super(key: key);
+  final Stream<ClientEvents> parentEvents;
+  CreateRoom({Key? key, required this.parentEvents}) : super(key: key);
   static String pageId = 'CreateRoom';
 
   @override
@@ -26,28 +31,28 @@ class CreateRoom extends StatefulWidget {
 
 class _CreateRoomState extends State<CreateRoom> {
   final RestClient client = RestClient.create();
-  FixtureBloc fixtureBloc;
+  late FixtureBloc fixtureBloc;
   List<DropDown> fixtureDropDown = [];
   List<DropDown> roomTypes = [];
-  DropDown selectedFixture;
-  DropDown selectedType;
+  late DropDown selectedFixture;
+  late DropDown selectedType;
   final roomNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  RoomsBloc roomsBloc;
-  AuthUser currentUser;
+  late RoomsBloc roomsBloc;
+  late AuthUser currentUser;
   bool _isLoading = false;
 
   createFixtureRoom() async {
     setState(() {
       _isLoading = true;
     });
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       if (selectedFixture.key != 'no_matches') {
         print('Test : ' + selectedType.key);
-        AgoraRoom room = await roomsBloc.createRoom(
+        AgoraRoom? room = await roomsBloc.createRoom(
             selectedFixture.key, roomNameController.text, selectedType.key);
         Navigator.popAndPushNamed(context, RoomScreen.pageId,
-            arguments: RoomScreenArguments(room.room));
+            arguments: RoomScreenArguments(room!.room!));
       } else {
         print('No matches are available!');
         final snackBar = SnackBar(
@@ -71,21 +76,21 @@ class _CreateRoomState extends State<CreateRoom> {
     for (var fixture in fixtures) {
       try {
         print("timess");
-        print(formatter.format(DateTime.parse(fixture.date)));
+        print(formatter.format(DateTime.parse(fixture.date!)));
         print(today);
-        print("${fixture.teams.home.name} Vs ${fixture.teams.away.name}");
-        if (formatter.format(DateTime.parse(fixture.date).toLocal()) == today ||
-            formatter.format(DateTime.parse(fixture.date)
+        print("${fixture.teams!.home!.name} Vs ${fixture.teams!.away!.name}");
+        if (formatter.format(DateTime.parse(fixture.date!).toLocal()) == today ||
+            formatter.format(DateTime.parse(fixture.date!)
                     .subtract(Duration(hours: 6))
                     .toLocal()) ==
                 today ||
-            formatter.format(DateTime.parse(fixture.date)
+            formatter.format(DateTime.parse(fixture.date!)
                     .add(Duration(hours: 6))
                     .toLocal()) ==
                 today)
           fixtureDropDown.add(DropDown(
-            fixture.id,
-            "${fixture.teams.home.name} Vs ${fixture.teams.away.name}",
+            fixture.id!,
+            "${fixture.teams!.home!.name} Vs ${fixture.teams!.away!.name}",
           ));
       } catch (e) {
         print(e);
@@ -103,8 +108,20 @@ class _CreateRoomState extends State<CreateRoom> {
     roomsBloc = RoomsBloc(client: client);
     fixtureBloc = FixtureBloc(client: client);
     fixtureBloc.getFixtures();
-    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser;
+    currentUser = Provider.of<UserProvider>(context, listen: false).currentUser!;
+    listenForGlobalEvents();
     super.initState();
+  }
+
+  void listenForGlobalEvents() {
+    widget.parentEvents.listen((event) {
+      if(event == ClientEvents.LeveRoom){
+        Room? room = Provider.of<RTCProvider>(context, listen: false).room;
+        if(room != null){
+          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
+        }
+      }
+    });
   }
 
   @override
@@ -143,12 +160,12 @@ class _CreateRoomState extends State<CreateRoom> {
                 stream: fixtureBloc.fixturesStream,
                 builder: (context, snapShot) {
                   if (snapShot.hasData) {
-                    switch (snapShot.data.status) {
+                    switch (snapShot.data!.status) {
                       case Status.LOADING:
                       case Status.ERROR:
                         return Container();
                       case Status.COMPLETED:
-                        populateFixturesDropDown(snapShot.data.data);
+                        populateFixturesDropDown(snapShot.data!.data);
                         return buildUI();
                     }
                   }
@@ -189,7 +206,7 @@ class _CreateRoomState extends State<CreateRoom> {
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) =>
-                      value.isEmpty ? "Room name can not be empty" : null,
+                      value!.isEmpty ? "Room name can not be empty" : null,
                 ),
                 SizedBox(
                   height: 15,

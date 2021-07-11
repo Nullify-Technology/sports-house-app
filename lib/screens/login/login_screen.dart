@@ -16,17 +16,17 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-   TabController _controller;
-   String _verificationId;
+   TabController? _controller;
+   String? _verificationId;
   final GlobalKey<FormState> _phoneNumberFormKey = GlobalKey();
   final GlobalKey<FormState> _otpFormKey = GlobalKey();
 
   void signInWithPhoneNumber(String phoneNumber) async {
-    _controller.animateTo(1);
+    _controller!.animateTo(1);
 
     PhoneVerificationFailed phoneVerificationFailed =
         (FirebaseAuthException authException) {
-      _controller.animateTo(0);
+      _controller!.animateTo(0);
       final snackBar = SnackBar(content: Text(kInvalidPhoneNumber));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print(
@@ -44,9 +44,9 @@ class _LoginScreenState extends State<LoginScreen>
     };
 
     PhoneCodeSent codeSent =
-        (String verificationId, [int forceResendingToken]) async {
+        (String verificationId, [int? forceResendingToken]) async {
       this._verificationId = verificationId;
-      _controller.animateTo(2);
+      _controller!.animateTo(2);
     };
 
     PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
@@ -71,10 +71,10 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void verifyOtp(String otp) async {
-    _controller.animateTo(1);
+    _controller!.animateTo(1);
     try {
       final AuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: this._verificationId, smsCode: otp);
+          verificationId: this._verificationId!, smsCode: otp);
       final User user =
           (await _auth.signInWithCredential(credential)).user as User;
       print("Successfully signed in UID: ${user.uid}");
@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen>
     } catch (e) {
       final snackBar = SnackBar(content: Text(kInvalidOtp));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      _controller.animateTo(2);
+      _controller!.animateTo(2);
       print(e);
     }
   }
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen>
                 fillColor: kTextFieldBgColor,
               ),
               validator: (value) {
-                if (value.isEmpty) {
+                if (value!.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -218,10 +218,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_phoneNumberFormKey.currentState.validate()) {
+                if (!_phoneNumberFormKey.currentState!.validate()) {
                   return;
                 }
-                _phoneNumberFormKey.currentState.save();
+                _phoneNumberFormKey.currentState!.save();
               },
             ),
           ],
@@ -248,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
                 children: [
                   IconButton(
                     onPressed: () {
-                      _controller.animateTo(0);
+                      _controller!.animateTo(0);
                     },
                     icon: Icon(Icons.arrow_back),
                   ),
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               textAlign: TextAlign.center,
               validator: (value) {
-                if (value.isEmpty) {
+                if (value!.isEmpty) {
                   return kInvalidPhone;
                 }
                 return null;
@@ -304,10 +304,10 @@ class _LoginScreenState extends State<LoginScreen>
               textColor: kColorBlack,
               onClick: () {
                 FocusScope.of(context).unfocus();
-                if (!_otpFormKey.currentState.validate()) {
+                if (!_otpFormKey.currentState!.validate()) {
                   return;
                 }
-                _otpFormKey.currentState.save();
+                _otpFormKey.currentState!.save();
               },
             ),
           ],

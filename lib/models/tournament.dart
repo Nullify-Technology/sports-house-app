@@ -6,19 +6,19 @@ part 'tournament.g.dart';
 @JsonSerializable()
 class Tournament {
   @JsonKey(name: "id")
-  final String id;
+  final String? id;
   @JsonKey(name: "name")
-  final String name;
+  final String? name;
   @JsonKey(name: "season")
-  final int season;
+  final int? season;
   @JsonKey(name: "externalId")
-  final int externalId;
+  final int? externalId;
   @JsonKey(name: "banner")
-  final String banner;
+  final String? banner;
   @JsonKey(name: "logo")
-  final String logo;
+  final String? logo;
   @JsonKey(name: "current_season")
-  final Season currentSeason;
+  final Season? currentSeason;
 
   Tournament(
     this.id,

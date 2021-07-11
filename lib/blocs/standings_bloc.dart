@@ -8,7 +8,7 @@ import 'package:match_cafe/network/rest_client.dart';
 
 class StandingsBloc {
   final RestClient client;
-  StreamController<Response<TournamentStandings>> _standingsController;
+  late StreamController<Response<TournamentStandings>> _standingsController;
   final flutterStorage = FlutterSecureStorage();
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
@@ -19,7 +19,7 @@ class StandingsBloc {
   Stream<Response<TournamentStandings>> get standingsStream =>
       _standingsController.stream;
 
-  StandingsBloc({this.client}) {
+  StandingsBloc({required this.client}) {
     this._standingsController =
         StreamController<Response<TournamentStandings>>.broadcast();
     standingsSink.add(Response.loading('Initialising tournaments Details'));

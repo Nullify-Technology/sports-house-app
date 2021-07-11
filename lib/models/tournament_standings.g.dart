@@ -8,13 +8,13 @@ part of 'tournament_standings.dart';
 
 TournamentStandings _$TournamentStandingsFromJson(Map<String, dynamic> json) {
   return TournamentStandings(
-    json['id'] as String,
-    json['name'] as String,
-    json['banner'] as String,
-    json['logo'] as String,
-    (json['standings'] as List<dynamic>)
+    json['id'] as String?,
+    json['name'] as String?,
+    json['banner'] as String?,
+    json['logo'] as String?,
+    (json['standings'] as List<dynamic>?)
         ?.map((e) => Standings.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+        .toList(),
   );
 }
 

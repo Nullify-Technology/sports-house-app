@@ -8,10 +8,10 @@ import 'package:match_cafe/utils/constants.dart';
 import 'package:match_cafe/utils/reusable_components/error_components.dart';
 
 Widget buildMatchXI(Fixture fixture, BuildContext context) {
-  if (fixture.teams.home.lineups != null &&
-      fixture.teams.away.lineups != null &&
-      fixture.teams.home.lineups.startXI != null &&
-      fixture.teams.away.lineups.startXI != null) {
+  if (fixture.teams!.home!.lineups != null &&
+      fixture.teams!.away!.lineups != null &&
+      fixture.teams!.home!.lineups!.startXI != null &&
+      fixture.teams!.away!.lineups!.startXI != null) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(
@@ -20,7 +20,7 @@ Widget buildMatchXI(Fixture fixture, BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildTeamTitle(fixture.teams.home),
+            buildTeamTitle(fixture.teams!.home!),
             SizedBox(
               height: 20,
             ),
@@ -28,7 +28,7 @@ Widget buildMatchXI(Fixture fixture, BuildContext context) {
             SizedBox(
               height: 40,
             ),
-            buildTeamTitle(fixture.teams.away),
+            buildTeamTitle(fixture.teams!.away!),
             SizedBox(
               height: 20,
             ),
@@ -58,15 +58,15 @@ Widget buildStartingXI(Fixture fixture, String team) {
       padding: EdgeInsets.zero,
       physics: NeverScrollableScrollPhysics(),
       itemCount: team == 'home'
-          ? fixture.teams.home.lineups.startXI.length
-          : fixture.teams.away.lineups.startXI.length,
+          ? fixture.teams!.home!.lineups!.startXI!.length
+          : fixture.teams!.away!.lineups!.startXI!.length,
       itemBuilder: (context, i) {
-        Lineup lineup = team == 'home'
-            ? fixture.teams.home.lineups
-            : fixture.teams.away.lineups;
+        Lineup? lineup = team == 'home'
+            ? fixture.teams!.home!.lineups
+            : fixture.teams!.away!.lineups;
         return ListTile(
           title: Text(
-            '${lineup.startXI[i].name} ( ${lineup.startXI[i].number} )',
+            '${lineup!.startXI![i].name} ( ${lineup.startXI![i].number} )',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -82,10 +82,10 @@ Widget buildStartingXI(Fixture fixture, String team) {
               color: kDropdownBgColor,
             ),
             child: fixture.players != null &&
-                    fixture.players[lineup.startXI[i].id.toString()] != null
+                    fixture.players![lineup.startXI![i].id.toString()] != null
                 ? CircleAvatar(
                     foregroundImage: CachedNetworkImageProvider(fixture
-                            .players[lineup.startXI[i].id.toString()].photo ??
+                            .players![lineup.startXI![i].id.toString()]!.photo ??
                         kDummyProfileImageUrl),
                   )
                 : null,
@@ -104,13 +104,13 @@ Row buildTeamTitle(Team team) {
       ),
       CachedNetworkImage(
         width: 40,
-        imageUrl: team.logoUrl,
+        imageUrl: team.logoUrl!,
       ),
       SizedBox(
         width: 15,
       ),
       Text(
-        team.name,
+        team.name!,
         style: TextStyle(
           // color: kColorGreen,
           fontSize: kHeadingFontSize,
@@ -124,8 +124,8 @@ Row buildTeamTitle(Team team) {
 //Substitutes
 
 Widget buildSubstitutesHomeAndAway(Room room, BuildContext context) {
-  if (room.fixture.teams.home.lineups.substitutes != null &&
-      room.fixture.teams.home.lineups.substitutes != null) {
+  if (room.fixture!.teams!.home!.lineups!.substitutes != null &&
+      room.fixture!.teams!.home!.lineups!.substitutes != null) {
     return SingleChildScrollView(
       child: Card(
         color: kCardBgColor,
@@ -165,12 +165,13 @@ Widget buildSubstitutesHomeAndAway(Room room, BuildContext context) {
         ),
       ),
     );
-  } else
+  } else {
     return buildSquadDetailsUnavilable(
       context: context,
       error: kSquadDetailsUnavailable,
       icon: Icons.change_circle,
     );
+  }
 }
 
 ListView buildSubstitutes(Room room, String team) {
@@ -178,15 +179,15 @@ ListView buildSubstitutes(Room room, String team) {
     shrinkWrap: true,
     physics: NeverScrollableScrollPhysics(),
     itemCount: team == 'home'
-        ? room.fixture.teams.home.lineups.substitutes.length
-        : room.fixture.teams.away.lineups.substitutes.length,
+        ? room.fixture!.teams!.home!.lineups!.substitutes!.length
+        : room.fixture!.teams!.away!.lineups!.substitutes!.length,
     itemBuilder: (context, i) {
-      Lineup lineup = team == 'home'
-          ? room.fixture.teams.home.lineups
-          : room.fixture.teams.away.lineups;
+      Lineup? lineup = team == 'home'
+          ? room.fixture!.teams!.home!.lineups
+          : room.fixture!.teams!.away!.lineups;
       return ListTile(
         title: Text(
-          '${lineup.substitutes[i].name}',
+          '${lineup!.substitutes![i].name}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -202,7 +203,7 @@ ListView buildSubstitutes(Room room, String team) {
             color: kDropdownBgColor,
           ),
           child: Text(
-            '${lineup.substitutes[i].pos}',
+            '${lineup.substitutes![i].pos}',
             style: TextStyle(
               color: kColorGreen,
               fontWeight: FontWeight.bold,

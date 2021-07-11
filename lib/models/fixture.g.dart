@@ -8,17 +8,21 @@ part of 'fixture.dart';
 
 Fixture _$FixtureFromJson(Map<String, dynamic> json) {
   return Fixture(
-    json['id'] as String,
-    Venue.fromJson(json['venue'] as Map<String, dynamic>),
-    json['date'] as String,
-    Teams.fromJson(json['teams'] as Map<String, dynamic>),
-    json['externalId'] as int,
-    json['round'] == null ? "Group" : json['round'] as String,
+    json['id'] as String?,
+    json['venue'] == null
+        ? null
+        : Venue.fromJson(json['venue'] as Map<String, dynamic>),
+    json['date'] as String?,
+    json['teams'] == null
+        ? null
+        : Teams.fromJson(json['teams'] as Map<String, dynamic>),
+    json['externalId'] as int?,
+    json['round'] as String?,
     json['score'] == null
         ? null
         : MatchDetails.fromJson(json['score'] as Map<String, dynamic>),
-    json['status'] as String,
-    (json['players'] as Map<String, dynamic>)?.map(
+    json['status'] as String?,
+    (json['players'] as Map<String, dynamic>?)?.map(
       (k, e) => MapEntry(k, PlayerData.fromJson(e as Map<String, dynamic>)),
     ),
   );
@@ -31,6 +35,7 @@ Map<String, dynamic> _$FixtureToJson(Fixture instance) {
     'date': instance.date,
     'teams': instance.teams,
     'externalId': instance.externalId,
+    'round': instance.round,
   };
 
   void writeNotNull(String key, dynamic value) {

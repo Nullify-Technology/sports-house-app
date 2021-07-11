@@ -16,10 +16,10 @@ class UserProvider with ChangeNotifier {
   final ImagePicker picker = ImagePicker();
   FirebaseStorage _storage = FirebaseStorage.instance;
   final RestClient client = RestClient.create();
-  AuthUser _authUser;
+  AuthUser? _authUser;
   final FirebaseAuth auth;
 
-  AuthUser get currentUser => _authUser;
+  AuthUser? get currentUser => _authUser;
 
   UserProvider(this.auth) {
     authenticateUser();
@@ -27,15 +27,15 @@ class UserProvider with ChangeNotifier {
 
   Future authenticateUser() async {
     if (auth.currentUser != null) {
-      String idToken = await auth.currentUser?.getIdToken(false);
-      String phoneNumber = auth.currentUser?.phoneNumber;
+      String? idToken = await auth.currentUser?.getIdToken(false);
+      String? phoneNumber = auth.currentUser?.phoneNumber;
       _authUser = await getUser(idToken, phoneNumber);
       auth.idTokenChanges().listen((user) async {
         if (user != null &&
             user.refreshToken != null &&
-            user.refreshToken.isNotEmpty) {
-          String idToken = user.refreshToken;
-          String phoneNumber = user.phoneNumber;
+            user.refreshToken!.isNotEmpty) {
+          String? idToken = user.refreshToken;
+          String? phoneNumber = user.phoneNumber;
           _authUser = await getUser(idToken, phoneNumber);
         }
       });
@@ -43,7 +43,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<AuthUser> getUser(idToken, phoneNumber) async {
+  Future<AuthUser?> getUser(idToken, phoneNumber) async {
     try {
       Auth response = await client.getUser(phoneNumber, idToken);
       await flutterStorage.write(
@@ -54,7 +54,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateUserName({String name}) async {
+  Future<void> updateUserName({required String name}) async {
     try {
       Auth response = await client.updateUser(name: name);
       _authUser = response.user;

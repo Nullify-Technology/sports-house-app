@@ -6,7 +6,7 @@ part 'match_details.g.dart';
 @JsonSerializable()
 class MatchDetails{
   @JsonKey(name: "current")
-  final Score current;
+  final Score? current;
 
   MatchDetails(this.current);
 

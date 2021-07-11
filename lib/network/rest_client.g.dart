@@ -13,7 +13,7 @@ class _RestClient implements RestClient {
 
   final Dio _dio;
 
-  String baseUrl;
+  String? baseUrl;
 
   @override
   Future<Auth> getUser(phone, idToken) async {
@@ -29,7 +29,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/user',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Auth.fromJson(_result.data);
+    final value = Auth.fromJson(_result.data!);
     return value;
   }
 
@@ -49,7 +49,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/user',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Auth.fromJson(_result.data);
+    final value = Auth.fromJson(_result.data!);
     return value;
   }
 
@@ -65,7 +65,7 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Fixture>.fromJson(
-      _result.data,
+      _result.data!,
       (json) => Fixture.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -83,7 +83,7 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Tournament>.fromJson(
-      _result.data,
+      _result.data!,
       (json) => Tournament.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -102,7 +102,7 @@ class _RestClient implements RestClient {
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Fixture>.fromJson(
-      _result.data,
+      _result.data!,
       (json) => Fixture.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -119,7 +119,7 @@ class _RestClient implements RestClient {
                 .compose(_dio.options, '/tournament/$tournamentId/standings',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = TournamentStandings.fromJson(_result.data);
+    final value = TournamentStandings.fromJson(_result.data!);
     return value;
   }
 
@@ -135,7 +135,7 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Room>.fromJson(
-      _result.data,
+      _result.data!,
       (json) => Room.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -153,7 +153,7 @@ class _RestClient implements RestClient {
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = ApiResponse<Room>.fromJson(
-      _result.data,
+      _result.data!,
       (json) => Room.fromJson(json as Map<String, dynamic>),
     );
     return value;
@@ -173,7 +173,7 @@ class _RestClient implements RestClient {
             .compose(_dio.options, '/room',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = AgoraRoom.fromJson(_result.data);
+    final value = AgoraRoom.fromJson(_result.data!);
     return value;
   }
 
@@ -188,7 +188,7 @@ class _RestClient implements RestClient {
                 .compose(_dio.options, '/room/$roomId/join',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = AgoraRoom.fromJson(_result.data);
+    final value = AgoraRoom.fromJson(_result.data!);
     return value;
   }
 

@@ -8,14 +8,17 @@ part of 'user.dart';
 
 AuthUser _$AuthUserFromJson(Map<String, dynamic> json) {
   return AuthUser(
-    id: json['id'] as String,
-    phone: json['phone'] as String,
-    name: json['name'] as String,
-    profilePictureUrl: json['profile_picture_url'] as String,
-    hasAccess: json['has_access'] as bool,
+    json['id'] as String?,
+    json['phone'] as String?,
+    json['name'] as String?,
+    json['profile_picture_url'] as String?,
+    json['has_access'] as bool?,
+    json['peerId'] as String?,
   )
-    ..muted = json['muted'] as bool
-    ..joined = json['joined'] as bool;
+    ..muted = json['muted'] as bool?
+    ..joined = json['joined'] as bool?
+    ..isModerator = json['isModerator'] as bool?
+    ..isSpeaker = json['isSpeaker'] as bool?;
 }
 
 Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
@@ -35,5 +38,8 @@ Map<String, dynamic> _$AuthUserToJson(AuthUser instance) {
 
   writeNotNull('muted', instance.muted);
   writeNotNull('joined', instance.joined);
+  writeNotNull('isModerator', instance.isModerator);
+  writeNotNull('isSpeaker', instance.isSpeaker);
+  writeNotNull('peerId', instance.peerId);
   return val;
 }

@@ -2,7 +2,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:match_cafe/utils/client_events.dart';
+import 'package:move_to_background/move_to_background.dart';
 import 'package:provider/provider.dart';
 import 'package:match_cafe/blocs/fixtures_bloc.dart';
 import 'package:match_cafe/blocs/rooms_bloc.dart';
@@ -21,7 +24,6 @@ import 'package:match_cafe/screens/profile/profile_screen.dart';
 import 'package:match_cafe/screens/room_screen/room_screen.dart';
 import 'package:match_cafe/screens/tournament/tournament.dart';
 import 'package:match_cafe/utils/constants.dart';
-import 'package:match_cafe/utils/reusable_components/CenterProgressBar.dart';
 import 'package:match_cafe/utils/reusable_components/FixtureCard.dart';
 import 'package:match_cafe/utils/reusable_components/InRoomBottomBar.dart';
 import 'package:match_cafe/utils/reusable_components/TrendingRoomCard.dart';
@@ -30,7 +32,8 @@ import 'package:match_cafe/utils/reusable_components/custom_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen();
+  final Stream<ClientEvents> parentEvents;
+  HomeScreen({required this.parentEvents});
 
   static String pageId = 'HomeScreen';
 
@@ -39,24 +42,24 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  FixtureBloc fixtureBloc;
-  TournamentBloc tournamentBloc;
-  AuthUser currentUser;
-  RoomsBloc roomsBloc;
+  FixtureBloc? fixtureBloc;
+  TournamentBloc? tournamentBloc;
+  AuthUser? currentUser;
+  RoomsBloc? roomsBloc;
   final RestClient client = RestClient.create();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   RemoteConfig remoteConfig = RemoteConfig.instance;
-  double _appLatestVersion;
+  double? _appLatestVersion;
 
   Future joinRoomWithId(BuildContext context, String roomId) async {
     print('retrieveDynamicLink $roomId');
     try {
-      AgoraRoom agoraRoom = await roomsBloc.joinRoom(roomId);
-      Room room = agoraRoom.room;
+      AgoraRoom? agoraRoom = await roomsBloc!.joinRoom(roomId);
+      Room? room = agoraRoom!.room;
       print(room);
       Navigator.of(context)
-          .pushNamed(RoomScreen.pageId, arguments: RoomScreenArguments(room));
+          .pushNamed(RoomScreen.pageId, arguments: RoomScreenArguments(room!));
     } catch (e) {
       print("failed to join room : " + e.toString());
     }
@@ -64,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void initDynamicLinks() async {
     FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      final Uri deepLink = dynamicLink?.link;
+        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+      final Uri? deepLink = dynamicLink?.link;
       print('Deeplink 1: ' + deepLink.toString());
       if (deepLink != null) {
         List<String> segments = deepLink.pathSegments;
@@ -75,12 +78,12 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }, onError: (OnLinkErrorException e) async {
       print('onLinkError');
-      print('Deeplink : ' + e.message);
+      print('Deeplink : ' + e.message!);
     });
 
-    final PendingDynamicLinkData data =
+    final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
-    final Uri deepLink = data?.link;
+    final Uri? deepLink = data?.link;
 
     if (deepLink != null) {
       List<String> segments = deepLink.pathSegments;
@@ -132,15 +135,16 @@ class _HomeScreenState extends State<HomeScreen> {
     fixtureBloc = FixtureBloc(client: client);
     tournamentBloc = TournamentBloc(client: client);
     roomsBloc = RoomsBloc(client: RestClient.create());
-    roomsBloc.getTrendingRooms();
-    tournamentBloc.getTournaments();
+    roomsBloc!.getTrendingRooms();
+    tournamentBloc!.getTournaments();
+    listenForGlobalEvents();
     fetchConfig();
   }
 
   @override
   void dispose() {
-    fixtureBloc.dispose();
-    tournamentBloc.dispose();
+    fixtureBloc!.dispose();
+    tournamentBloc!.dispose();
     super.dispose();
   }
 
@@ -152,247 +156,253 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     currentUser = context.watch<UserProvider>().currentUser;
     if (currentUser != null) {
-      if (currentUser.name == null || currentUser.name.isEmpty) {
+      if (currentUser!.name!.isEmpty) {
         Navigator.popAndPushNamed(context, ProfileScreen.pageId);
       } else {
-        fixtureBloc.getFixtures();
+        fixtureBloc!.getFixtures();
       }
     }
 
-    return Scaffold(
-      backgroundColor: kCardBgColor,
-      resizeToAvoidBottomInset: true,
-      floatingActionButton: !context.watch<RTCProvider>().joined
-          ? FloatingActionButton(
-              child: Icon(Icons.add),
-              backgroundColor: kColorGreen,
-              foregroundColor: kColorBlack,
-              onPressed: () {
-                Navigator.pushNamed(context, CreateRoom.pageId);
-              },
-            )
-          : null,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            snap: false,
-            floating: false,
-            expandedHeight: 390.0,
-            toolbarHeight: 60,
-            backgroundColor: kHomeAppBarBgColor,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 30,
-                      height: 30,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    CustomText(
-                      text: kAppName,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    // OutlinedButton(
-                    //   onPressed: () {
-                    //     Navigator.pushNamed(context, CreateRoom.pageId);
-                    //   },
-                    //   style: OutlinedButton.styleFrom(
-                    //     shape: RoundedRectangleBorder(
-                    //       borderRadius: BorderRadius.all(Radius.circular(50)),
-                    //     ),
-                    //   ),
-                    //   child: Row(
-                    //     children: [
-                    //       Icon(Icons.add),
-                    //       SizedBox(
-                    //         width: 5,
-                    //       ),
-                    //       Text(
-                    //         kCreate,
-                    //         style: TextStyle(
-                    //           fontSize: 17,
-                    //         ),
-                    //       ),
-                    //       SizedBox(
-                    //         width: 10,
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    // SizedBox(
-                    //   width: 10,
-                    // ),
-                    TextButton(
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundColor: kHomeAppBarBgColor,
-                        backgroundImage: AssetImage(kProfilePlaceHolder),
-                        foregroundImage: CachedNetworkImageProvider(
-                          currentUser?.profilePictureUrl ??
-                              kProfilePlaceHolderUrl,
-                        ),
-                        onForegroundImageError: (exception, stackTrace) {
-                          print(exception);
-                        },
+    return WillPopScope(
+      onWillPop: () async {
+        MoveToBackground.moveTaskToBack();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: kCardBgColor,
+        resizeToAvoidBottomInset: true,
+        floatingActionButton: !context.watch<RTCProvider>().joined
+            ? FloatingActionButton(
+                child: Icon(Icons.add),
+                backgroundColor: kColorGreen,
+                foregroundColor: kColorBlack,
+                onPressed: () {
+                  Navigator.pushNamed(context, CreateRoom.pageId);
+                },
+              )
+            : null,
+        // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverAppBar(
+              pinned: true,
+              snap: false,
+              floating: false,
+              expandedHeight: 390.0,
+              toolbarHeight: 60,
+              backgroundColor: kHomeAppBarBgColor,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 15,
                       ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, ProfileScreen.pageId);
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.pin,
-              background: Padding(
-                padding: const EdgeInsets.only(
-                  top: 105,
-                ),
-                child: Column(
-                  children: [
-                    buildIconTitle(
-                      icon: Icons.recommend,
-                      title: kTrending,
-                      padding: EdgeInsets.only(left: 30),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                      child: StreamBuilder<Response<List<Room>>>(
-                        stream: roomsBloc.roomsStream,
-                        builder: (context, snapShot) {
-                          if (snapShot.hasData) {
-                            switch (snapShot.data.status) {
-                              case Status.LOADING:
-                              case Status.ERROR:
-                                return Container();
-                              case Status.COMPLETED:
-                                return buildTrendingCarousel(
-                                  snapShot.data.data,
-                                );
-                            }
-                          }
-                          return Container();
-                        },
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 30,
+                        height: 30,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (kAppVersion < _appLatestVersion)
-            SliverToBoxAdapter(
-              child: GestureDetector(
-                onTap: () => _launchURL(),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10,
+                      SizedBox(
+                        width: 10,
+                      ),
+                      CustomText(
+                        text: kAppName,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ],
                   ),
-                  // margin: EdgeInsets.fromLTRB(50, 10, 50, 0),
-                  decoration: BoxDecoration(
-                    color: kColorGreen,
-                    // borderRadius: BorderRadius.all(
-                    //   Radius.circular(50),
-                    // ),
+                  Row(
+                    children: [
+                      // OutlinedButton(
+                      //   onPressed: () {
+                      //     Navigator.pushNamed(context, CreateRoom.pageId);
+                      //   },
+                      //   style: OutlinedButton.styleFrom(
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.all(Radius.circular(50)),
+                      //     ),
+                      //   ),
+                      //   child: Row(
+                      //     children: [
+                      //       Icon(Icons.add),
+                      //       SizedBox(
+                      //         width: 5,
+                      //       ),
+                      //       Text(
+                      //         kCreate,
+                      //         style: TextStyle(
+                      //           fontSize: 17,
+                      //         ),
+                      //       ),
+                      //       SizedBox(
+                      //         width: 10,
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   width: 10,
+                      // ),
+                      TextButton(
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: kHomeAppBarBgColor,
+                          backgroundImage: AssetImage(kProfilePlaceHolder),
+                          foregroundImage: CachedNetworkImageProvider(
+                            currentUser?.profilePictureUrl ??
+                                kProfilePlaceHolderUrl,
+                          ),
+                          onForegroundImageError: (exception, stackTrace) {
+                            print(exception);
+                          },
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, ProfileScreen.pageId);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 105,
                   ),
                   child: Column(
                     children: [
-                      // Icon(
-                      //   Icons.new_releases,
-                      //   size: 18,
-                      //   color: kColorBlack,
-                      // ),
-                      CustomText(
-                        text: kNewUpdateAvailable,
-                        fontSize: 16,
-                        color: kColorBlack,
-                        fontWeight: FontWeight.bold,
+                      buildIconTitle(
+                        icon: Icons.recommend,
+                        title: kTrending,
+                        padding: EdgeInsets.only(left: 30),
                       ),
-                      SizedBox(height: 2),
-                      CustomText(
-                        text: kClickHereToInstall,
-                        fontSize: 12,
-                        color: kColorBlack,
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                        child: StreamBuilder<Response<List<Room>>>(
+                          stream: roomsBloc!.roomsStream,
+                          builder: (context, snapShot) {
+                            if (snapShot.hasData) {
+                              switch (snapShot.data!.status) {
+                                case Status.LOADING:
+                                case Status.ERROR:
+                                  return Container();
+                                case Status.COMPLETED:
+                                  return buildTrendingCarousel(
+                                    snapShot.data!.data,
+                                  );
+                              }
+                            }
+                            return Container();
+                          },
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-          StreamBuilder<Response<List<Tournament>>>(
-              stream: tournamentBloc.tournamentsStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  switch (snapshot.data.status) {
-                    case Status.LOADING:
-                    case Status.ERROR:
-                      return SliverToBoxAdapter(child: Container());
-                    case Status.COMPLETED:
-                      return SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
-                          child: Center(
-                            child: buildTournamentList(snapshot.data.data),
-                          ),
+            if (kAppVersion < _appLatestVersion!)
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  onTap: () => _launchURL(),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10,
+                    ),
+                    // margin: EdgeInsets.fromLTRB(50, 10, 50, 0),
+                    decoration: BoxDecoration(
+                      color: kColorGreen,
+                      // borderRadius: BorderRadius.all(
+                      //   Radius.circular(50),
+                      // ),
+                    ),
+                    child: Column(
+                      children: [
+                        // Icon(
+                        //   Icons.new_releases,
+                        //   size: 18,
+                        //   color: kColorBlack,
+                        // ),
+                        CustomText(
+                          text: kNewUpdateAvailable,
+                          fontSize: 16,
+                          color: kColorBlack,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
+                        SizedBox(height: 2),
+                        CustomText(
+                          text: kClickHereToInstall,
+                          fontSize: 12,
+                          color: kColorBlack,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            StreamBuilder<Response<List<Tournament>>>(
+                stream: tournamentBloc!.tournamentsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    switch (snapshot.data!.status) {
+                      case Status.LOADING:
+                      case Status.ERROR:
+                        return SliverToBoxAdapter(child: Container());
+                      case Status.COMPLETED:
+                        return SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(30, 30, 30, 10),
+                            child: Center(
+                              child: buildTournamentList(snapshot.data!.data),
+                            ),
+                          ),
+                        );
+                    }
                   }
-                }
-                return SliverToBoxAdapter(child: Container());
-              }),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(30, 15, 0, 10),
-              child: buildIconTitle(icon: Icons.podcasts, title: kFixtures),
+                  return SliverToBoxAdapter(child: Container());
+                }),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(30, 15, 0, 10),
+                child: buildIconTitle(icon: Icons.podcasts, title: kFixtures),
+              ),
             ),
-          ),
-          StreamBuilder<Response<List<Fixture>>>(
-              stream: fixtureBloc.fixturesStream,
-              builder: (context, snapShot) {
-                if (snapShot.hasData) {
-                  switch (snapShot.data.status) {
-                    case Status.LOADING:
-                    case Status.ERROR:
-                      return SliverToBoxAdapter(child: Container());
-                    case Status.COMPLETED:
-                      return buildFixtureList(snapShot.data.data);
+            StreamBuilder<Response<List<Fixture>>>(
+                stream: fixtureBloc!.fixturesStream,
+                builder: (context, snapShot) {
+                  if (snapShot.hasData) {
+                    switch (snapShot.data!.status) {
+                      case Status.LOADING:
+                      case Status.ERROR:
+                        return SliverToBoxAdapter(child: Container());
+                      case Status.COMPLETED:
+                        return buildFixtureList(snapShot.data!.data);
+                    }
                   }
-                }
-                return SliverToBoxAdapter(child: Container());
-              }),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 80,
+                  return SliverToBoxAdapter(child: Container());
+                }),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 80,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        extendBody: true,
+        bottomNavigationBar: context.watch<RTCProvider>().joined
+            ? InRoomBottomBar(
+                room: context.watch<RTCProvider>().room!,
+              )
+            : null,
       ),
-      extendBody: true,
-      bottomNavigationBar: context.watch<RTCProvider>().joined
-          ? InRoomBottomBar(
-              room: context.watch<RTCProvider>().room,
-            )
-          : null,
     );
   }
 
-  Row buildSectionHeading({IconData icon, String heading}) {
+  Row buildSectionHeading({required IconData icon, required String heading}) {
     return Row(
       children: [
         SizedBox(
@@ -506,8 +516,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               tournamentName: tournaments[i].name ?? '',
                               banner: tournaments[i].banner ?? '',
                               startDate:
-                                  tournaments[i].currentSeason.start ?? '',
-                              endDate: tournaments[i].currentSeason.end ?? '',
+                                  tournaments[i].currentSeason!.start ?? '',
+                              endDate: tournaments[i].currentSeason!.end ?? '',
                             ),
                           );
                         });
@@ -520,8 +530,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildIconTitle({
-    IconData icon,
-    String title,
+    required IconData icon,
+    required String title,
     EdgeInsets padding = const EdgeInsets.all(0),
   }) {
     return Padding(
@@ -559,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
       items: rooms.map((room) {
         return Builder(
           builder: (BuildContext context) {
-            if (!room.isClosed)
+            if (!room.isClosed!)
               return Container(
                 width: MediaQuery.of(context).size.width,
                 child: GestureDetector(
@@ -570,10 +580,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             else
-              return null;
+              return Container();
           },
         );
       }).toList(),
     );
+  }
+
+  void listenForGlobalEvents() {
+    widget.parentEvents.listen((event) {
+      if(event == ClientEvents.LeveRoom){
+        Room? room = Provider.of<RTCProvider>(context, listen: false).room;
+        if(room != null){
+          Provider.of<RTCProvider>(context, listen: false).leaveRoom(room.id!);
+        }
+      }
+    });
   }
 }

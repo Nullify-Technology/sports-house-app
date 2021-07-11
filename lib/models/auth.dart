@@ -8,12 +8,12 @@ part 'auth.g.dart';
 @JsonSerializable()
 class Auth{
   @JsonKey(name: "user")
-  final AuthUser user;
+  final AuthUser? user;
 
   @JsonKey(name: "token")
-  final String accessToken;
+  final String? accessToken;
 
-  Auth({this.user, this.accessToken});
+  Auth(this.user, this.accessToken);
 
   factory Auth.fromJson(Map<String, dynamic> json) => _$AuthFromJson(json);
   Map<String, dynamic> toJson() => _$AuthToJson(this);

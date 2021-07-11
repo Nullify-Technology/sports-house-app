@@ -8,11 +8,11 @@ part of 'player.dart';
 
 Player _$PlayerFromJson(Map<String, dynamic> json) {
   return Player(
-    json['id'] as int,
-    json['name'] as String,
-    json['pos'] as String,
-    json['number'] as int,
-    json['grid'] as String,
+    json['id'] as int?,
+    json['name'] as String?,
+    json['pos'] as String?,
+    json['number'] as int?,
+    json['grid'] as String?,
   );
 }
 

@@ -8,27 +8,27 @@ part 'room.g.dart';
 @JsonSerializable()
 class Room {
   @JsonKey(name: "id")
-  final String id;
+  final String? id;
   @JsonKey(name: "fixture_id")
-  final String fixturesId;
+  final String? fixturesId;
   @JsonKey(name: "fixture")
-  final Fixture fixture;
+  final Fixture? fixture;
   @JsonKey(name: "created_by")
-  final AuthUser createdBy;
+  final AuthUser? createdBy;
   @JsonKey(name: "count")
-  final int count;
+  final int? count;
   @JsonKey(name: "name")
-  final String name;
+  final String? name;
   @JsonKey(name: "type")
-  final String type;
+  final String? type;
   @JsonKey(name: "is_closed")
-  final bool isClosed;
+  final bool? isClosed;
   @JsonKey(name: "dynamicLink")
-  final String dynamicLink;
+  final String? dynamicLink;
   @JsonKey(name: "members")
-  final List<AuthUser> members;
+  final List<AuthUser>? members;
   @JsonKey(name: "created_by_id")
-  final String createdById;
+  final String? createdById;
 
   Room(
       this.id,
